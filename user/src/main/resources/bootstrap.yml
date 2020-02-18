@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: user-server
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource 
+    url: jdbc:mysql://134.175.90.151:3306/product_v1?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: root
+    password: Hlxd@123456
+    driver-class-name: com.mysql.jdbc.Driver
+    configuration:
+      MapUnderscoreToCamelCase: true
+    dbcp2: 
+      min-idle: 5                                
+      initial-size: 5                              
+      max-total: 5
+      max-wait-millis: 200
+
+  redis:
+    host: 127.0.0.1
+    #host: 192.168.0.138
+    port: 6379
+#请求和响应GZIP压缩支持
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+  compression:
+    request:
+      enabled: true
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+    response:
+      enabled: true
+
+  
+mybatis:
+  mapper-locations: classpath:/mybatis/mapper/*Mapper.xml
+  typeAliasesPackage: com.hlxd.microcloud.entity
+
+server:
+  port: 8003
+  connection-timeout: 60000
+
+eureka: # 一定要编写一个eureka的地址
+  client: # 目的是为了让客户端可以通过eureka找到SpringCloudConfig微服务
+    service-url:
+      defaultZone: http://admin:root@127.0.0.1:9001/eureka
+  instance:
+    instance-id: microdept.com
+    prefer-ip-address: true
+info:
+  app.name: www.microdept.com
+  company.name: hlxd
+  build.groupId: $project.groupId$
+  build.artifactId: $project.artifactId$
+  app.version: V33.3.3
+logging:
+  level:
+    com.hlxd.microcloud.dao : debug
+    
+security:
+  basic:
+    enabled: false
+  user:
+    name: admin
+    password: root
+  oauth2:
+    client:
+      client-id: ouyaaa
+      client-secret: ouyaaa
+      access-token-uri: http://127.0.0.1:9900
+      user-authorization-uri: http://127.0.0.1:9900/oauth/authorize
+    resource:
+      token-info-uri: http://127.0.0.1:9900/oauth/check_token
+#文件上传限制大小
+upload:
+  file:
+    size: 406800KB

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.UserMapper">
+
+
+    <resultMap type="com.hlxd.microcloud.entity.SysUser" id="userMap">
+        <result column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="organize_code" property="organizeCode"/>
+        <result column="organize_name" property="organizeName"/>
+        <result column="status" property="status"/>
+        <result column="grant_api" property="grantApi"/>
+    </resultMap>
+
+    <select id="getUserInfo"  resultMap="userMap">
+        select tpu.id,tpu.username,tpu.password,tpu.organize_code,tpo.organize_name,tpu.status,tpu.grant_api
+        from t_pro_user tpu
+        left join t_pro_organize tpo
+        on tpu.organize_code = tpo.organize_code
+        where username = #{username}
+        and password = #{password}
+    </select>
+
+
+
+
+</mapper>

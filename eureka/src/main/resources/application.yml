@@ -1,0 +1,24 @@
+server:
+  port: 9001
+
+eureka: 
+  instance:
+    hostname: 127.0.0.1 
+    instance-id: 127.0.0.1
+    prefer-ip-address: true
+  client:
+    service-url: 
+      defaultZone: http://admin:root@127.0.0.1:9001/eureka/
+    register-with-eureka: false   #当前服务部注册到eureka里面
+    fetch-registry: false         #不通过eureka获取注册信息
+    
+spring:
+  application:
+    name: hlxd-server
+
+security:
+  basic:
+    enabled: true    # 启用安全认证处理
+  user:
+    name: admin
+    password: root

@@ -1,0 +1,59 @@
+server:
+  port: 9900
+loggin:
+  level: debug
+Debug: true
+spring:
+  application:
+    name: auth-server
+  session:
+    store-type: none
+  redis:
+    host: 127.0.0.1
+    #host: 192.168.0.138
+    port: 6379
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://admin:root@127.0.0.1:9001/eureka
+  instance:
+    instance-id: authserver.com
+    prefer-ip-address: true
+
+#请求和响应GZIP压缩支持
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+  compression:
+    request:
+      enabled: true
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+    response:
+      enabled: true
+logging:
+  level:
+    com.hlxd.oauthorization.service : debug
+ouyaaa:
+  security:
+    oauth:
+      clients[0]:
+        clientId: hlxd
+        clientSecret: hlxdsecret
+        validitySeconds: 9000
+      clients[1]:
+        clientId: ouyaaa
+        clientSecret: ouyaaa
+        validitySeconds: 7200
+        refreshSeconds: 32800
+      clients[2]:
+        clientId: yidong
+        clientSecret: yidong
+        validitySeconds: 19000
+        refreshSeconds: 30000000
+      storeType: redis
+

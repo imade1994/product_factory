@@ -1,0 +1,29 @@
+server:
+  port: 9002
+  
+eureka:
+  client:
+    service-url: 
+      defaultZone: http://admin:root@127.0.0.1:9001/eureka
+  instance:
+    instance-id: zuulporxy.com
+    prefer-ip-address: true
+          
+spring:     
+  application:
+    name: zull-gateway
+zuul: 
+  ignoredServices: '*' 
+  routes:
+    user-server: /user/**
+    auth-server: /auth/**
+  prefix: /demo
+security:
+  basic:
+    enabled: false
+  user:
+    name: admin
+    password: root
+ribbon:  
+  ReadTimeout: 60000 
+  ConnectTimeout: 60000

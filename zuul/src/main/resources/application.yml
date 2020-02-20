@@ -17,6 +17,7 @@ zuul:
   routes:
     user-server: /user/**
     auth-server: /auth/**
+    code-server: /code/**
   prefix: /demo
 security:
   basic:

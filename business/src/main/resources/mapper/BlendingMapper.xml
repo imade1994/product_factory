@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.BlendingMapper">
+
+
+    <resultMap type="com.hlxd.microcloud.entity.Blending" id="BaseMap">
+        <result column="id" property="id"/>
+        <result column="blendingDate" property="blendingDate"/>
+        <result column="blendingNumber" property="blendingNumber"/>
+        <result column="lineCode" property="lineCode"/>
+        <result column="lineName" property="lineName"/>
+        <result column="brandCode" property="brandCode"/>
+        <result column="brandName" property="brandName"/>
+        <result column="blendingFormulation" property="blendingFormulation"/>
+        <result column="planBlendingQuantity" property="planBlendingQuantity"/>
+        <result column="planBlendingWeight" property="planBlendingWeight"/>
+        <result column="doBlendingQuantity" property="doBlendingQuantity"/>
+        <result column="doBlendingWeight" property="doBlendingWeight"/>
+        <result column="blendingStatus" property="blendingStatus"/>
+        <result column="remark" property="remark"/>
+        <collection property="blendingDetails" ofType="com.hlxd.microcloud.entity.BlendingDetails">
+            <result column="details_id" property="id"/>
+            <result column="details_blendingNumber" property="blendingNumber"/>
+            <result column="details_boxCode" property="boxCode"/>
+            <result column="details_blendingDate" property="blendingDate"/>
+            <result column="details_tobaccoYear" property="tobaccoYear"/>
+            <result column="details_produceArea" property="produceArea"/>
+            <result column="details_breed" property="breed"/>
+            <result column="details_level" property="level"/>
+            <result column="details_grossWeight" property="grossWeight"/>
+            <result column="details_netWeight" property="netWeight"/>
+            <result column="details_redryNumber" property="redryNumber"/>
+            <result column="details_remark" property="remark"/>
+        </collection>
+    </resultMap>
+
+    <select id="getBlending"  resultMap="BaseMap" parameterType="java.util.HashMap">
+     select
+
+     from
+
+    </select>
+
+
+
+
+</mapper>

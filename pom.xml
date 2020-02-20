@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hlxd</groupId>
-    <artifactId>hlxdmicrocloud</artifactId>
+    <artifactId>product_factory</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <dependencies>
         <dependency>
@@ -14,7 +14,7 @@
     </dependencies>
     <packaging>pom</packaging>
 
-    <name>hlxdmicrocloud</name>
+    <name>product_factory</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -265,9 +265,6 @@
         <module>zuul</module>
         <module>pojo</module>
         <module>util</module>
-        <module>backstage</module>
         <module>business</module>
-        <module>cacheServer</module>
-        <module>businessDataUpload</module>
     </modules>
 </project>

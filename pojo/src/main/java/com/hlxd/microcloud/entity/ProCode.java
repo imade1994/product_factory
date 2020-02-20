@@ -79,5 +79,12 @@ public class ProCode implements Serializable {
 
 
 
+    /**
+     * 子集合
+     * */
+    private List<ProCode> proCodes;
+
+
+
 
 }

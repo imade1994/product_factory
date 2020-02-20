@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.FeedingMapper">
+
+    <resultMap id="meMap" type="com.hlxd.microcloud.entity.FeedingRecord" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="throwing_number" property="throwingNumber" jdbcType="VARCHAR" />
+        <result column="start_feeding_date" property="startFeedingDate" jdbcType="VARCHAR" />
+        <result column="end_feeding_date" property="endFeedingDate" jdbcType="VARCHAR" />
+        <result column="equipment_code" property="equipmentCode" jdbcType="VARCHAR" />
+        <result column="feeding_equipment_code" property="feedingEquipmentCode" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="organize_code" property="organizeCode" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <resultMap type="com.hlxd.microcloud.entity.FeedingRecord" id="BaseMap">
+        <result column="id" property="id"/>
+        <result column="throwingNumber" property="throwingNumber"/>
+        <result column="startFeedingDate" property="startFeedingDate"/>
+        <result column="endFeedingDate" property="endFeedingDate"/>
+        <result column="equipmentCode" property="machineCode"/>
+        <result column="feedingEquipmentCode" property="feedingMachineCode"/>
+        <result column="remark" property="remark"/>
+        <result column="organizeCode" property="organizeCode"/>
+    </resultMap>
+
+    <select id="getFeedingRecord"  resultMap="BaseMap" parameterType="java.util.HashMap">
+        select
+        id,
+        throwing_number as throwingNumber,
+        start_feeding_date as startFeedingDate,
+        end_feeding_date as endFeedingDate,
+        equipment_code as equipmentCode,
+        feeding_equipment_code as feedingEquipmentCode,
+        remark,
+        organize_code as organizeCode
+        from t_pro_feeding_record
+        where
+         feeding_equipment_code=#{machineCode}and
+         #{produceDate} between start_feeding_date and end_feeding_date
+
+    </select>
+
+    <select id="selectByFeed" resultMap="meMap"  parameterType="java.lang.String">
+        SELECT throwing_number FROM t_pro_feeding_record t
+        WHERE t.feeding_equipment_code = #{feedingMachineCode} AND #{feedTime} BETWEEN t.start_feeding_date AND t.end_feeding_date
+    </select>
+
+
+
+
+</mapper>

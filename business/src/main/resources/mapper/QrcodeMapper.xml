@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.QrcodeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.Qrcode">
+        <id column="id" property="id" />
+        <result column="brand_id" property="brandName" />
+        <result column="factory_id" property="factoryName" />
+        <result column="packing_specifications" property="type" />
+        <result column="qr_code" property="qrCode" />
+        <result column="parent_qr_code" property="parentCode" />
+        <result column="production_time" property="productTime" />
+        <result column="warehouse_status" property="silkFeederCode" />
+        <result column="remarks" property="remark" />
+        <result column="equipment_name" property="machineCode" />
+        <collection property="childrenList" ofType="com.hlxd.microcloud.vo.Qrcode">
+            <id column="c_id" property="id" />
+            <result column="c_brand_id" property="brandName" />
+            <result column="c_factory_id" property="factoryName" />
+            <result column="c_packing_specifications" property="type" />
+            <result column="c_qr_code" property="qrCode" />
+            <result column="c_parent_qr_code" property="parentCode" />
+            <result column="c_production_time" property="productTime" />
+            <result column="c_warehouse_status" property="silkFeederCode" />
+            <result column="c_remarks" property="remark" />
+            <result column="c_equipment_name" property="machineCode" />
+           <!--<collection property="childrenList" ofType="com.hlxd.vo.Qrcode">
+                <id column="b_id" property="id" />
+                <result column="b_brand_id" property="brandName" />
+                <result column="b_factory_id" property="factoryName" />
+                <result column="b_packing_specifications" property="type" />
+                <result column="b_qr_code" property="qrCode" />
+                <result column="b_parent_qr_code" property="parentCode" />
+                <result column="b_production_time" property="productTime" />
+                <result column="b_warehouse_status" property="silkFeederCode" />
+                <result column="b_remarks" property="remark" />
+                <result column="b_equipment_name" property="machineCode" />
+            </collection>-->
+        </collection>
+    </resultMap>
+
+    <select id="getQrcode" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        t_cc.id,
+        t_cc.brand_id,
+        t_cc.factory_id,
+        t_cc.packing_specifications,
+        t_cc.qr_code,
+        t_cc.parent_qr_code,
+        t_cc.production_time,
+        t_cc.warehousing_status,
+        t_cc.remarks,
+        t_cc.equipment_name,
+        t_c_c.id as c_id,
+        t_c_c.brand_id as c_brand_id,
+        t_c_c.factory_id as c_factory_id,
+        t_c_c.packing_specifications as c_packing_specifications,
+        t_c_c.qr_code as c_qr_code,
+        t_c_c.parent_qr_code as c_parent_qr_code,
+        t_c_c.production_time as c_production_time,
+        t_c_c.warehousing_status as c_warehousing_status,
+        t_c_c.remarks as c_remarks,
+        t_c_c.equipment_name as c_equipment_name
+        /*b_id,
+        b_brand_id,
+        b_factory_id,
+        b_packing_specifications,
+        b_qr_code,
+        b_parent_qr_code,
+        b_production_time,
+        b_warehouse_status,
+        b_remarks,
+        b_equipment_name*/
+        from t_cpzs_code t_cc
+        left join t_cpzs_code t_c_c
+        on t_cc.qr_code = t_c_c.parent_qr_code
+        and (t_cc.packing_specifications = '2' or t_cc.packing_specifications = '3')
+        where t_cc.qr_code = #{qrCode}
+    </select>
+
+</mapper>

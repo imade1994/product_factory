@@ -3,10 +3,10 @@ spring:
     name: code-server
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://134.175.90.151:3306/product_v1?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://134.175.90.151:3306/Qrcode?useUnicode=true&characterEncoding=UTF8&useSSL=FALSE&allowMultiQueries=true
     username: root
     password: Hlxd@123456
-    driver-class-name: com.mysql.jdbc.Driver
     configuration:
       MapUnderscoreToCamelCase: true
     dbcp2:
@@ -14,15 +14,6 @@ spring:
       initial-size: 5
       max-total: 5
       max-wait-millis: 200
-
-  redis:
-    host: 127.0.0.1
-    #host: 192.168.0.138
-    port: 6379
-  jta:
-    atomikos:
-      connectionfactory:
-        max-idle-time:
 #请求和响应GZIP压缩支持
 feign:
   httpclient:
@@ -40,10 +31,10 @@ feign:
 
 mybatis:
   mapper-locations: classpath:/mapper/*Mapper.xml
-  typeAliasesPackage: com.hlxd.microcloud.entity
+  typeAliasesPackage: com.hlxd.microcloud.vo
 
 server:
-  port: 8003
+  port: 8999
   connection-timeout: 60000
 
 eureka: # 一定要编写一个eureka的地址
@@ -69,17 +60,11 @@ security:
   user:
     name: admin
     password: root
-  oauth2:
-    client:
-      client-id: ouyaaa
-      client-secret: ouyaaa
-      access-token-uri: http://127.0.0.1:9900
-      user-authorization-uri: http://127.0.0.1:9900/oauth/authorize
-    resource:
-      token-info-uri: http://127.0.0.1:9900/oauth/check_token
-#文件上传限制大小
-upload:
-  file:
-    size: 406800KB
-##风力送丝时间差
-timeBreak: 10
+#  oauth2:
+#    client:
+#      client-id: ouyaaa
+#      client-secret: ouyaaa
+#      access-token-uri: http://127.0.0.1:9900
+#      user-authorization-uri: http://127.0.0.1:9900/oauth/authorize
+#    resource:
+#      token-info-uri: http://127.0.0.1:9900/oauth/check_token

@@ -9,13 +9,17 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>business</artifactId>
+    <artifactId>code</artifactId>
     <dependencies>
     <!--feign 依赖 -->
     <dependency>
         <groupId>io.github.openfeign</groupId>
         <artifactId>feign-okhttp</artifactId>
     </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+        </dependency>
     <dependency>
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-starter-feign</artifactId>
@@ -67,6 +71,7 @@
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-starter-eureka</artifactId>
     </dependency>
+
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-actuator</artifactId>
@@ -97,11 +102,11 @@
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
     </dependency>
-    <dependency>
+   <!-- <dependency>
         <groupId>org.springframework.security.oauth</groupId>
         <artifactId>spring-security-oauth2</artifactId>
         <version>2.3.3.RELEASE</version>
-    </dependency>
+    </dependency>-->
     <dependency>
         <groupId>org.mybatis</groupId>
         <artifactId>mybatis-spring</artifactId>
@@ -119,27 +124,15 @@
         <artifactId>fastjson</artifactId>
         <version>1.2.54</version>
     </dependency>
-    <dependency>
-        <groupId>com.hlxd</groupId>
-        <artifactId>pojo</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-        <groupId>com.hlxd</groupId>
-        <artifactId>util</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </dependency>
-
-    <!--redis 依赖 -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-redis</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>org.influxdb</groupId>
+            <artifactId>influxdb-java</artifactId>
+            <version>2.5</version>
+        </dependency>
 </dependencies>
 
     <build>
-        <finalName>business-server</finalName>
+        <finalName>code-server</finalName>
         <plugins>
             <plugin>  <!-- 该插件的主要功能是进行项目的打包发布处理 -->
                 <groupId>org.springframework.boot</groupId>

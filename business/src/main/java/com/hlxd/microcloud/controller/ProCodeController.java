@@ -1,35 +1,15 @@
 package com.hlxd.microcloud.controller;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
-import com.hlxd.microcloud.entity.FeedingRecord;
-import com.hlxd.microcloud.entity.ProCode;
-import com.hlxd.microcloud.entity.Throwing;
-import com.hlxd.microcloud.entity.WrapOrder;
-import com.hlxd.microcloud.service.ICodeService;
-import com.hlxd.microcloud.service.IFeedingService;
-import com.hlxd.microcloud.service.IThrowingService;
-import com.hlxd.microcloud.service.WrapService;
-import com.hlxd.microcloud.util.CommonConstants;
-import com.hlxd.microcloud.util.HttpClientUtil;
-import com.hlxd.microcloud.util.JedisPoolUtils;
-import org.apache.http.client.methods.HttpPost;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import com.hlxd.microcloud.vo.ProCode;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static com.hlxd.microcloud.util.CommonUtil.UTCToCST;
-import static com.hlxd.microcloud.util.CommonUtil.influxDbDateToJsonObject;
+import static com.hlxd.microcloud.util.CommonUtil.*;
 
 /**
  * CREATED BY IDEA
@@ -43,24 +23,6 @@ import static com.hlxd.microcloud.util.CommonUtil.influxDbDateToJsonObject;
 @RestController
 @RequestMapping("/pro")
 public class ProCodeController {
-
-
-    @Value("${timeBreak}")
-    private String timeBreak;
-
-    @Autowired
-    private WrapService wrapService;
-
-    @Autowired
-    private ICodeService iCodeService;
-
-    @Autowired
-    private IThrowingService iThrowingService;
-
-    @Autowired
-    private IFeedingService iFeedingService;
-
-
 
     /**
      *编码查询
@@ -85,10 +47,31 @@ public class ProCodeController {
     /**
      *产品追踪
      * */
-    public Map getCode(@RequestParam("machineCode")String machineCode,@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate){
+    @RequestMapping("/codeCondition")
+    public Map getCode(@RequestParam("machineCode")String machineCode,@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate,String qrCode){
+        Map returnMap = new HashMap();
+        if(null !=qrCode ){
+            returnMap = findCode(machineCode, beginDate, endDate, qrCode);
+        }else{
+            returnMap =  getCodeCount(machineCode,beginDate,endDate);
+        }
+        return returnMap;
+    }
 
+    /**
+     * 产品统计
+     *
+     * */
+    @RequestMapping("/getCodeCount")
+    public Map getCodeCountFromDate(@RequestParam(value = "beginDate",required = false)String beginDate,@RequestParam(value = "endDate",required = false)String endDate) throws ParseException {
+        Map returnMap = new HashMap();
+        if(null == beginDate || null == endDate){
+            returnMap=getCountCodeCommen();
+        }else{
+            returnMap=getCodeCount(beginDate, endDate);
+        }
 
-
+        return returnMap;
 
     }
 

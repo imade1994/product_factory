@@ -54,11 +54,16 @@ public class ProCode implements Serializable {
     /**
      * 包装规格
      * */
-    private String type;
+    private int  type;
     /**
      * 备注
      * */
     private String remark;
+
+    /**
+     * 无用字段
+     * */
+    private String produceDate;
 
 
     /***

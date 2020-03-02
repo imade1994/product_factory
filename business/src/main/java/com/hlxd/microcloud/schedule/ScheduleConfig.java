@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
 import java.util.*;
+
+import static com.hlxd.microcloud.util.CommonUtil.insertCodeRelationFromMap;
 
 /**
  * CREATED BY IDEA
@@ -36,10 +39,12 @@ public class ScheduleConfig {
 
     @Scheduled(cron = "0 0 0 * * ?")
     @RequestMapping("/upload")
-    public static void upload(){
+    public static void upload() throws ParseException {
+        //influxDb.enableBatch()
         long endDate = new Date().getTime();
         long beginDate = endDate-24*60*60*1000;
         Query query = new Query("select * from code  where time >="+beginDate+"000000"+" and time <="+endDate+"000000"+" group by type",dataBase);
+        //Query query = new Query("select * from code  group by type",dataBase);
         QueryResult queryResult = influxDb.query(query);
         Map map = new HashMap<>();
         if(null != queryResult && null != queryResult.getResults()){
@@ -56,10 +61,7 @@ public class ScheduleConfig {
                 }
            }
         }
-        List<ProCode> jianCode = (List<ProCode>) map.get("3");
-        List<ProCode> tiaoCode = (List<ProCode>) map.get("2");
-        List<ProCode> baoCode = (List<ProCode>) map.get("1");
-
+        insertCodeRelationFromMap(map);
     }
 
 }

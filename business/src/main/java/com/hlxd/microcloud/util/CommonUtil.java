@@ -1,18 +1,18 @@
 package com.hlxd.microcloud.util;
 
+import com.hlxd.microcloud.vo.CodeCount;
+import com.hlxd.microcloud.vo.CodeRelation;
 import com.hlxd.microcloud.vo.ProCode;
-import org.apache.ibatis.annotations.Mapper;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.*;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.security.access.method.P;
 
-import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /** 类名: CommonUtil </br> 描述: 通用工具类 </br> */
 public final class CommonUtil {
@@ -25,6 +25,49 @@ public final class CommonUtil {
   public static final String time = "yyyy-MM-dd";
 
   public static final String UTCString = "yyyy-MM-dd'T'HH:mm:ss.SS'Z'";
+
+  public static final String UTCString1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
+  public static final Map queryMap = new HashMap();
+
+
+  public static final Map queryTimeMap = new HashMap();
+
+
+
+  public static final String key1 = "beginDate";
+
+  public static final String key2 = "endDate";
+
+
+  public static final String key4 = "period";
+
+  public static final String key5 = "machineCode";
+
+  public static final String sql1 = " and time >= ";
+
+  public static final String sql2 = " and time <= ";
+
+
+  public static final String sql4 = " and period = ";
+
+  public static final String sql5 = " and machineCode = ";
+
+  private static AtomicInteger atomicInteger = new AtomicInteger(0);
+
+
+
+  static{
+      queryMap.put(key4,sql4);
+      queryMap.put(key5,sql5);
+
+  }
+  static {
+      queryTimeMap.put(key1,sql1);
+      queryTimeMap.put(key2,sql2);
+  }
+
+
 
   public static String UTCToCST(String UTCStr, String format) throws ParseException {
     Date date = null;
@@ -40,6 +83,58 @@ public final class CommonUtil {
     String returnTime = timeChange.format(calendar.getTime());
     return returnTime;
   }
+    public static String UTCToStr(String UTCStr) throws ParseException {
+        Date date = null;
+        SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString);
+        SimpleDateFormat sdfSTR = new SimpleDateFormat(UTCString);
+        date = sdfUTC.parse(UTCStr);
+        String str = sdfSTR.format(date);
+
+        return str;
+    }
+
+    public static Date UTCToStr1(String UTCStr) throws ParseException {
+        Date date = null;
+        SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString1);
+        SimpleDateFormat sdfSTR = new SimpleDateFormat(time);
+        date = sdfUTC.parse(UTCStr);
+        String time = sdfSTR.format(date);
+        date = sdfSTR.parse(time);
+        return date;
+    }
+
+    public static String UTCToStr2(String UTCStr) throws ParseException {
+        Date date = null;
+        SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString1);
+        SimpleDateFormat sdfSTR = new SimpleDateFormat(time);
+        date = sdfUTC.parse(UTCStr);
+        String time = sdfSTR.format(date);
+        return time;
+    }
+
+    public static int getPeriod(String UTCStr) throws ParseException {
+        Date date = null;
+        SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString1);
+        //SimpleDateFormat sdfSTR = new SimpleDateFormat(UTCString);
+        date = sdfUTC.parse(UTCStr);
+        int type = 0;
+        switch (date.getHours()){
+            case 0:
+                type= 1;
+                break;
+            case 8:
+                type= 2;
+                break;
+            case 16:
+                type= 3;
+                break;
+            default:
+                break;
+        }
+        return type;
+    }
+
+
   public static Long UTCToLong(String UTCStr) throws ParseException {
     Date date = null;
     SimpleDateFormat sdf = new SimpleDateFormat(UTCString);
@@ -61,12 +156,12 @@ public final class CommonUtil {
     return proCode;
   }
 
- /* public static ProCode influxDbDateToJsonObject(String code) {
-    *//*QueryResult queryResult = new QueryResult();
-    Query query = new Query("select * from code where qrCode = '" + code + "' order by time desc", dataBase);
+  public static Map influxDbDateToJsonObject(String code) throws InstantiationException, IllegalAccessException {
+    QueryResult queryResult = new QueryResult();
+    Query query = new Query("select * from codeRelation where qrCode = '" + code + "' order by time desc", dataBase);
     queryResult = influxDb.query(query);
     Map returnMap = new HashMap();
-    List<ProCode> proCodes = new ArrayList<>();
+    List proCodes = new ArrayList<>();
     if (null != queryResult
         && null != queryResult.getResults()
         && queryResult.getResults().size() > 0) { // 正常请求会有返回值，若此处为false说明可能网络异常
@@ -74,70 +169,38 @@ public final class CommonUtil {
         List<QueryResult.Series> series = result.getSeries();
         if (null != series) {//查询返回结果集，此处为空可能是没有相关数据
           for (QueryResult.Series serie : series) {
-            List<String> columns = serie.getColumns();
-            List<List<Object>> values = serie.getValues();
-            Map map = getQueryData(columns, values, null, 0);
-            proCodes.clear();
-            proCodes.addAll((Collection<? extends ProCode>) map.get("list"));
-          }
-          //此处直接查询有返回结果集，继续以结果集的父码为条件查询件码  需判断是包码还是条码
-          List<ProCode> proCodeList = new ArrayList<>();
-          ProCode proCode = changeCode(proCodes.get(0));//返回实体应该是 件+list包
-          proCodeList.add(proCodes.get(0));
-          proCode.setProCodes(proCodeList);
-          query =  new Query("select * from code where qrCode = '" + proCode.getQrCode() + "' order by time desc", dataBase);
-          queryResult = influxDb.query(query);
-          if (null != queryResult
-              && null != queryResult.getResults()
-              && queryResult.getResults().size() > 0) {
-              // 正常请求会有返回值，若此处为false说明可能网络异常
-              List<QueryResult.Series> series1 = result.getSeries();
-              if(null != series1){
-                  for (QueryResult.Series serie : series1) {
-                      List<String> columns = serie.getColumns();
-                      proCodes.clear();
-                      List<List<Object>> values = serie.getValues();
-                      Map map = getQueryData(columns, values, null, 0);
-                      proCodes.addAll((Collection<? extends ProCode>) map.get("list"));
-                  }
-                  ProCode jianCode = changeCode(proCodes.get(0));
-                  List<ProCode> proCodes1 = new ArrayList<>();
-                  proCodes1.add(proCode);
-                  jianCode.setProCodes(proCodes1);
-                  returnMap.put("status", 1);
-                  returnMap.put("data",jianCode);
-              }else{
-                  returnMap.put("status", 1);
-                  returnMap.put("data",proCode);
-              }
-          }else{
-              returnMap.put("status", 0);
-              returnMap.put("data",proCode);
+            proCodes=getQueryData(serie, CodeRelation.class);
+            returnMap.put("status",1);
+            returnMap.put("data",proCodes.get(0));
           }
         } else { // 出现此情况有两种  1：条包未装箱，所以查不到条包数据  2：码不存在
           // 先进行条包未装箱检查
-          query = new Query("select * from code where parentCode = '" + code + "'order by time desc", dataBase);
+          query = new Query("select * from code where qrCode = '" + code + "'order by time desc", dataBase);
           queryResult = influxDb.query(query);
           if (null != queryResult
               && null != queryResult.getResults()
               && queryResult.getResults().size() > 0) {
             for (QueryResult.Result result1 : queryResult.getResults()) {
               List<QueryResult.Series> series1 = result1.getSeries();
-              if (null != series) {//此处查出来应该是条未装箱
+              if (null != series1) {//此处查出来应该是条未装箱
                 for (QueryResult.Series serie : series1) {
-                  List<String> columns = serie.getColumns();
-                  List<List<Object>> values = serie.getValues();
                   proCodes.clear();
-                  Map map = getQueryData(columns, values, null, 0);
-                  proCodes.addAll((Collection<? extends ProCode>) map.get("list"));
+                  proCodes=getQueryData(serie, ProCode.class);
+                  //proCodes.addAll(null);
                 }
-                ProCode proCode = changeCode(proCodes.get(0));//取最新一条数据
-                if(proCode.getType()!=3){
-                    returnMap.put("status",1);
-                    returnMap.put("data",proCode);//此处直接返回，因为以此码直接查询查询不到结果集，说明条未装箱
-                }else{//此处else为了完善逻辑
-                    //如果上面if为false的话，说明，件码未录入，只有 包-条 ，条-件 件码未存入数据库，暂时不做处理
-                }
+                //ProCode proCode = changeCode(proCodes.get(0));//取最新一条数据
+                ProCode proCode = (ProCode) proCodes.get(0);
+                CodeRelation codeRelation = new CodeRelation();
+                codeRelation.setTime(proCode.getTime());
+                codeRelation.setBaoCode(proCode.getParentCode());
+                codeRelation.setBMachineCode(proCode.getMachineCode());
+                codeRelation.setBProduceDate(proCode.getTime());
+                codeRelation.setBrandName(proCode.getProductId());
+                codeRelation.setBRemark(proCode.getRemark());
+                codeRelation.setBVerifyStatus(proCode.getVerifyStatus());
+                codeRelation.setQrCode(proCode.getQrCode());
+                returnMap.put("status",1);
+                returnMap.put("data",codeRelation);
               } else { // 查询返回结果集为空
                 returnMap.put("status", 0);
                 returnMap.put("msg","码不存在！");
@@ -149,55 +212,35 @@ public final class CommonUtil {
           }
         }
       }
-    } else {
-      returnMap.put("status", 0);
-      returnMap.put("msg","数据异常！");
-    }*//*
-    ProCode proCode = getProCodeFromResult(code, null, 1);
-    ProCode jianCode = new ProCode();
-    if (null != proCode) {
-      switch (proCode.getType()) {
-        case 2:
-          jianCode = getProCodeFromResult(proCode.getQrCode(), proCode, 1);
-          break;
-        case 3:
-          if(proCode.getProCodes().size()>0){
-              ProCode tiaoCode = getProCodeFromResult(proCode.getProCodes().get(0).getQrCode(),null,2);
-
-          }else{
-             jianCode = getProCodeFromResult(proCode.getQrCode(),null,2);
-             for(ProCode proCode1:jianCode.getProCodes()){
-                 proCode1 = getProCodeFromResult(proCode1.getQrCode(),null,2);
-             }
-          }
-
-
-
-          proCode = getProCodeFromResult(proCode.getProCodes().get(0).getQrCode(), proCode.getProCodes().get(0), 2);
-          for (ProCode proCode1 : proCode.getProCodes()) {
-            getProCodeFromResult(proCode1.getQrCode(), proCode1, 2);
-          }
-          jianCode = proCode;
-      }
-    } else {
-      proCode = getProCodeFromResult(code, null, 2);
     }
-    return jianCode;
-  }*/
+    return returnMap;
+  }
 
   /** 生成对应实体对象 */
-  public static List<ProCode> getQueryData(
-      List<String> columns, List<List<Object>> values) {
-    List<ProCode> proCodes = new ArrayList<>();
+  public static List getQueryData(
+          QueryResult.Series series, java.lang.Class t) throws IllegalAccessException, InstantiationException {
+      List<String> columns = series.getColumns();
+      List<List<Object>> values = series.getValues();
+      Map<String,String> map = series.getTags();
+      if(null != map){
+          for(String s:map.keySet()){
+              columns.add(s);
+              for(int i=0;i<values.size();i++){
+                  List<Object> temList = values.get(i);
+                  temList.add(map.get(s));
+              }
+          }
+      }
+      List proCodes = new ArrayList<>();
     for (List<Object> list : values) {
-      ProCode proCode = new ProCode();
-      BeanWrapperImpl bean = new BeanWrapperImpl(proCode);
+        Object object = t.newInstance();
+      BeanWrapperImpl bean = new BeanWrapperImpl(object);
       for (int i = 0; i < list.size(); i++) {
         String propertyName = columns.get(i); // 字段名
         Object value = list.get(i); // 相应字段值
         bean.setPropertyValue(propertyName, value);
       }
-      proCodes.add(proCode);
+        proCodes.add(object);
     }
     return proCodes;
   }
@@ -220,49 +263,128 @@ public final class CommonUtil {
 
   /**
    * map转换数组
+   *插入時序數據庫
    *
    * */
   public static void insertCodeRelationFromMap(Map map) throws ParseException {
-    List<ProCode> jianCode = (List<ProCode>) map.get("3");
-    List<ProCode> tiaoCode = (List<ProCode>) map.get("2");
-    List<ProCode> baoCode = (List<ProCode>) map.get("1");
-    BatchPoints batchPoints = BatchPoints.database(dataBase)
-            .consistency(InfluxDB.ConsistencyLevel.ALL)
-            .build();
-    for(int i=0;i<jianCode.size();i++){
-      ProCode jian = jianCode.get(i);
-      for(int j=0;j<tiaoCode.size();j++){
-        ProCode tiao = tiaoCode.get(j);
-        if(jian.getQrCode().equals(tiao.getParentCode())){
-          for(int k=0;k<baoCode.size();k++){
-            ProCode bao = baoCode.get(k);
-            if(bao.getParentCode().equals(tiao.getQrCode())){
-              Point point=Point.measurement("codeRelation")
-                      .tag("qrCode",bao.getQrCode())
-                      .tag("baoCode",tiao.getQrCode())
-                      .tag("jianCode",jian.getQrCode())
-                      .tag("brandName",bao.getProductId())
-                      .tag("jMachineCode",jian.getMachineCode())
-                      .tag("bMachineCode",bao.getMachineCode())
-                      .field("jRemark",jian.getRemark())
-                      .field("bRemark",bao.getRemark())
-                      //.tag("jVerifyStatus",jian.getVerifyStatus())
-                      //.tag("bVerifyStatus",bao.getVerifyStatus())
-                      .tag("jProduceDate",jian.getTime())
-                      .tag("bProduceDate",bao.getTime())
-                      .time(UTCToLong(bao.getTime()), TimeUnit.MILLISECONDS)
-                      .build();
-              batchPoints.point(point);
+    Map<String,List<ProCode>> baoMap = (Map<String, List<ProCode>>) map.get("1");
+    Map<String,List<ProCode>> tiaoMap = (Map<String, List<ProCode>>) map.get("2");
+    influxDb.enableBatch(10000,10000,TimeUnit.MILLISECONDS);
+    //AtomicInteger i= new AtomicInteger();
+    influxDb.enableGzip();
+    long beginDate = new Date().getTime();
+    for(String s:tiaoMap.keySet()){
+        if(!s.equals("")){
+            List<ProCode> temPro = tiaoMap.get(s);
+            for(ProCode proCode:temPro){
+                List<ProCode> temList = baoMap.get(proCode.getQrCode());
+                for(ProCode proCode1:temList){
+                    Point point= null;
+                    try {
+                        point = Point.measurement("codeRelation")
+                                .tag("qrCode",proCode1.getQrCode())
+                                .tag("baoCode",proCode1.getParentCode())
+                                .tag("jianCode",proCode.getParentCode())
+                                .tag("brandName",proCode1.getProductId())
+                                .tag("jMachineCode",proCode.getMachineCode())
+                                .tag("bMachineCode",proCode1.getMachineCode())
+                                .field("jRemark",proCode.getRemark())
+                                .field("bRemark",proCode1.getRemark())
+                                .tag("jVerifyStatus",proCode.getVerifyStatus())
+                                .tag("bVerifyStatus",proCode1.getVerifyStatus())
+                                .tag("jProduceDate",proCode.getTime())
+                                .tag("bProduceDate",proCode1.getTime())
+                                .time(UTCToLong(proCode1.getTime()), TimeUnit.MILLISECONDS)
+                                .build();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    influxDb.write(dataBase,"autogen",point);
+                }
             }
-          }
         }
-      }
     }
-    if(batchPoints.getPoints().size()>0){
-      //int j=1;
-      influxDb.write(batchPoints);
-    }
+    System.out.println("循环总耗时***********************************"+(new Date().getTime()-beginDate));
   }
+
+    /**
+     * map转换数组
+     *插入時序數據庫
+     *
+     * */
+    public static void insertCodeCountByPeriod(List<CodeCount> codeCounts) throws ParseException {
+        influxDb.enableBatch(10000,10000,TimeUnit.MILLISECONDS);
+        //AtomicInteger i= new AtomicInteger();
+        influxDb.enableGzip();
+        for(CodeCount codeCount:codeCounts){
+            Point point=Point.measurement("codeCount")
+                    .tag("count_remark",codeCount.getCount_remark())
+                    .tag("type",codeCount.getType())
+                    .tag("machineCode",codeCount.getMachineCode())
+                    .tag("period",String.valueOf(codeCount.getPeriod()))
+                    .field("remark","測試統計")
+                    .time(codeCount.getDate(), TimeUnit.MILLISECONDS)
+                    .build();
+            influxDb.write(dataBase,"autogen",point);
+        }
+    }
+
+    /**
+     * 时间段+机台号
+     * 产量查询
+     * */
+    public static Map getCountFromPeriod(Map<String,String[]> map) throws InstantiationException, IllegalAccessException, ParseException {
+        String sql ="select * from codeCount where 1=1 ";
+        Map<String,Map> returnMap = new HashMap();
+        String temSql = "";
+        for(String s:map.keySet()){
+            if(null != map.get(s)){
+                String[] temValue = map.get(s);
+                if(queryMap.containsKey(s)){
+                    temSql = temSql+queryMap.get(s)+"'"+temValue[0]+"' ";
+                }else if(queryTimeMap.containsKey(s)){
+                    temSql = temSql+queryTimeMap.get(s)+temValue[0]+" ";
+                }
+
+            }
+        }
+        sql = sql+temSql+" group by type order by time desc ";
+        Query query = new Query(sql, dataBase);
+        QueryResult queryResult = influxDb.query(query);
+        List<CodeCount> codeCountList = new ArrayList<>();
+        if (null != queryResult
+                && null != queryResult.getResults()
+                && queryResult.getResults().size() > 0) { // 正常请求会有返回值，若此处为false说明可能网络异常
+            for (QueryResult.Result result : queryResult.getResults()) {
+                List<QueryResult.Series> series = result.getSeries();
+                if (null != series) {//查询返回结果集，此处为空可能是没有相关数据
+                    for (QueryResult.Series serie : series) {
+                        Map<String,String> tags= serie.getTags();
+                        codeCountList=getQueryData(serie, CodeCount.class);
+                        Map<String,List<CodeCount>> temMap = new HashMap();
+                        String type = tags.get("type");
+                        for(CodeCount codeCount:codeCountList){
+                            String time = UTCToStr2(codeCount.getTime());
+                            if(temMap.containsKey(time)){
+                                temMap.get(time).add(codeCount);
+                            }else{
+                                List<CodeCount> codeCounts = new ArrayList<>();
+                                codeCounts.add(codeCount);
+                                temMap.put(time,codeCounts);
+                            }
+                        }
+                        if(returnMap.containsKey(type)){
+                            returnMap.get(type).putAll(temMap);
+                        }else{
+                            returnMap.put(type,temMap);
+                        }
+                    }
+                }
+            }
+        }
+        return  returnMap;
+
+    }
 
 
 

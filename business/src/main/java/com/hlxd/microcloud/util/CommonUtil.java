@@ -2,6 +2,7 @@ package com.hlxd.microcloud.util;
 
 import com.hlxd.microcloud.vo.CodeCount;
 import com.hlxd.microcloud.vo.CodeRelation;
+import com.hlxd.microcloud.vo.CountVo;
 import com.hlxd.microcloud.vo.ProCode;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
@@ -287,9 +288,10 @@ public final class CommonUtil {
                                 .tag("jianCode",proCode.getParentCode())
                                 .tag("brandName",proCode1.getProductId())
                                 .tag("jMachineCode",proCode.getMachineCode())
-                                .tag("bMachineCode",proCode1.getMachineCode())
+                                .tag("machineCode",proCode1.getMachineCode())
                                 .field("jRemark",proCode.getRemark())
                                 .field("bRemark",proCode1.getRemark())
+                                .field("jQrCode",proCode.getParentCode())
                                 .tag("jVerifyStatus",proCode.getVerifyStatus())
                                 .tag("bVerifyStatus",proCode1.getVerifyStatus())
                                 .tag("jProduceDate",proCode.getTime())
@@ -328,6 +330,9 @@ public final class CommonUtil {
             influxDb.write(dataBase,"autogen",point);
         }
     }
+
+
+
 
     /**
      * 时间段+机台号
@@ -385,6 +390,97 @@ public final class CommonUtil {
         return  returnMap;
 
     }
+    public static Map getCodeCountFromPeriod(Map<String,String[]> map) throws InstantiationException, IllegalAccessException {
+        String sql1 ="select count(distinct(jQrCode)) from codeRelation where 1=1 ";
+        String sql2 ="select count(*) from code where type = '1'  ";
+        Map returnMap = new HashMap();
+        String temSql = "";
+        for(String s:map.keySet()){
+            if(null != map.get(s)){
+                String[] temValue = map.get(s);
+                if(queryTimeMap.containsKey(s)){
+                    temSql = temSql+queryTimeMap.get(s)+temValue[0]+" ";
+                }else if(queryMap.containsKey(s)&&!s.equals("machineCode") ){
+                    temSql = temSql+queryMap.get(s)+"'"+temValue[0]+"' ";
+                }
+            }
+        }
+        sql1 = sql1+temSql;
+        sql2 = sql2+temSql;
+        Query query = new Query(sql1+";"+sql2, dataBase);
+        QueryResult queryResult = influxDb.query(query);
+        if(null != queryResult&&null !=queryResult.getResults() && queryResult.getResults().size()>0){
+            for (QueryResult.Result result:queryResult.getResults()){
+                List<QueryResult.Series> series = result.getSeries();
+                if(null != series){
+                    for(QueryResult.Series serie:series){
+                        List<CountVo> countVo = new ArrayList<>();
+                        countVo=getQueryData(serie, CountVo.class);
+                        if(countVo.size()>0 && null !=countVo.get(0).getCount_remark()){
+                            returnMap.put("1",countVo);
+                        }else if(countVo.size()>0 && null !=countVo.get(0).getCount()){
+                            returnMap.put("3",countVo);
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+        return returnMap;
+    }
+
+
+    /**
+     * 精准查找
+     * */
+    public static Map findCode(Map<String,String[]> map){
+        String sql = "select * from codeRelation where 1=1 ";
+        String sql1 = "select * from code where type = '1' ";
+        String temSql = "";
+        Map returnMap = new HashMap();
+        for(String s:map.keySet()){
+            if(null != map.get(s)){
+                String[] temValue = map.get(s);
+                if(queryTimeMap.containsKey(s)){
+                    temSql = temSql+queryTimeMap.get(s)+temValue[0]+" ";
+                }else if(queryMap.containsKey(s) ){
+                    temSql = temSql+queryMap.get(s)+"'"+temValue[0]+"' ";
+                }else if(s.equals("qrCode")){
+                    temSql = temSql+" and qrCode = '"+temValue[0]+"' or baoCode = '"+temValue[0]+"' or jianCode= '"+temValue[0]+"'";
+                }
+            }
+        }
+        sql = sql+temSql;
+        sql1 = sql1+temSql;
+        Query query = new Query(sql+";"+sql1, dataBase);
+        QueryResult queryResult = influxDb.query(query);
+        boolean flag = false;
+        if(null != queryResult&&null !=queryResult.getResults() && queryResult.getResults().size()>0){
+            for (QueryResult.Result result:queryResult.getResults()){
+                List<QueryResult.Series> series = result.getSeries();
+                if(null != series){
+                    for(QueryResult.Series serie:series){
+                        if(serie.getValues().size()>0){
+                            flag = true;
+                        }
+                    }
+                }
+            }
+        }
+        if(flag){
+            returnMap.put("status",1);
+            returnMap.put("msg","码存在!");
+        }else{
+            returnMap.put("status",0);
+            returnMap.put("msg","码不在所选条件范围内!");
+        }
+        return returnMap;
+    }
+
+
 
 
 

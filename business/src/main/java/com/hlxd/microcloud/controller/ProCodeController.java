@@ -51,15 +51,23 @@ public class ProCodeController {
      * 产品追踪
      *
      * */
-    @RequestMapping("/getCodeCount")
-    public Map getCodeCountFromDate(@RequestParam(value = "beginDate",required = false)String beginDate,@RequestParam(value = "endDate",required = false)String endDate) throws ParseException {
-        Map returnMap = new HashMap();
-        if(null == beginDate || null == endDate){
-           // returnMap=getCountCodeCommen();
-        }else{
-            //returnMap=getCodeCount(beginDate, endDate);
-        }
+    @RequestMapping("/getCode")
+    public Map getCodeCountFromDate(HttpServletRequest request) throws ParseException, IllegalAccessException, InstantiationException {
+        Map paramMap = request.getParameterMap();
+        Map returnMap = getCodeCountFromPeriod(paramMap);
+        return returnMap;
+    }
 
+
+    /**
+     * 范围性码查找
+     * @param machineCode,beginDate,endDate,qrCode
+     *
+     * */
+    @RequestMapping("/findCode")
+    public Map findCodeFromPeriod(HttpServletRequest request){
+        Map paramMap = request.getParameterMap();
+        Map returnMap = findCode(paramMap);
         return returnMap;
 
     }

@@ -45,8 +45,9 @@ public class ScheduleConfig {
         //influxDb.enableBatch()
         long endDate = new Date().getTime();
         long beginDate = endDate-24*60*60*1000;
-        //Query query = new Query("select * from code  where time >="+beginDate+"000000"+" and time <="+endDate+"000000"+" group by type",dataBase);
-        Query query = new Query("select * from code where type !='3'  group by type,parentCode",dataBase);
+       // //Query query = new Query("select * from code  where time >="+beginDate+"000000"+" and time <="+endDate+"000000"+" group by type",dataBase);
+        Query query = new Query("select * from code where time>="+beginDate+"000000"+" and time <="+endDate+"000000"+" type !='3'  group by type,parentCode",dataBase);
+        //Query query = new Query("select * from code where  type !='3'  group by type,parentCode",dataBase);
         QueryResult queryResult = influxDb.query(query);
         Map<String,Map<String,List<ProCode>>> map = new HashMap<>();
         if(null != queryResult && null != queryResult.getResults()){
@@ -79,7 +80,7 @@ public class ScheduleConfig {
     @RequestMapping("/count")
     public static void count() throws ParseException, InstantiationException, IllegalAccessException {
         //influxDb.enableBatch()
-        Date beginDate = new Date();
+        /*Date beginDate = new Date();
         //date.setYear(2020);
         beginDate.setMonth(beginDate.getMonth()-1);
         beginDate.setDate(29);
@@ -91,12 +92,12 @@ public class ScheduleConfig {
         endDate.setDate(29);
         endDate.setMinutes(0);
         endDate.setHours(24);
-        endDate.setSeconds(0);
+        endDate.setSeconds(0);*/
 
-        //long endDate = new Date().getTime();
-        //long beginDate = date.getTime()-24*60*60*1000;
+        long endDate = new Date().getTime();
+        long beginDate = endDate-24*60*60*1000;
         //Query query = new Query("select count(*) from code  where time >"+beginDate.getTime()+"000000"+" and time <="+endDate.getTime()+"000000"+" group by time(8h),type",dataBase);
-        Query query = new Query("select count(*) from code  group by time(8h),type,machineCode",dataBase);
+        Query query = new Query("select count(*) from code  where time >"+beginDate+"000000"+" and time <="+endDate+"000000"+"  group by time(8h),type,machineCode",dataBase);
         QueryResult queryResult = influxDb.query(query);
         List<CodeCount> proCodes = new ArrayList<>();
         if(null != queryResult && null != queryResult.getResults()){

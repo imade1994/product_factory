@@ -19,6 +19,8 @@ public class CodeCount implements Serializable {
     private String time;
     //計數類型
     private String type;
+
+    private String rejectType;
     //统计机台
     private String machineCode;
     //統計數量

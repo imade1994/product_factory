@@ -11,6 +11,12 @@
 
     <artifactId>code</artifactId>
     <dependencies>
+        <!--redis 依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
     <!--feign 依赖 -->
     <dependency>
         <groupId>io.github.openfeign</groupId>

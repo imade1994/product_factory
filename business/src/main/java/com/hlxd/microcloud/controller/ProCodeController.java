@@ -1,9 +1,11 @@
 package com.hlxd.microcloud.controller;
 
+import com.hlxd.microcloud.util.JedisPoolUtils;
 import com.hlxd.microcloud.vo.ProCode;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
@@ -69,7 +71,24 @@ public class ProCodeController {
         Map paramMap = request.getParameterMap();
         Map returnMap = findCode(paramMap);
         return returnMap;
+    }
 
+
+    @RequestMapping("/validate")
+    public int validateCode(@RequestParam(value = "code",required = true)String code){
+        Jedis jedis = JedisPoolUtils.getJedis();
+        if(null != jedis){
+            if(jedis.exists(code)){
+                jedis.del(code);
+                jedis.close();
+                return 1;
+            }else{
+                jedis.close();
+                return 0;
+            }
+        }else{
+            return 3;
+        }
     }
 
 

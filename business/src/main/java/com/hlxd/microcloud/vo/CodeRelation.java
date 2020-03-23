@@ -29,7 +29,7 @@ public class CodeRelation  implements Serializable {
      //装箱机台号
      private String jMachineCode;
      //卷包机台号
-     private String bMachineCode;
+     private String machineCode;
      //装箱备注
      private String jRemark;
      //卷包备注
@@ -43,5 +43,7 @@ public class CodeRelation  implements Serializable {
      //卷包时间
      private String bProduceDate;
 
+     //filed 做过滤的冗余字段
+     private String jQrCode;
 
 }

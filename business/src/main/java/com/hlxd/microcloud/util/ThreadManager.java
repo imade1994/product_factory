@@ -35,7 +35,7 @@ public class ThreadManager {
     public static ThreadPoolProxy getDownloadPool() {
         synchronized (mDownloadLock) {
             if (mDownloadPool == null) {
-                mDownloadPool = new ThreadPoolProxy(10000, 10000, 5L);
+                mDownloadPool = new ThreadPoolProxy(30000, 30000, 5L);
             }
             return mDownloadPool;
         }
@@ -77,6 +77,9 @@ public class ThreadManager {
             return singlePool;
         }
     }
+    /**p判断是否还有未完成的任务*/
+
+
 
     public static class ThreadPoolProxy {
         private ThreadPoolExecutor mPool;
@@ -114,6 +117,8 @@ public class ThreadManager {
                 mPool.getQueue().remove(run);
             }
         }
+
+
 
         /** 取消线程池中某个还未执行的任务 */
         public synchronized boolean contains(Runnable run) {

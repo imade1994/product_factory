@@ -2,6 +2,7 @@ package com.hlxd.microcloud.schedule;
 
 import com.hlxd.microcloud.util.CommonUtil;
 import com.hlxd.microcloud.util.JedisPoolUtils;
+import com.hlxd.microcloud.util.ThreadManager;
 import com.hlxd.microcloud.vo.CodeCount;
 import com.hlxd.microcloud.vo.CodeRelation;
 import com.hlxd.microcloud.vo.ProCode;
@@ -20,8 +21,7 @@ import redis.clients.jedis.Jedis;
 import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static com.hlxd.microcloud.util.CommonUtil.*;
 
@@ -40,7 +40,7 @@ import static com.hlxd.microcloud.util.CommonUtil.*;
 public class ScheduleConfig {
 
     /** influx 连接工厂 */
-    public static final InfluxDB influxDb = InfluxDBFactory.connect("http://134.175.90.151:8086");
+    public static final InfluxDB influxDb = InfluxDBFactory.connect("http://192.168.12.250:8086");
 
     public static final String dataBase = "hlxd";
 
@@ -121,7 +121,7 @@ public class ScheduleConfig {
 
 
 
-    @PostConstruct
+   // @PostConstruct
     public static void initRedis() throws ParseException {
         Jedis jedis = JedisPoolUtils.getJedis();
         long endDate = new Date().getTime();
@@ -168,16 +168,14 @@ public class ScheduleConfig {
             jedis.close();
         }
     }
-    @PostConstruct
-    public void initCode(){
+    //@PostConstruct
+    public void initCode() throws ExecutionException, InterruptedException {
         log.info("生成码开始*******************************************************************");
         String prifix = "HTTPS://TB2D.CN/01/";
         String endfix = "/21/01234567895";
-        CopyOnWriteArrayList<String> jian = new CopyOnWriteArrayList<>();
-        CopyOnWriteArrayList<String> tiao = new CopyOnWriteArrayList<>();
-        CopyOnWriteArrayList<String> bao = new CopyOnWriteArrayList<>();
         influxDb.enableBatch(10000,10000, TimeUnit.SECONDS);
         influxDb.enableGzip();
+        List<FutureTask<Boolean>> ShoppingCartTasks = new ArrayList<>();
         Pong pong =influxDb.ping();
         if(pong==null){
             System.out.println("数据库连接异常");
@@ -187,101 +185,275 @@ public class ScheduleConfig {
         BatchPoints batchPoints = BatchPoints.database(dataBase)
                 .consistency(InfluxDB.ConsistencyLevel.ALL)
                 .build();
-        do{
-            String uuid = prifix+0+UUID.randomUUID().toString().replaceAll("-","")+endfix;
-            if(!bao.contains(uuid)){
-                //System.out.println(uuid);
-                log.info("包码**********************************************"+uuid);
-                bao.add(uuid);
-            }
-        }while(bao.size()<182500000);//包码
-        do{
-            String uuid = prifix+1+UUID.randomUUID().toString().replaceAll("-","")+endfix;
-            if(!tiao.contains(uuid)){
-                //System.out.println(uuid);
-                log.info("条码**********************************************"+uuid);
-                tiao.add(uuid);
-            }
-        }while(tiao.size()<182500000);//条码
-        do{
-            String uuid = prifix+2+UUID.randomUUID().toString().replaceAll("-","")+endfix;
-            if(!jian.contains(uuid)){
-                // System.out.println(uuid);
-                log.info("件码**********************************************"+uuid);
-                jian.add(uuid);
-            }
-        }while(jian.size()<3650000);//件码
-        Map map = new HashMap();
-        for(int i = 0;i<365;i++){//30天
-            long day = new Date().getTime();
-            day = day-i*24*60*60*1000;
-            Map newMap = new HashMap();
-            List<String> baoList = bao.subList(i*5000000,(i+1)*5000000);
-            List<String> tiaoList = tiao.subList(i*500000,(i+1)*500000);
-            List<String> jianList = jian.subList(i*10000,(i+1)*10);
-            newMap.put(1,baoList);
-            newMap.put(2,tiaoList);
-            newMap.put(3,jianList);
-            map.put(day,newMap);
-        }
-        Long jTime=null;
-        Long bTime = null;
-        int ck = 0;
-        for(Object object:map.keySet()){
-            log.info("第"+ck+"次循环");
-            jTime = Long.valueOf(String.valueOf(object));
-            bTime = Long.valueOf(String.valueOf(object));
-            Map tem = (Map) map.get(object);
-            List<String> jianList = (List<String>) tem.get(3);
-            List<String> tiaoList = (List<String>) tem.get(2);
-            List<String> baoList = (List<String>) tem.get(1);
-            for(int i=0;i<jianList.size();i++){
-                List<String> temTiaoList = tiaoList.subList(i*50,(i+1)*50);
-                for(int k=0;k<temTiaoList.size();k++){
-                    List<String> temBaoList = baoList.subList((50*i+k)*10,(50*i+k+1)*10);
-                    for(String s:temBaoList){
+        int count = 1;
+        long day = new Date().getTime();
+        /*CopyOnWriteArrayList<String> jian = new CopyOnWriteArrayList<>();
+        CopyOnWriteArrayList<String> tiao = new CopyOnWriteArrayList<>();
+        CopyOnWriteArrayList<String> bao = new CopyOnWriteArrayList<>();*/
+        log.debug("**************************数据模拟开始时间"+new Date().getTime());
+        boolean flag = false;
+        boolean flag1 = false;
+        boolean flag2 = false;
+        long bTime = 0;
+        long jTime = 0;
+        for(int i=0;i<365;i++){
+            log.info("****************第"+i+"次循环******************************");
+            int finalI = i;
+            Callable<Boolean> ShoppingCartDetailsCall = new Callable<Boolean>() {
+                @Override
+                public Boolean call()  {
+                    Map<Integer,CopyOnWriteArrayList<String>> jMap = new HashMap<>();
+                    Map<Integer,CopyOnWriteArrayList<String>> tMap = new HashMap<>();
+                    Map<Integer,CopyOnWriteArrayList<String>> bMap = new HashMap<>();
+                    long btime = day -finalI*24*60*60*1000L;
+                    long jtime = day -finalI*24*60*60*1000L;
+                    do{
+                        String uuid = prifix+0+UUID.randomUUID().toString().replaceAll("-","")+endfix;
+                        if(null != bMap.get(finalI)){
+                            if(!bMap.get(finalI).contains(uuid)){
+                                //System.out.println(uuid);
+                                log.info("****************包码******************************"+uuid);
+                                bMap.get(finalI).add(uuid);
+                            }
+                        }else{
+                            CopyOnWriteArrayList<String> strings = new CopyOnWriteArrayList<>();
+                            strings.add(uuid);
+                            bMap.put(finalI,strings);
+                        }
+                    }while(bMap.get(finalI).size()<500000);//包码182500
+                    try{
+                        do{
+                            String uuid = prifix+1+UUID.randomUUID().toString().replaceAll("-","")+endfix;
+                            if(null != tMap.get(finalI)){
+                                if(!tMap.get(finalI).contains(uuid)){
+                                    //System.out.println(uuid);
+                                    log.info("****************条码******************************"+uuid);
+                                    tMap.get(finalI).add(uuid);
+                                }
+                            }else{
+                                CopyOnWriteArrayList<String> strings = new CopyOnWriteArrayList<>();
+                                strings.add(uuid);
+                                tMap.put(finalI,strings);
+                            }
+                        }while(tMap.get(finalI).size()<50000);//条码18250
+                        do{
+                            String uuid = prifix+1+UUID.randomUUID().toString().replaceAll("-","")+endfix;
+                            if(null != jMap.get(finalI)){
+                                if(!jMap.get(finalI).contains(uuid)){
+                                    //System.out.println(uuid);
+                                    log.info("****************件码******************************"+uuid);
+                                    jMap.get(finalI).add(uuid);
+                                }
+                            }else{
+                                CopyOnWriteArrayList<String> strings = new CopyOnWriteArrayList<>();
+                                strings.add(uuid);
+                                jMap.put(finalI,strings);
+                            }
+                        }while(jMap.get(finalI).size()<1000);//件码10000
+                    }catch (Exception e){
+                        log.debug("**************************发生异常"+e.getMessage());
+                        return false;
+                    }
+                    log.info("****************第"+finalI+"次任务执行完成,开始封装插入******************************");
+                    for(int k=0;k<jMap.get(finalI).size();k++){
+                        List<String> temTiaoList = tMap.get(finalI).subList(k*50,(k+1)*50);
+                        for(int f=0;f<temTiaoList.size();f++){
+                            List<String> temBaoList = bMap.get(finalI).subList((50*k+f)*10,(50*k+f+1)*10);
+                            for(String s:temBaoList){
+                                Point point= Point.measurement("code")
+                                        .tag("qrCode",s)
+                                        .tag("type","1")
+                                        .tag("parentCode",temTiaoList.get(f))
+                                        .tag("machineCode","G18")
+                                        .tag("productId","云烟(软珍)")
+                                        .tag("verifyStatus","0")
+                                        .tag("factoryName","红河卷烟厂")
+                                        .field("remark","测试第"+500*k+f+"条烟")
+                                        .time(btime*1000000L,TimeUnit.NANOSECONDS)
+                                        .build();
+                                batchPoints.point(point);
+                            }
+                            Point point= Point.measurement("code")
+                                    .tag("qrCode",temTiaoList.get(f))
+                                    .tag("type","2")
+                                    .tag("parentCode",jMap.get(finalI).get(k))
+                                    .tag("machineCode","G1")
+                                    .tag("productId","云烟(软珍)")
+                                    .tag("verifyStatus","0")
+                                    .tag("factoryName","红河卷烟厂")
+                                    .field("remark","测试第"+500*k+f+"条烟")
+                                    .time(btime*1000000L,TimeUnit.NANOSECONDS)
+                                    .build();
+                            batchPoints.point(point);
+                            btime = btime +1;
+                        }
                         Point point= Point.measurement("code")
-                                .tag("qrCode",s)
-                                .tag("type","1")
-                                .tag("parentCode",temTiaoList.get(k))
-                                .tag("machineCode","G18")
+                                .tag("qrCode",jMap.get(finalI).get(k))
+                                .tag("type","3")
+                                .tag("machineCode","G1")
                                 .tag("productId","云烟(软珍)")
                                 .tag("verifyStatus","0")
                                 .tag("factoryName","红河卷烟厂")
-                                .field("remark","测试第"+500*i+k+"条烟")
-                                .time(bTime*1000000,TimeUnit.NANOSECONDS)
+                                .field("remark","测试第"+k+1+"件烟")
+                                .time(jtime*1000000L,TimeUnit.NANOSECONDS)
                                 .build();
+                        jtime = jtime + 500;
                         batchPoints.point(point);
+                        if(batchPoints.getPoints().size()%10000==0&&batchPoints.getPoints().size()!=0){
+                            influxDb.write(batchPoints);
+                        }
                     }
+
+                    return true;
+                }
+            };
+            FutureTask<Boolean> ShoppingCartTask = new FutureTask<>(ShoppingCartDetailsCall);
+            ShoppingCartTasks.add(ShoppingCartTask);
+            ThreadManager.getDownloadPool().execute(ShoppingCartTask);
+
+        }
+
+
+        /*if(ThreadManager.validate(30000)){
+            log.debug("**************************进入主线程开始阻塞"+bao.size());
+            log.debug("**************************包码数量"+bao.size());
+            log.debug("**************************条码数量"+tiao.size());
+            log.debug("**************************件码数量"+jian.size());
+            Map map = new HashMap();
+            for(int i = 0;i<365;i++){//30天
+                day = day-i*24*60*60*1000L;
+                Map newMap = new HashMap();
+                List<String> baoList = bao.subList(i*50000,(i+1)*50000);
+                List<String> tiaoList = tiao.subList(i*5000,(i+1)*5000);
+                List<String> jianList = jian.subList(i*100,(i+1)*100);
+                newMap.put(1,baoList);
+                newMap.put(2,tiaoList);
+                newMap.put(3,jianList);
+                map.put(day,newMap);
+            }
+            Long jTime=null;
+            Long bTime = null;
+            int ck = 0;
+            for(Object object:map.keySet()){
+                log.info("第"+ck+"次循环");
+                jTime = Long.valueOf(String.valueOf(object));
+                bTime = Long.valueOf(String.valueOf(object));
+                Map tem = (Map) map.get(object);
+                List<String> jianList = (List<String>) tem.get(3);
+                List<String> tiaoList = (List<String>) tem.get(2);
+                List<String> baoList = (List<String>) tem.get(1);
+
+            }
+
+        }*/
+
+
+    }
+
+    //@PostConstruct
+    @Scheduled(cron = "0 */5 * * * ?")
+    public void initStatic(){
+        log.info("生成码开始*******************************************************************");
+        String prifix = "HTTPS://TB2D.CN/01/";
+        String endfix = "/21/01234567895";
+        if(!influxDb.isBatchEnabled()){
+            influxDb.enableBatch(10000,10000, TimeUnit.SECONDS);
+        }
+        if(!influxDb.isGzipEnabled()){
+            influxDb.enableGzip();
+        }
+        List<FutureTask<Boolean>> ShoppingCartTasks = new ArrayList<>();
+        Pong pong =influxDb.ping();
+        if(pong==null){
+            System.out.println("数据库连接异常");
+        }else{
+            System.out.println("连接成功，ping值为"+pong.getResponseTime());
+        }
+        BatchPoints batchPoints = BatchPoints.database(dataBase)
+                .consistency(InfluxDB.ConsistencyLevel.ALL)
+                .build();
+        long day = new Date().getTime();
+        log.info("**************************数据模拟开始时间"+new Date().getTime());
+        long bTime = 0;
+        long jTime = 0;
+        for(int k=0;k<1;k++){
+            log.info("****************第"+k+"次循环******************************");
+            int finalI = k;
+            /*Callable<Boolean> ShoppingCartDetailsCall = new Callable<Boolean>() {
+                @Override
+                public Boolean call()  {
+
+                    log.info("**************************数据模拟开始时间"+(new Date().getTime()-day));
+                    return true;
+                }
+            };
+            FutureTask<Boolean> ShoppingCartTask = new FutureTask<>(ShoppingCartDetailsCall);
+            ShoppingCartTasks.add(ShoppingCartTask);
+            ThreadManager.getDownloadPool().execute(ShoppingCartTask);*/
+            long btime = day -finalI*24*60*60*1000L;
+            long jtime = day -finalI*24*60*60*1000L;
+            String tiaouuid = prifix+0+UUID.randomUUID().toString().replaceAll("-","")+finalI+1+endfix;
+            String jianuuid = prifix+0+UUID.randomUUID().toString().replaceAll("-","")+finalI+2+endfix;
+            for(int i=0;i<500000;i++){
+                String uuid = prifix+0+UUID.randomUUID().toString().replaceAll("-","")+finalI+0+endfix;
+                if(i%10==0){
+                    tiaouuid = prifix+0+UUID.randomUUID().toString().replaceAll("-","")+finalI+1+endfix;
                     Point point= Point.measurement("code")
-                            .tag("qrCode",temTiaoList.get(k))
+                            .tag("qrCode",tiaouuid)
                             .tag("type","2")
-                            .tag("parentCode",jianList.get(i))
+                            .tag("parentCode",jianuuid)
                             .tag("machineCode","G1")
                             .tag("productId","云烟(软珍)")
                             .tag("verifyStatus","0")
                             .tag("factoryName","红河卷烟厂")
-                            .field("remark","测试第"+500*i+k+"条烟")
-                            .time(bTime*1000000,TimeUnit.NANOSECONDS)
+                            .field("remark","测试第"+i/10+"条烟")
+                            .time(btime*1000000L,TimeUnit.NANOSECONDS)
                             .build();
                     batchPoints.point(point);
-                    bTime = bTime +1;
+                    btime = btime +1;
+                }
+                if(i%500==0){
+                    log.info("第+"+finalI+"线程+++++++++++++++++++++++++++++++第"+i/500+"件");
+                    jianuuid = prifix+0+UUID.randomUUID().toString().replaceAll("-","")+finalI+2+endfix;
+                    Point point= Point.measurement("code")
+                            .tag("qrCode",jianuuid)
+                            .tag("type","3")
+                            .tag("machineCode","G1")
+                            .tag("productId","云烟(软珍)")
+                            .tag("verifyStatus","0")
+                            .tag("factoryName","红河卷烟厂")
+                            .field("remark","测试第"+i/500+"件烟")
+                            .time(jtime*1000000L,TimeUnit.NANOSECONDS)
+                            .build();
+                    batchPoints.point(point);
+                    jtime = jtime + 500;
                 }
                 Point point= Point.measurement("code")
-                        .tag("qrCode",jianList.get(i))
-                        .tag("type","3")
-                        .tag("machineCode","G1")
+                        .tag("qrCode",uuid)
+                        .tag("type","1")
+                        .tag("parentCode",tiaouuid)
+                        .tag("machineCode","G18")
                         .tag("productId","云烟(软珍)")
                         .tag("verifyStatus","0")
                         .tag("factoryName","红河卷烟厂")
-                        .field("remark","测试第"+i+1+"件烟")
-                        .time(jTime*1000000,TimeUnit.NANOSECONDS)
+                        .field("remark","测试第"+i+"包烟")
+                        .time(btime*1000000L,TimeUnit.NANOSECONDS)
                         .build();
-                jTime = jTime + 500;
                 batchPoints.point(point);
+                /*if(batchPoints.getPoints().size()%10000==0&&batchPoints.getPoints().size()!=0){
+
+                }*/
             }
+            influxDb.write(batchPoints);
+
+
         }
-        influxDb.write(batchPoints);
+        influxDb.close();
+
+
+
+
+
     }
 
 

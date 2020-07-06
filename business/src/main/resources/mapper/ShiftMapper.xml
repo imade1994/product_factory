@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.ShiftMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.Shift">
+        <id column="id" property="id" />
+        <result column="shift_name" property="beginCheckDate" />
+        <result column="status" property="endCheckDate" />
+        <collection property="shiftDetails" ofType="com.hlxd.microcloud.vo.ShiftDetails">
+            <id column="d_id" property="id" />
+            <id column="shift_id" property="shiftId" />
+            <id column="class_name" property="qrCode" />
+            <id column="begin_date" property="beginDate" />
+            <id column="end_date" property="endDate" />
+        </collection>
+    </resultMap>
+
+
+    <select id="getShift" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+        select
+        thss.id,
+        thss.shift_name,
+        thss.status,
+        thssd.id as d_id,
+        thssd.shift_id,
+        thssd.class_name,
+        thssd.begin_date,
+        thssd.end_date
+        from
+        t_hl_system_shift thss
+        left join
+        t_hl_system_shift_details thssd
+        on thssd.shift_id = thss.id
+        where
+        1=1
+        <if test="null != className and '' != className">
+        and class_name LIKE CONCAT(CONCAT('%',#{className}),'%')
+        </if>
+    </select>
+
+    <update id="updateShift" parameterType="com.hlxd.microcloud.vo.Shift">
+        update
+        <trim prefix="set" suffixOverrides=",">
+            <if test="vo.shiftName!=null">shift_name = #{vo.shiftName},</if>
+            <if test="vo.status!=null">status = #{vo.status},</if>
+        </trim>
+        where id=#{vo.id}
+    </update>
+
+
+    <insert id="insertShift" parameterType="com.hlxd.microcloud.vo.Shift">
+        insert into
+        t_hl_system_shift
+        (id,shift_name,status)values(#{vo.id},#{vo.shiftName},#{vo.status})
+    </insert>
+
+    <select id="validateParent" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        select count(*) from t_hl_system_shift
+        where id= #{id}
+    </select>
+
+    <update id="updateShiftDetails" parameterType="com.hlxd.microcloud.vo.ShiftDetails">
+        update
+        <trim prefix="set" suffixOverrides=",">
+            <if test="vo.className!=null">class_name = #{vo.className},</if>
+            <if test="vo.beginDate!=null">begin_date = #{vo.beginDate},</if>
+            <if test="vo.endDate!=null">end_date = #{vo.endDate},</if>
+        </trim>
+        where id=#{vo.id}
+    </update>
+    
+    <delete id="deleteShiftDetails" parameterType="com.hlxd.microcloud.vo.ShiftDetails">
+        delete from t_hl_system_shift_details
+        where id = #{vo.id}
+    </delete>
+
+    <insert id="insertShiftDetails" parameterType="com.hlxd.microcloud.vo.ShiftDetails">
+        insert into
+        t_hl_system_shift_details
+        (id,shift_id,class_name,begin_date,end_date)
+        values
+        (#{vo.id},#{vo.shiftId},#{vo.className},#{vo.beginDate},#{vo.endDate})
+
+
+    </insert>
+
+
+
+
+
+</mapper>

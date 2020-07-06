@@ -20,7 +20,7 @@ import java.util.Map;
  * @PROJECT qrCodeExcute
  */
 @RestController
-@RequestMapping("/code")
+@RequestMapping("/api/code")
 public class QrcodeExcuteController {
     @Autowired
     private QrcodeService qrcodeService;

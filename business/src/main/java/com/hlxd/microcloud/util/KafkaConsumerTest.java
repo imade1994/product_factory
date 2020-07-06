@@ -4,19 +4,14 @@ package com.hlxd.microcloud.util;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hlxd.microcloud.vo.KafkaVo;
-import com.netflix.discovery.converters.jackson.EurekaXmlJacksonCodec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 /**
  * CREATED BY IDEA
@@ -32,13 +27,13 @@ public class KafkaConsumerTest implements Runnable {
     private final KafkaConsumer<String, String> consumer;
     private ConsumerRecords<String, String> msgList;
     private final String topic;
-    private static final String GROUPID = "groupA";
+    private static final String GROUPID = "groupB";
 
     public KafkaConsumerTest(String topicName) {
         Properties props = new Properties();
         props.put("bootstrap.servers", "192.168.12.250:9092");
         props.put("group.id", GROUPID);
-        props.put("enable.auto.commit", "false");
+        props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", "1000");
         props.put("session.timeout.ms", "30000");
         props.put("auto.offset.reset", "earliest");
@@ -96,9 +91,9 @@ public class KafkaConsumerTest implements Runnable {
                         consumer.commitSync(map);*/
                         messageNo++;
                     }
-                    if(flag){
+                    /*if(flag){
                         consumer.commitSync();
-                    }
+                    }*/
                 }else{
                     Thread.sleep(1000);
                 }

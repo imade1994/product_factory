@@ -1,15 +1,11 @@
 package com.hlxd.microcloud.controller;
 
-import com.hlxd.microcloud.util.JedisPoolUtils;
-import com.hlxd.microcloud.vo.ProCode;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.hlxd.microcloud.util.CommonUtil.*;
@@ -24,7 +20,7 @@ import static com.hlxd.microcloud.util.CommonUtil.*;
  * @PROJECT hlxdmicrocloud
  */
 @RestController
-@RequestMapping("/pro")
+@RequestMapping("/api/pro")
 public class ProCodeController {
 
     /**
@@ -74,7 +70,7 @@ public class ProCodeController {
     }
 
 
-    @RequestMapping("/validate")
+   /* @RequestMapping("/validate")
     public int validateCode(@RequestParam(value = "code",required = true)String code){
         Jedis jedis = JedisPoolUtils.getJedis();
         if(null != jedis){
@@ -89,7 +85,7 @@ public class ProCodeController {
         }else{
             return 3;
         }
-    }
+    }*/
 
 
 

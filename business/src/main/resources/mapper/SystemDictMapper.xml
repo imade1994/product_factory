@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.SystemDictMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.SystemDict">
+        <id column="id" property="id" />
+        <result column="parent_id" property="parentId" />
+        <result column="key" property="key" />
+        <result column="value" property="value" />
+        <result column="last_update_date" property="lastUpdateDate" />
+        <result column="create_date" property="createDate" />
+        <result column="create_people" property="createPeople" />
+        <result column="status" property="status" />
+        <collection property="systemDicts" ofType="com.hlxd.microcloud.vo.SystemDict" javaType="java.util.ArrayList">
+            <id column="c_id" property="id" />
+            <result column="c_parent_id" property="parentId" />
+            <result column="c_key" property="key" />
+            <result column="c_value" property="value" />
+            <result column="c_last_update_date" property="lastUpdateDate" />
+            <result column="c_create_date" property="createDate" />
+            <result column="c_create_people" property="createPeople" />
+            <result column="c_status" property="status" />
+            <collection property="systemDicts" ofType="com.hlxd.microcloud.vo.SystemDict" javaType="java.util.ArrayList">
+                <id column="c1_id" property="id" />
+                <result column="c1_parent_id" property="parentId" />
+                <result column="c1_key" property="key" />
+                <result column="c1_value" property="value" />
+                <result column="c1_last_update_date" property="lastUpdateDate" />
+                <result column="c1_create_date" property="createDate" />
+                <result column="c1_create_people" property="createPeople" />
+                <result column="c1_status" property="status" />
+            </collection>
+        </collection>
+    </resultMap>
+
+    <delete id="deleteSystemDict" parameterType="java.util.HashMap">
+        delete from t_hl_system_dict
+        where id = #{id}
+    </delete>
+
+    <update id="updateSystemDict" parameterType="com.hlxd.microcloud.vo.SystemDict">
+        update t_hl_system_dict
+        <trim prefix="set" suffixOverrides=",">
+            <if test="vo.key!=null">`key` = #{vo.key},</if>
+            <if test="vo.value!=null">value = #{vo.value},</if>
+            <if test="vo.status!=null">status = #{vo.status},</if>
+            last_update_date = now(),
+        </trim>
+
+        where id = #{vo.id}
+    </update>
+
+    <insert id="insertSystemDict" parameterType="com.hlxd.microcloud.vo.SystemDict">
+        insert into t_hl_system_dict
+        (id,parent_id,`key`,`value`,last_update_date,create_date,create_people,status)
+        values (#{vo.id},#{vo.parentId},#{vo.key},#{vo.value},now(),now(),#{vo.createPeople},'1')
+    </insert>
+    <select id="getAllDictList" resultMap="BaseResultMap">
+       select
+	thsd.id,
+	thsd.parent_id,
+	thsd.key,
+	thsd.value,
+	thsd.create_people,
+	thsd.last_update_date,
+	thsd.status,
+	thsd.create_date,
+	thsd_1.id as c_id,
+	thsd_1.parent_id as c_parent_id,
+	thsd_1.key as c_key,
+	thsd_1.value as c_value,
+	thsd_1.create_people as c_create_people,
+	thsd_1.last_update_date as c_last_update_date,
+	thsd_1.status as c_status,
+	thsd_1.create_date as c_create_date,
+	thsd_2.id as c1_id,
+	thsd_2.parent_id as c1_parent_id,
+	thsd_2.key as c1_key,
+	thsd_2.value as c1_value,
+	thsd_2.create_people as c1_create_people,
+	thsd_2.last_update_date as c1_last_update_date,
+	thsd_2.status as c1_status,
+	thsd_2.create_date as c1_create_date
+	from t_hl_system_dict thsd
+	left join t_hl_system_dict thsd_1
+	on thsd.id = thsd_1.parent_id
+	left join t_hl_system_dict thsd_2
+	on thsd_1.id = thsd_2.parent_id
+	where thsd.parent_id = '0'
+    </select>
+
+
+
+    <select id="getDictList" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+	SELECT
+	*
+	FROM t_hl_system_dict
+	where 1=1
+    <if test="null != parentId and '' != parentId">
+        and parent_id = #{parentId}
+    </if>
+    <if test="null != status and '' != status">
+       and status =#{status}
+    </if>
+    <if test="null != id and '' != id">
+        and id =#{id}
+    </if>
+    </select>
+
+
+    <select id="countValidate" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        select count(*)
+        from t_hl_system_dict
+        where first_category = #{firstCategory}
+        and id !=#{id}
+        <if test=" 0 != secondCategory">
+            and second_category = #{secondCategory}
+        </if>
+
+    </select>
+</mapper>

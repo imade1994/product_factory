@@ -1,6 +1,9 @@
 package com.hlxd.microcloud.util;
 
+import com.alibaba.druid.util.StringUtils;
 import com.hlxd.microcloud.vo.*;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.*;
@@ -9,21 +12,25 @@ import org.springframework.beans.BeanWrapperImpl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /** 类名: CommonUtil </br> 描述: 通用工具类 </br> */
+@Slf4j
 public final class CommonUtil {
 
+    static OkHttpClient.Builder client = new OkHttpClient.Builder()
+            .readTimeout(100,TimeUnit.SECONDS)
+            .writeTimeout(100,TimeUnit.SECONDS);
+
   /** influx 连接工厂 */
-  public static final InfluxDB influxDb = InfluxDBFactory.connect("http://134.175.90.151:8086");
+  public static final InfluxDB influxDb = InfluxDBFactory.connect("http://127.0.0.1:8086",client);
 
   public static final String dataBase = "hlxd";
 
   public static final String time = "yyyy-MM-dd";
+
+  public static final String timeFormate = "yyyy-MM-dd HH:mm:ss.S";
 
   public static final String UTCString = "yyyy-MM-dd'T'HH:mm:ss.SS'Z'";
 
@@ -86,73 +93,134 @@ public final class CommonUtil {
     String returnTime = timeChange.format(calendar.getTime());
     return returnTime;
   }
-    public static String UTCToStr(String UTCStr) throws ParseException {
-        Date date = null;
-        SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString);
-        SimpleDateFormat sdfSTR = new SimpleDateFormat(UTCString);
-        date = sdfUTC.parse(UTCStr);
-        String str = sdfSTR.format(date);
+  public static String UTCToStr(String UTCStr) throws ParseException {
+      Date date = null;
+      SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString);
+      SimpleDateFormat sdfSTR = new SimpleDateFormat(UTCString);
+      date = sdfUTC.parse(UTCStr);
+      String str = sdfSTR.format(date);
 
-        return str;
-    }
+      return str;
+  }
+  /**
+   * 时间对比工具类
+   * @Param  t1 开始时间 t2 结束时间
+   *
+   * */
+  public static Long compareTime(String t1,String t2) throws ParseException {
+      SimpleDateFormat simpleDateFormat = new SimpleDateFormat(timeFormate);
+      Date d1 = simpleDateFormat.parse(t1);
+      Date d2 = simpleDateFormat.parse(t2);
+      return d1.getTime()-d2.getTime();
 
-    public static Date UTCToStr1(String UTCStr) throws ParseException {
-        Date date = null;
-        SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString1);
-        SimpleDateFormat sdfSTR = new SimpleDateFormat(time);
-        date = sdfUTC.parse(UTCStr);
-        String time = sdfSTR.format(date);
-        date = sdfSTR.parse(time);
-        return date;
-    }
+  }
 
-    public static String UTCToStr2(String UTCStr) throws ParseException {
-        Date date = null;
-        SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString1);
-        SimpleDateFormat sdfSTR = new SimpleDateFormat(time);
-        date = sdfUTC.parse(UTCStr);
-        String time = sdfSTR.format(date);
-        return time;
-    }
+  public static String getFormateString(){
+    Date date = new Date();
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(time);
+    return simpleDateFormat.format(date);
+  }
 
-    public static String UTCToStr3(String UTCStr) throws ParseException {
-        Date date = null;
-        SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString2);
-        SimpleDateFormat sdfSTR = new SimpleDateFormat(time);
-        date = sdfUTC.parse(UTCStr);
-        String time = sdfSTR.format(date);
-        return time;
-    }
+  public static Date UTCToStr1(String UTCStr) throws ParseException {
+      Date date = null;
+      SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString1);
+      SimpleDateFormat sdfSTR = new SimpleDateFormat(time);
+      date = sdfUTC.parse(UTCStr);
+      String time = sdfSTR.format(date);
+      date = sdfSTR.parse(time);
+      return date;
+  }
 
-    public static int getPeriod(String UTCStr) throws ParseException {
-        Date date = null;
-        SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString1);
-        //SimpleDateFormat sdfSTR = new SimpleDateFormat(UTCString);
-        date = sdfUTC.parse(UTCStr);
-        int type = 0;
-        switch (date.getHours()){
-            case 0:
-                type= 1;
-                break;
-            case 8:
-                type= 2;
-                break;
-            case 16:
-                type= 3;
-                break;
-            default:
-                break;
-        }
-        return type;
-    }
+  public static String UTCToStr2(String UTCStr) throws ParseException {
+      Date date = null;
+      if(UTCStr.length() == 30){
+          UTCStr = UTCStr.substring(0,UTCStr.length()-7)+"Z";
+      }
+      SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString2);
+      SimpleDateFormat sdfSTR = new SimpleDateFormat(time);
+      date = sdfUTC.parse(UTCStr);
+      String time = sdfSTR.format(date);
+      return time;
+  }
+
+  public static String UTCToStr3(String UTCStr) throws ParseException {
+      Date date = null;
+
+      SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString2);
+      SimpleDateFormat sdfSTR = new SimpleDateFormat(time);
+      date = sdfUTC.parse(UTCStr);
+      String time = sdfSTR.format(date);
+      return time;
+  }
+
+  public static int getPeriod(String UTCStr) throws ParseException {
+      Date date = null;
+      SimpleDateFormat sdfUTC = new SimpleDateFormat(UTCString1);
+      //SimpleDateFormat sdfSTR = new SimpleDateFormat(UTCString);
+      date = sdfUTC.parse(UTCStr);
+      int type = 0;
+      switch (date.getHours()){
+          case 0:
+              type= 1;
+              break;
+          case 8:
+              type= 2;
+              break;
+          case 16:
+              type= 3;
+              break;
+          default:
+              break;
+      }
+      return type;
+  }
 
 
   public static Long UTCToLong(String UTCStr) throws ParseException {
     Date date = null;
-    SimpleDateFormat sdf = new SimpleDateFormat(UTCString);
+    String Str = "";
+    switch (UTCStr.length()){
+        case 20:
+            Str = UTCString1;
+            break;
+        case 23:
+            Str = UTCString;
+            break;
+        case 24:
+            Str = UTCString2;
+            break;
+        default:
+            Str = UTCString;
+            break;
+    }
+    SimpleDateFormat sdf = new SimpleDateFormat(Str);
     date = sdf.parse(UTCStr);
     return date.getTime();
   }
+  public static String UTCToString(String UTCStr) throws ParseException {
+        Date date = null;
+        String returnStr = "";
+        String Str = "";
+        switch (UTCStr.length()){
+            case 20:
+                Str = UTCString1;
+                break;
+            case 23:
+                Str = UTCString;
+                break;
+            case 24:
+                Str = UTCString2;
+                break;
+            default:
+                Str = UTCString;
+                break;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(Str);
+        date = sdf.parse(UTCStr);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(time);
+        returnStr =simpleDateFormat.format(date);
+        return returnStr;
+    }
 
   public static ProCode changeCode(ProCode oldProCode) {
     ProCode proCode = new ProCode();
@@ -171,6 +239,7 @@ public final class CommonUtil {
   public static Map influxDbDateToJsonObject(String code) throws InstantiationException, IllegalAccessException {
     QueryResult queryResult = new QueryResult();
     Query query = new Query("select * from codeRelation where qrCode = '" + code + "' or baoCode = '"+code+"' or jianCode = '"+code+"' order by time desc", dataBase);
+
     queryResult = influxDb.query(query);
     Map returnMap = new HashMap();
     List proCodes = new ArrayList<>();
@@ -285,41 +354,56 @@ public final class CommonUtil {
    * */
   public static void insertCodeRelationFromMap(Map map) throws ParseException {
     Map<String,List<ProCode>> baoMap = (Map<String, List<ProCode>>) map.get("1");
+    log.info("包MAP大小-*----------------------"+baoMap.keySet().size());
     Map<String,List<ProCode>> tiaoMap = (Map<String, List<ProCode>>) map.get("2");
-    influxDb.enableBatch(10000,10000,TimeUnit.MILLISECONDS);
+    log.info("件MAP大小-*----------------------"+tiaoMap.keySet().size());
+    if(!influxDb.isBatchEnabled()){
+        influxDb.enableBatch(10000,10000,TimeUnit.MILLISECONDS);
+    }
     //AtomicInteger i= new AtomicInteger();
-    influxDb.enableGzip();
+    if(!influxDb.isGzipEnabled()){
+        influxDb.enableGzip();
+    }
     long beginDate = new Date().getTime();
     for(String s:tiaoMap.keySet()){
         if(!s.equals("")){
             List<ProCode> temPro = tiaoMap.get(s);
             for(ProCode proCode:temPro){
                 List<ProCode> temList = baoMap.get(proCode.getQrCode());
-                for(ProCode proCode1:temList){
-                    Point point= null;
-                    try {
-                        point = Point.measurement("codeRelation")
-                                .tag("qrCode",proCode1.getQrCode())
-                                .tag("baoCode",proCode1.getParentCode())
-                                .tag("jianCode",proCode.getParentCode())
-                                .tag("brandName",proCode1.getProductId())
-                                .tag("jMachineCode",proCode.getMachineCode())
-                                .tag("machineCode",proCode1.getMachineCode())
-                                .field("jRemark",proCode.getRemark())
-                                .field("bRemark",proCode1.getRemark())
-                                .field("jQrCode",proCode.getParentCode())
-                                .tag("jVerifyStatus",proCode.getVerifyStatus())
-                                .tag("bVerifyStatus",proCode1.getVerifyStatus())
-                                .tag("jProduceDate",proCode.getTime())
-                                .tag("bProduceDate",proCode1.getTime())
-                                .time(UTCToLong(proCode1.getTime()), TimeUnit.MILLISECONDS)
-                                .build();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                if(null != temList){
+                    for(ProCode proCode1:temList){
+                        try {
+                            Point point = Point.measurement("codeRelation")
+                                    .tag("qrCode",proCode1.getQrCode())
+                                    .tag("baoCode",proCode1.getParentCode())
+                                    .tag("jianCode",proCode.getParentCode())
+                                    .tag("brandName",proCode1.getProductId())
+                                    .tag("jMachineCode",proCode.getMachineCode())
+                                    .tag("machineCode",proCode1.getMachineCode())
+                                    .field("jRemark",proCode.getRemark())
+                                    .field("bRemark",proCode1.getRemark())
+                                    .field("jQrCode",proCode.getParentCode())
+                                    .tag("jVerifyStatus",proCode.getVerifyStatus())
+                                    .tag("bVerifyStatus",proCode1.getVerifyStatus())
+                                    .tag("jProduceDate",proCode.getTime())
+                                    .tag("bProduceDate",proCode1.getTime())
+                                    .time(UTCToLong(proCode1.getTime()), TimeUnit.MILLISECONDS)
+                                    .build();
+                            influxDb.write(dataBase,"autogen",point);
+                        } catch (ParseException e) {
+                            log.info("异常+++++++++++++++++++++包码信息"+proCode1.toString());
+                            log.info("异常+++++++++++++++++++++条码信息"+proCode.toString());
+                            //e.printStackTrace();
+                            continue;
+                        }
+
                     }
-                    influxDb.write(dataBase,"autogen",point);
+                }else{
+                    log.info("此条码不存在包码*******************"+proCode.getQrCode());
                 }
+
             }
+            log.info("任务处理完成+******************************************************************");
         }
     }
     System.out.println("循环总耗时***********************************"+(new Date().getTime()-beginDate));
@@ -331,9 +415,14 @@ public final class CommonUtil {
      *
      * */
     public static void insertCodeCountByPeriod(List<CodeCount> codeCounts) throws ParseException {
-        influxDb.enableBatch(10000,10000,TimeUnit.MILLISECONDS);
+        if(!influxDb.isBatchEnabled()){
+            influxDb.enableBatch(10000,10000,TimeUnit.MILLISECONDS);
+        }
         //AtomicInteger i= new AtomicInteger();
-        influxDb.enableGzip();
+        if(!influxDb.isGzipEnabled()){
+            influxDb.enableGzip();
+        }
+
         for(CodeCount codeCount:codeCounts){
             Point point=Point.measurement("codeCount")
                     .tag("count_remark",codeCount.getCount_remark())
@@ -345,6 +434,7 @@ public final class CommonUtil {
                     .build();
             influxDb.write(dataBase,"autogen",point);
         }
+        //influxDb.close();
     }
 
 
@@ -355,8 +445,8 @@ public final class CommonUtil {
      * 产量查询
      * */
     public static Map getCountFromPeriod(Map<String,String[]> map) throws InstantiationException, IllegalAccessException, ParseException {
-        String sql ="select * from codeCount where 1=1 ";//统计
-        String sql1 = " select count(*) from rejectCode where 1=1 ";
+        String sql ="select * from scanCount where 1=1 ";//统计
+        String sql1 = " select * from rejectCount where 1=1 ";
         Map<String,Map> countMap = new HashMap();
         Map<String,Map> rejectMap = new HashMap();
         Map<String,Map> returnMap = new HashMap();
@@ -391,7 +481,7 @@ public final class CommonUtil {
                         codeCountList=getQueryData(serie, CodeCount.class);
                         Map<String,List<CodeCount>> temMap = new HashMap();
                         String type = tags.get("type");
-                        if(name.equals("codeCount")){
+                        if(name.equals("scanCount")){
                             for(CodeCount codeCount:codeCountList){
                                 String time = UTCToStr2(codeCount.getTime());
                                 if(temMap.containsKey(time)){
@@ -432,11 +522,12 @@ public final class CommonUtil {
                 }
             }
         }
+        //influxDb.close();
         return  returnMap;
     }
     public static Map getCodeCountFromPeriod(Map<String,String[]> map) throws InstantiationException, IllegalAccessException {
-        String sql1 ="select count(distinct(jQrCode)) from codeRelation where 1=1 ";
-        String sql2 ="select count(*) from code where type = '1'  ";
+        String sql1 ="select * from scanCount where 1=1 ";
+       // String sql2 ="select count(*) from code where type = '1'  ";
         Map returnMap = new HashMap();
         String temSql = "";
         for(String s:map.keySet()){
@@ -449,30 +540,46 @@ public final class CommonUtil {
                 }
             }
         }
-        sql1 = sql1+temSql;
-        sql2 = sql2+temSql;
-        Query query = new Query(sql1+";"+sql2, dataBase);
+        sql1 = sql1+temSql+" group by type";
+        //sql2 = sql2+temSql;
+        Query query = new Query(sql1, dataBase);
         QueryResult queryResult = influxDb.query(query);
         if(null != queryResult&&null !=queryResult.getResults() && queryResult.getResults().size()>0){
             for (QueryResult.Result result:queryResult.getResults()){
                 List<QueryResult.Series> series = result.getSeries();
                 if(null != series){
                     for(QueryResult.Series serie:series){
-                        List<CountVo> countVo = new ArrayList<>();
-                        countVo=getQueryData(serie, CountVo.class);
-                        if(countVo.size()>0 && null !=countVo.get(0).getCount_remark()){
+                        List<CountVo> countVos = new ArrayList<>();
+                        countVos=getQueryData(serie, CountVo.class);
+                        int count = 0;
+                        int type = (Integer.valueOf(serie.getTags().get("type"))==1)?1:3;
+                        for(CountVo countVo:countVos){
+                            count = count+countVo.getApproval();
+                        }
+                        CountVo countVo = new CountVo();
+                        switch (type){
+                            case 1:
+                                countVo.setCount_remark(count);
+                                break;
+                            case 3:
+                                countVo.setCount(count/50);
+                                break;
+                            default:
+                                break;
+                        }
+                        List<CountVo> countVoList = new ArrayList<>();
+                        countVoList.add(countVo);
+                        returnMap.put(type,countVoList);
+                        /*if(countVo.size()>0 && null !=countVo.get(0).getCount_remark()){
                             returnMap.put("1",countVo);
                         }else if(countVo.size()>0 && null !=countVo.get(0).getCount()){
                             returnMap.put("3",countVo);
-                        }
+                        }*/
                     }
                 }
             }
         }
-
-
-
-
+        //influxDb.close();
         return returnMap;
     }
 
@@ -482,7 +589,7 @@ public final class CommonUtil {
      * */
     public static Map findCode(Map<String,String[]> map){
         String sql = "select * from codeRelation where 1=1 ";
-        String sql1 = "select * from code where type = '1' ";
+        String sql1 = "select * from code where 1=1 ";
         String temSql = "";
         Map returnMap = new HashMap();
         for(String s:map.keySet()){
@@ -795,7 +902,56 @@ public final class CommonUtil {
     return returnMap;
   }*/
 
+    public static Map transformMap(Map<String,String[]> map){
+        Map returnMap = new HashMap();
+        StringBuilder stringBuilder = new StringBuilder();
+        for(String s:map.keySet()){
+            String[] str = map.get(s);
+            for(String t:str){
+                stringBuilder.append(t);
+            }
+            returnMap.put(s,stringBuilder.toString());
+            stringBuilder.delete(0,stringBuilder.length());
+        }
+        return returnMap;
+    }
+
+
+
+    public static int validateParams(String s){
+        String[] validate = CommomStatic.CHECKSQL.split("\\|");
+        for(String str:validate){
+            if(s.indexOf(str)>0){
+                return -1;
+            }
+        }
+        return 0;
+    }
+
+
+    public static Husband newHusband(){
+        List<String> specialities = new ArrayList<>();
+        Husband husband = new Husband();
+        husband.setFeature("瓜子脸");
+        husband.setHeight(180);
+        husband.setIncome(100000);
+        husband.setSkinColour("白");
+        specialities.add("唱");
+        specialities.add("跳");
+        specialities.add("rap");
+        specialities.add("篮球");
+        husband.setSpecialities(specialities);
+        husband.setProfessional("练习时长两年半的练习生");
+        husband.setWeight(150);
+        return husband;
+    }
+
   public static void main(String[] args){
+
+
+      String str = "t_hl_code_batch_202005140001";
+
+      System.out.println(validateParams(str));
 
   }
 

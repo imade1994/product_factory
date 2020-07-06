@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.CodeBatchMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.CodeBatch">
+        <id column="batch_no" property="batchNo" />
+        <result column="brand_name" property="brandName" />
+        <result column="code_num" property="codeNum" />
+        <result column="check_date" property="checkDate" />
+        <result column="check_name" property="checkName" />
+        <result column="status" property="status" />
+        <result column="table_name" property="tableName" />
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="CodeDetailMap" type="com.hlxd.microcloud.vo.CodeDetail">
+        <id column="code" property="code" />
+        <result column="status" property="status" />
+        <result column="machine_code" property="machineCode" />
+        <result column="brand_name" property="brandName" />
+        <result column="scan_date" property="scanDate" />
+        <result column="validate_status" property="validateStatus" />
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="UploadRecordMap" type="com.hlxd.microcloud.vo.UploadRecord">
+        <id column="id" property="id" />
+        <result column="pack_twig" property="packTwig" />
+        <result column="twig_item" property="twigItem" />
+        <result column="statistics" property="statistic" />
+        <result column="upload_model" property="uploadModel" />
+        <result column="complete_date" property="completeDate" />
+        <result column="manual_people" property="manualPeople" />
+        <result column="status" property="status" />
+        <result column="produce_date" property="produceDate" />
+    </resultMap>
+
+    <select id="getBatch" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+        select * from t_hl_batch_code
+        where
+        1=1
+        <if test="null != brandName and '' != brandName">
+        and brand_name =#{brandName}
+        </if>
+        <if test="null != batchNo and '' != batchNo">
+        and batch_no = #{batchNo}
+        </if>
+        <if test="null != beginDate and '' != beginDate">
+        and check_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="null != endDate and '' != endDate">
+        and check_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="null != status and '' != status">
+        and status = #{status}
+        </if>
+    </select>
+
+    <select id="getCodeDetail" resultMap="CodeDetailMap" parameterType="java.util.HashMap" statementType="STATEMENT">
+        select * from ${tableName}
+        where validate_status = ${type}
+    </select>
+
+    <insert id="insertBatch" parameterType="com.hlxd.microcloud.vo.CodeBatch">
+        insert into
+        (batch_no,brand_name,code_num,check_date,check_name,status,`table_name`)
+        values (#{vo.batchNo},#{vo.brandName},#{vo.codeNum},#{vo.checkDate},#{vo.checkName},#{vo.status},#{vo.tableName})
+    </insert>
+
+    <insert id="createNewTable" parameterType="java.lang.String" statementType="STATEMENT">
+        DROP TABLE IF EXISTS ${tableName};
+CREATE TABLE ${tableName}  (
+  `code` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '码',
+  `status` int(1) NULL DEFAULT NULL COMMENT '状态 1：已关联 2：未关联',
+  `brand_name` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '牌号',
+  `machine_code` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '生产机台',
+  `scan_date` timestamp(0) NULL DEFAULT NULL COMMENT '读码时间',
+  `validate_status` int(1) NULL DEFAULT NULL COMMENT '验证或激活状态 0：未激活 1：已激活',
+  PRIMARY KEY (`code`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+SET FOREIGN_KEY_CHECKS = 1;
+    </insert>
+
+
+    <select id="getUploadRecord" parameterType="java.lang.String" resultMap="UploadRecordMap">
+        select * from t_hl_upload_record
+        where 1=1
+        <if test="null != produceDate and '' != produceDate">
+            and produce_date = #{produceDate}
+        </if>
+    </select>
+
+    <update id="updateUploadRecord" parameterType="java.lang.Integer">
+        update t_hl_upload_record
+        set status = 1
+        where id = #{id}
+    </update>
+
+    <select id="validateUploadRecord" parameterType="java.lang.Integer">
+        select count(*) from t_hl_upload_record
+        where id = #{id}
+    </select>
+
+
+
+</mapper>

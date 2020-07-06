@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.AnalysisMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.ScanCount">
+        <id column="machine_name" property="machineName" />
+        <result column="realtime_reject" property="realtimeReject" />
+        <result column="realtime_relate" property="realtimeRelate" />
+        <result column="realtime_scan_reject" property="realtimeScanReject" />
+        <result column="realtime_scan" property="realtimeScan" />
+        <result column="brand_name" property="brandName" />
+        <result column="time" property="time" />
+        <result column="shift_id" property="period" />
+        <result column="random_check" property="randomCheck" />
+        <result column="random_check_fail" property="randomCheckFail" />
+        <result column="relate_time_break_count" property="relateTimeBreakCount" />
+        <result column="relate_time_break_time" property="relateTimeBreakTime" />
+        <result column="type" property="type" />
+        <result column="relateCount" property="relateCount" />
+        <result column="relateReject" property="relateReject" />
+        <result column="collection_count" property="collectionCount" />
+        <result column="workEfficiency" property="workEfficiency" />
+        <result column="scanEfficiency" property="scanEfficiency" />
+        <collection property="rejectCounts" ofType="com.hlxd.microcloud.vo.RejectCount">
+            <result column="rejectCount" property="countRemark"/>
+            <result column="reject_type" property="rejectType"/>
+        </collection>
+        <collection property="breakRecords" ofType="com.hlxd.microcloud.vo.BreakRecord">
+            <result column="break_time_count" property="breakTimeOut"/>
+            <result column="break_count" property="breakCount"/>
+        </collection>
+        <collection property="randomCheckRecords" ofType="com.hlxd.microcloud.vo.RandomCheckRecord">
+            <result column="begin_check_date" property="beginCheckDate"/>
+            <result column="check_type" property="checkType"/>
+            <result column="quality_type" property="qualityType"/>
+            <result column="qr_code" property="qr_code"/>
+            <result column="check_status" property="checkStatus"/>
+            <result column="on_line_check" property="onLineCheck"/>
+            <collection property="randomCheckDetails" ofType="com.hlxd.microcloud.vo.RandomCheckDetails">
+                <result column="check_qrCode" property="qrCode"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseMachineMap" type="com.hlxd.microcloud.vo.Machine">
+        <result column="machine_code" property="machineCode" />
+        <result column="type" property="type" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <select id="getMachineStatus" resultMap="BaseMachineMap" parameterType="java.util.HashMap">
+        select * from t_hl_base_machine
+        where type = #{type}
+    </select>
+
+
+    <select id="getCountStatic" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+    select sum(realtime_relate) as relateCount,sum(realtime_reject) as relateReject,sum(collection_count) as collection_count,sum(relate_time_break_time) as relate_time_break_time,
+(1-sum(relate_time_break_time/((thssd.end_date-thssd.begin_date)*60))/count(*)) as workEfficiency,
+sum(realtime_scan/(realtime_scan+realtime_scan_reject))/count(*) as scanEfficiency,
+time,type
+    from  t_hl_realtime_work thrw
+		left join t_hl_system_shift_details thssd
+		on thssd.id = thrw.shift_id
+    where type = #{type}
+    and time <![CDATA[>=]]>str_to_date(#{beginDate},'%Y-%m-%d')
+    AND time <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d')
+    group by time,type
+
+    </select>
+    <select id="getScanCount" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+        select
+        thrw.*,
+        thsc.total_scan,
+        thsc.reject,
+        thsc.approval,
+        thrc.count_remark as rejectCount,
+        thrc.reject_type,
+        thtb.break_time_count,
+        thtb.break_count,
+        thrck.begin_check_date,
+        thrck.check_type,
+        thrck.quality_type,
+        thrck.qr_code,
+        thrck.check_status,
+        thrck.on_line_check,
+        thrcd.qr_code as check_qrCode
+        from
+        t_hl_realtime_work thrw
+        left join
+        t_hl_reject_count thrc
+        on thrc.machine_code = thrw.machine_name and thrc.type = thrw.type and thrc.shift_id = thrw.shift_id and thrc.date = DATE_FORMAT(thrw.time,'%Y-%m-%d')
+        left join
+        t_hl_scan_count thsc
+        on thsc.machine_name = thrw.machine_name and thsc.type = thrw.type and thsc.shift_id = thrw.shift_id and thsc.date = DATE_FORMAT(thrw.time,'%Y-%m-%d')
+        left join
+        t_hl_time_break thtb
+        on thtb.machine_code = thrw.machine_name and thtb.type = thrw.type and thtb.shift_id = thrw.shift_id and thtb.date = DATE_FORMAT(thrw.time,'%Y-%m-%d')
+        left join
+        t_hl_system_shift_details thssd
+        on thrw.shift_id = thssd.id
+        left join
+        t_hl_random_check thrck
+        on  thrck.begin_check_date between date_add(STR_TO_DATE(DATE_FORMAT(thrw.time,'%Y-%m-%d'),'%Y-%m-%d'),INTERVAL thssd.begin_date HOUR) and date_add(STR_TO_DATE(DATE_FORMAT(thrw.time,'%Y-%m-%d'),'%Y-%m-%d'),INTERVAL thssd.end_date HOUR) and thrck.machine_code = thrw.machine_name
+        left join t_hl_random_check_detail thrcd
+        on thrcd.random_check_id = thrck.id
+     where 1=1
+        <if test="null != time and '' != time">
+            and thrw.time = str_to_date(#{time},'%Y-%m-%d')
+        </if>
+        <if test="null != machineCode and '' != machineCode">
+        and thrw.machine_name = #{machineCode}
+        </if>
+        <if test=" null != type and '' != type">
+           and thrw.type = #{type}
+        </if>
+        <if test=" null != beginDate and '' != beginDate">
+            and thrw.time <![CDATA[>=]]>str_to_date(#{beginDate},'%Y-%m-%d')
+        </if>
+        <if test=" null != endDate and '' != endDate">
+            and thrw.time <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d')
+        </if>
+
+
+
+    </select>
+
+    <insert id="batchInsertScanCount" parameterType="java.util.ArrayList" >
+        insert into t_hl_scan_count
+        (approval,machine_name,brand_name,factory_name,type,total_scan,reject,shift_id,date,remark)
+        values
+        <foreach collection="list" separator="," open="(" close=")" index="index">
+        #{index.approval},#{index.machineName},#{index.brandName},#{index.factoryName},
+        #{index.type},#{index.totalScan},#{index.reject},#{index.period},#{index.date},
+        #{index.remark}
+        </foreach>
+    </insert>
+
+    <insert id="batchInsertRejectCount" parameterType="java.util.ArrayList">
+        insert into t_hl_reject_count
+        (count_remark,machine_code,shift_id,date,reject_type,type,remark,factory_name)
+        values
+        <foreach collection="list" separator="," index="index">
+            (#{index.countRemark},#{index.machineCode},#{index.period},#{index.date},#{index.rejectType},
+            #{index.type},#{index.factoryName})
+        </foreach>
+    </insert>
+
+</mapper>

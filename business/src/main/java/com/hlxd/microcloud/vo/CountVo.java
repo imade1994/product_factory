@@ -18,11 +18,24 @@ public class CountVo implements Serializable {
     //返回统计时间
     private String time;
 
+    //
+    private String type;
+
+    private int approval;
+
+    private String machineCode;
+
+    private int reject;
+
+    private int period;
+
+    private int totalScan;
+
     ///count(distinct)返回
-    private String count;
+    private int count;
 
     ///count(*)返回
-    private String count_remark;
+    private int count_remark;
 
 
 }

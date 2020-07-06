@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.SystemUserMapper">
+
+
+    <resultMap id="AuthorizationResultMap" type="com.hlxd.microcloud.vo.SystemUser">
+        <id column="id" property="id" />
+        <result column="user_name" property="userName" />
+        <result column="password" property="passWord" />
+        <result column="department" property="department" />
+        <result column="create_people" property="createPeople" />
+        <result column="check_date" property="checkDate" />
+        <result column="status" property="status" />
+        <collection property="systemRoles" ofType="com.hlxd.microcloud.vo.SystemRole" javaType="java.util.ArrayList">
+            <id column="r_id" property="id" />
+            <result column="r_role_name" property="roleName" />
+            <result column="r_department" property="department" />
+            <result column="r_create_people" property="createPeople" />
+            <result column="r_status" property="status" />
+            <collection property="systemMenuList" ofType="com.hlxd.microcloud.vo.SystemMenu" javaType="java.util.ArrayList">
+                <id column="menu_id" property="id" />
+                <result column="menu_parent_id" property="parentId" />
+                <result column="menu_is_folder" property="isFolder" />
+                <result column="menu_menu_name" property="menuName" />
+                <result column="menu_path" property="path" />
+                <result column="menu_component" property="component" />
+                <result column="menu_status" property="status" />
+                <association property="extraProps"  javaType="com.hlxd.microcloud.vo.MenuMeta">
+                    <result column="meta_menu_id" property="menuId" />
+                    <result column="meta_title" property="title" />
+                    <result column="meta_to" property="to" />
+                    <result column="meta_exact" property="exact" />
+                </association>
+                <collection property="permissions" ofType="java.lang.String" javaType="java.util.ArrayList">
+                    <result column="methods" property="methods" />
+                </collection>
+                <collection property="routes" ofType="com.hlxd.microcloud.vo.SystemMenu" javaType="java.util.ArrayList">
+                    <id column="c_id" property="id" />
+                    <result column="c_menu_name" property="menuName" />
+                    <result column="c_path" property="path" />
+                    <result column="c_component" property="component" />
+                    <result column="c_status" property="status" />
+                    <result column="c_parent_id" property="parentId" />
+                    <result column="c_is_folder" property="isFolder" />
+                    <association property="extraProps" javaType="com.hlxd.microcloud.vo.MenuMeta">
+                        <result column="c_menu_id" property="menuId" />
+                        <result column="c_title" property="title" />
+                        <result column="c_to" property="to" />
+                        <result column="c_exact" property="exact" />
+                    </association>
+                    <!--<collection property="permissions" ofType="java.lang.String" javaType="java.util.ArrayList">
+                        <result column="c_method" property="methods" />
+                    </collection>-->
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+
+
+    <select id="login" resultMap="AuthorizationResultMap" parameterType="java.util.HashMap">
+
+        select
+	thsu.id,
+	thsu.user_name,
+	thsu.password,
+	thsu.department,
+	thsu.create_people,
+	thsu.check_date,
+	thsu.status,
+	thsr.id as r_id,
+	thsr.role_name as r_role_name,
+	thsr.department as r_department,
+	thsr.create_people as r_create_people,
+	thsr.status as r_status,
+	thsm.id as menu_id,
+	thsm.parent_id as menu_parent_id,
+	thsm.is_folder as menu_is_folder,
+	thsm.menu_name as menu_menu_name,
+	thsm.path as menu_path,
+	thsm.component as menu_component,
+	thsm.status as menu_status,
+	thsmm.menu_id as meta_menu_id,
+	thsmm.title as meta_title,
+	thsmm.to as meta_to,
+thsmm.exact as meta_exact,
+    thsm_1.id as c_id,
+	thsm_1.parent_id as c_parent_id,
+	thsm_1.is_folder as c_is_folder,
+	thsm_1.menu_name as c_menu_name,
+	thsm_1.path as c_path,
+	thsm_1.component as c_component,
+	thsm_1.status as c_status,
+	thsmm_1.menu_id as c_menu_id,
+	thsmm_1.title as c_title,
+	thsmm_1.to as c_to,
+    thsmm_1.exact as c_exact,
+	thsmethod.method as methods
+	from
+	t_hl_system_user thsu
+	left join t_hl_system_user_role thsur
+	on thsu.id = thsur.user_id
+	left join t_hl_system_role thsr
+	on thsur.role_id = thsr.id
+	left join
+	t_hl_system_role_menu thsrm
+	on thsr.id = thsrm.role_id
+	left join
+	t_hl_system_menu thsm
+	on thsrm.menu_id = thsm.id
+	left join
+	t_hl_system_menu_meta thsmm
+	on thsm.id = thsmm.menu_id
+	left join t_hl_system_menu thsm_1
+	on  thsm.id=thsm_1.parent_id
+	left join
+	t_hl_system_menu_meta thsmm_1
+	on thsm_1.id = thsmm_1.menu_id
+	left join t_hl_system_method thsmethod
+	on thsrm.method_id = thsmethod.id
+	where thsr.status = '1'
+	and thsrm.status = '1'
+	and thsm.status = '1'
+	and thsmethod.status = '1'
+	and thsu.user_name= #{username}
+	and thsu.password = #{password}
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

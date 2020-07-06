@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.QualityCheckMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.RandomCheckRecord">
+        <id column="id" property="id" />
+        <result column="begin_check_date" property="beginCheckDate" />
+        <result column="end_check_date" property="endCheckDate" />
+        <result column="machineCode" property="machineCode" />
+        <result column="check_type" property="checkType" />
+        <result column="quality_type" property="qualityType" />
+        <result column="qrCode" property="qrCode" />
+        <result column="check_status" property="checkStatus" />
+        <result column="on_line_check" property="onLineCheck" />
+        <collection property="randomCheckDetails" ofType="com.hlxd.microcloud.vo.RandomCheckDetails">
+            <id column="d_id" property="id" />
+            <id column="random_check_id" property="randomCheckId" />
+            <id column="d_qrCode" property="qrCode" />
+        </collection>
+    </resultMap>
+
+
+    <select id="getRandomCheckList" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+        select thrc.id,
+        date_format(thrc.begin_check_date,'%Y-%m-%d %H:%i:%s') as begin_check_date,
+        date_format(thrc.end_check_date,'%Y-%m-%d %H:%i:%s') as end_check_date,
+        thrc.machine_code,
+        thrc.check_type,
+        thrc.quality_type,
+        thrc.qr_code,
+        thrc.check_status,
+        thrc.on_line_check,
+        thrcd.id as d_id,
+        thrcd.random_check_id,
+        thrcd.qr_code as d_qrCode
+        from
+        t_hl_random_check thrc
+        left join
+        t_hl_random_check_detail thrcd
+        on thrcd.random_check_id = thrc.id
+        where
+        1=1
+        <if test="null != qualityType and '' != qualityType">
+        and quality_type =#{qualityType}
+        </if>
+        <if test="null != checkType and '' != checkType">
+        and check_type = #{checkType}
+        </if>
+        <if test="null != brandId and '' != brandId">
+        and brand_id =#{brandId}
+        </if>
+        <if test="null != beginCheckDate and '' != beginCheckDate">
+        and begin_check_date <![CDATA[>=]]> str_to_date(#{beginCheckDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="null != endCheckDate and '' != endCheckDate">
+            and end_check_date <![CDATA[<=]]> str_to_date(#{endCheckDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+    </select>
+
+</mapper>

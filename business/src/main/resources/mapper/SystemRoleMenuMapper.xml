@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.SystemRoleMenuMapper">
+
+
+
+    <delete id="deleteSingleSystemRoleMenu" parameterType="java.lang.String">
+        delete from t_hl_system_role_menu
+        where role_id = #{roleId}
+    </delete>
+
+    <insert id="addSystemRoleMenu" parameterType="java.util.ArrayList">
+        INSERT INTO t_hl_system_role_menu
+        (id,role_id,method_id,menu_id,status)
+        values
+        <foreach collection="list" separator="," index="index">
+            (#{index.id},#{index.roleId},#{index.methodId},#{index.menuId},#{index.status})
+        </foreach>
+    </insert>
+
+    <delete id="deleteSystemRoleMenu" parameterType="java.util.ArrayList">
+        delete from t_hl_system_role_menu
+        where id in
+        <foreach collection="list" separator="," index="index" item="item" open="(" close=")" >
+            #{item}
+        </foreach>
+    </delete>
+
+
+
+
+
+
+
+
+
+
+</mapper>

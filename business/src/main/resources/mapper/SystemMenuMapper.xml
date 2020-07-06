@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.SystemMenuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.SystemMenu">
+        <id column="id" property="id" />
+        <result column="menu_name" property="menuName" />
+        <result column="path" property="path" />
+        <result column="component" property="component" />
+        <result column="status" property="status" />
+        <result column="parent_id" property="parentId" />
+        <result column="is_folder" property="isFolder" />
+        <association property="extraProps" javaType="com.hlxd.microcloud.vo.MenuMeta">
+            <result column="menu_id" property="menuId" />
+            <result column="title" property="title" />
+            <result column="to" property="to" />
+            <result column="exact" property="exact" />
+        </association>
+        <collection property="permissions" ofType="java.lang.String" javaType="java.util.ArrayList">
+            <result column="method" property="methods" />
+        </collection>
+        <collection property="routes" ofType="com.hlxd.microcloud.vo.SystemMenu" javaType="java.util.ArrayList">
+            <id column="c_id" property="id" />
+            <result column="c_menu_name" property="menuName" />
+            <result column="c_path" property="path" />
+            <result column="c_component" property="component" />
+            <result column="c_status" property="status" />
+            <result column="c_parent_id" property="parentId" />
+            <result column="c_is_folder" property="isFolder" />
+            <association property="extraProps" javaType="com.hlxd.microcloud.vo.MenuMeta">
+                <result column="c_menu_id" property="menuId" />
+                <result column="c_title" property="title" />
+                <result column="c_to" property="to" />
+                <result column="c_exact" property="exact" />
+            </association>
+            <!--<collection property="permissions" ofType="java.lang.String" javaType="java.util.ArrayList">
+                <result column="c_method" property="methods" />
+            </collection>-->
+        </collection>
+
+    </resultMap>
+
+    <update id="updateSystemMenu" parameterType="java.util.HashMap">
+        update t_hl_system_menu_meta
+        set title = #{title}
+        where menu_id = #{id}
+    </update>
+
+    <update id="changeStatus" parameterType="java.util.HashMap">
+        update t_hl_system_menu
+        set status = #{status}
+        where id = #{menuId}
+    </update>
+
+    <select id="getSystemMenuList" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+	select
+thsm.id,
+thsm.path,
+thsm.component,
+thsm.status,
+thsmm.title,
+thsme.method,
+thsmm.to,
+thsmm.exact,
+thsm_1.id as c_id,
+thsm_1.path as c_path,
+thsm_1.component as c_component,
+thsm_1.status as c_status,
+thsmm_1.title as c_title,
+thsmm_1.to as c_to,
+thsmm_1.exact as c_exact
+from t_hl_system_menu thsm
+	left join t_hl_system_menu thsm_1
+	on  thsm.id=thsm_1.parent_id
+	left join
+	t_hl_system_menu_meta thsmm
+	on thsm.id = thsmm.menu_id
+	left join
+	t_hl_system_menu_meta thsmm_1
+	on thsm_1.id = thsmm_1.menu_id
+	left join t_hl_system_method thsme
+	on 1=1
+	where thsm.is_folder= 1 and thsm.status = '1'
+    </select>
+</mapper>

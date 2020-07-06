@@ -4,7 +4,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://134.175.90.151:3306/Qrcode?useUnicode=true&characterEncoding=UTF8&useSSL=FALSE&allowMultiQueries=true
+    url: jdbc:mysql://10.210.160.20:8066/qrCode
     username: root
     password: Hlxd@123456
     configuration:
@@ -14,9 +14,6 @@ spring:
       initial-size: 5
       max-total: 5
       max-wait-millis: 200
-  redis:
-    host: localhost
-    port: 6379
 #请求和响应GZIP压缩支持
 feign:
   httpclient:

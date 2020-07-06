@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.MachineMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.Machine">
+        <id column="machine_code" property="machineCode" />
+        <result column="type" property="type" />
+        <result column="status" property="status" />
+        <result column="machine_group" property="machineGroup" />
+        <result column="room" property="room" />
+    </resultMap>
+
+
+    <select id="getMachineList" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+        select * from t_hl_base_machine
+        where 1=1
+        <if test="null != type and '' != type">
+          and  type = #{type}
+        </if>
+    </select>
+
+    <update id="updateMachine" parameterType="com.hlxd.microcloud.vo.Machine">
+        update t_hl_base_machine
+        <trim prefix="set" suffixOverrides=",">
+            <if test="vo.machineGroup!=null">machine_group = #{vo.machineGroup},</if>
+            <if test="vo.room!=null">room = #{vo.room},</if>
+            <if test="vo.status!=null">status = #{vo.status},</if>
+            1=1,
+        </trim>
+        where machine_code = #{vo.machineCode}
+    </update>
+    
+    <insert id="insertMachine" parameterType="java.util.ArrayList">
+        insert into
+        t_hl_base_machine
+        (machine_code,type,status,machine_group,room)
+        values
+        <foreach collection="list" index="index" item="item"  separator=",">
+            (#{item.machineCode},#{item.type},#{item.status},#{item.machineGroup},#{item.room})
+        </foreach>
+    </insert>
+
+
+
+</mapper>

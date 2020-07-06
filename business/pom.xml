@@ -3,19 +3,24 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>product_factory</artifactId>
+        <artifactId>hlxdmicrocloud</artifactId>
         <groupId>com.hlxd</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>code</artifactId>
+    <artifactId>business</artifactId>
     <dependencies>
-        <!--redis 依赖 -->
+        <!--redis 依赖
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
+        </dependency>-->
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>-->
+
          <!-- Canal -->
          <dependency>
              <groupId>com.alibaba.otter</groupId>
@@ -29,7 +34,6 @@
             <artifactId>kafka_2.13</artifactId>
             <version>2.4.1</version>
         </dependency>
-
 
         <!--feign 依赖 -->
     <dependency>
@@ -149,7 +153,12 @@
             <artifactId>influxdb-java</artifactId>
             <version>2.5</version>
         </dependency>
-</dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <finalName>code-server</finalName>

@@ -2,7 +2,7 @@
 
 <configuration scan="true">
 	<property name="APP" value="code" />
-	<property name="LOG_HOME" value="/root/log/code" />
+	<property name="LOG_HOME" value="log/code" />
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{yy-MM-dd.HH:mm:ss.SSS} [%-16t] %-5p %-22c{0} %X{ServiceId} - %m%n</pattern>

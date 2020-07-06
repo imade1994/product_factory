@@ -25,6 +25,16 @@ public class CodeCount implements Serializable {
     private String machineCode;
     //統計數量
     private String count_remark;
+
+    //通过数量
+    private String approval;
+
+    //剔除数量
+    private String reject;
+
+    //总扫描量
+    private String totalScan;
+
     //統計班次
     private int period;
     //统计日毫秒值

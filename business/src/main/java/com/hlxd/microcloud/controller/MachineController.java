@@ -47,7 +47,7 @@ public class MachineController {
      * 更新机台信息
      * 机组，车间，状态
      * */
-    @RequestMapping("updateMachineInformation")
+    @RequestMapping("/updateMachineInformation")
     public Map updateMachineInformation(Machine machine){
         Map returnMap = new HashMap();
         if(null == machine){

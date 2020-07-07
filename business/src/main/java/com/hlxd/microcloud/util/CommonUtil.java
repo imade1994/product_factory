@@ -24,7 +24,7 @@ public final class CommonUtil {
             .writeTimeout(100,TimeUnit.SECONDS);
 
   /** influx 连接工厂 */
-  public static final InfluxDB influxDb = InfluxDBFactory.connect("http://127.0.0.1:8086",client);
+  public static final InfluxDB influxDb = InfluxDBFactory.connect("http://192.168.12.250:8086",client);
 
   public static final String dataBase = "hlxd";
 

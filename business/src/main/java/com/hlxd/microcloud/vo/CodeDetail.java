@@ -19,7 +19,7 @@ public class CodeDetail implements Serializable {
     /**
      * 码段
      * */
-    private String code;
+    private String qrCode;
 
     /**
      * 状态

@@ -70,7 +70,7 @@ public class CodeBatchController {
         Map returnMap = new HashMap();
         String tableName = CommomStatic.TABLE_NAME_PRIFIX+RandomStringUtils.randomAlphanumeric(10);
         codeBatchService.createNewTable(tableName);
-        codeBatch.setTableName(tableName);
+        //codeBatch.setTableName(tableName);
         codeBatchService.insertBatch(codeBatch);
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         returnMap.put(CommomStatic.DATA,CommomStatic.SUCCESS_MESSAGE);

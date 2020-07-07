@@ -54,10 +54,6 @@ public class CodeBatch implements Serializable {
      * */
     private int status;
 
-    /**
-     * 表名
-     * */
-    private String tableName;
 
 
 

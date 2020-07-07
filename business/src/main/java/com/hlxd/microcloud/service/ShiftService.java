@@ -16,7 +16,6 @@ import java.util.Map;
  * @COMPANY HLXD
  * @PROJECT product_factory
  */
-@Data
 public interface ShiftService {
 
     /**

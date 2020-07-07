@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.BrandMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.Brand">
+        <id column="id" property="id" />
+        <result column="brand_name" property="brandName" />
+        <result column="package_barcode" property="packageBarcode" />
+        <result column="strip_barcode" property="stripBarcode" />
+        <result column="item_barcode" property="itemBarcode" />
+        <result column="cigarettes" property="cigarettes" />
+        <result column="packges" property="packages" />
+        <result column="strips" property="strips" />
+    </resultMap>
+
+
+    <select id="getBrandList" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+        select * from t_hl_system_brand
+    </select>
+
+    <update id="updateBrand" parameterType="com.hlxd.microcloud.vo.Brand">
+        update t_hl_system_brand
+        <trim prefix="set" suffixOverrides=",">
+            <if test="vo.brandName!=null">brand_name = #{vo.brandName},</if>
+            <if test="vo.packageBarcode!=null">package_barcode = #{vo.packageBarcode},</if>
+            <if test="vo.stripBarcode!=null">strip_barcode = #{vo.stripBarcode},</if>
+            <if test="vo.itemBarcode!=null">item_barcode = #{vo.itemBarcode},</if>
+            <if test="vo.cigarettes!=null">cigarettes = #{vo.cigarettes},</if>
+            <if test="vo.packages!=null">packages = #{vo.packages},</if>
+            <if test="vo.strips!=null">strips = #{vo.strips},</if>
+        </trim>
+        where id = #{vo.id}
+    </update>
+    
+    <insert id="insertBrand" parameterType="java.util.ArrayList">
+        insert into
+        t_hl_system_brand
+        (id,brand_name,package_barcode,strip_barcode,item_barcode,cigarettes,packages,strips)
+        values
+        <foreach collection="list" index="index" item="item"  separator=",">
+            (#{item.id},#{item.brandName},#{item.packageBarcode},#{item.stripBarcode},#{item.itemBarcode},
+            #{item.cigarettes},#{item.packages},#{item.strips})
+        </foreach>
+    </insert>
+
+
+
+</mapper>

@@ -5,12 +5,12 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.Shift">
         <id column="id" property="id" />
-        <result column="shift_name" property="beginCheckDate" />
-        <result column="status" property="endCheckDate" />
+        <result column="shift_name" property="shiftName" />
+        <result column="status" property="status" />
         <collection property="shiftDetails" ofType="com.hlxd.microcloud.vo.ShiftDetails">
             <id column="d_id" property="id" />
             <id column="shift_id" property="shiftId" />
-            <id column="class_name" property="qrCode" />
+            <id column="class_name" property="className" />
             <id column="begin_date" property="beginDate" />
             <id column="end_date" property="endDate" />
         </collection>
@@ -34,13 +34,16 @@
         on thssd.shift_id = thss.id
         where
         1=1
-        <if test="null != className and '' != className">
-        and class_name LIKE CONCAT(CONCAT('%',#{className}),'%')
+        <if test="null != shiftName and '' != shiftName">
+        and thss.shift_name LIKE CONCAT(CONCAT('%',#{shiftName}),'%')
+        </if>
+        <if test="null != status and '' != status">
+            and thss.status = #{status}
         </if>
     </select>
 
     <update id="updateShift" parameterType="com.hlxd.microcloud.vo.Shift">
-        update
+        update t_hl_system_shift
         <trim prefix="set" suffixOverrides=",">
             <if test="vo.shiftName!=null">shift_name = #{vo.shiftName},</if>
             <if test="vo.status!=null">status = #{vo.status},</if>
@@ -52,7 +55,7 @@
     <insert id="insertShift" parameterType="com.hlxd.microcloud.vo.Shift">
         insert into
         t_hl_system_shift
-        (id,shift_name,status)values(#{vo.id},#{vo.shiftName},#{vo.status})
+        (shift_name,status)values(#{vo.shiftName},#{vo.status})
     </insert>
 
     <select id="validateParent" parameterType="java.util.HashMap" resultType="java.lang.Integer">
@@ -78,9 +81,9 @@
     <insert id="insertShiftDetails" parameterType="com.hlxd.microcloud.vo.ShiftDetails">
         insert into
         t_hl_system_shift_details
-        (id,shift_id,class_name,begin_date,end_date)
+        (shift_id,class_name,begin_date,end_date)
         values
-        (#{vo.id},#{vo.shiftId},#{vo.className},#{vo.beginDate},#{vo.endDate})
+        (#{vo.shiftId},#{vo.className},#{vo.beginDate},#{vo.endDate})
 
 
     </insert>

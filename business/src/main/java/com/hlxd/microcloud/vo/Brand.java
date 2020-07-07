@@ -29,18 +29,18 @@ public class Brand implements Serializable {
     /**
      *包一维条码
      * */
-    private int packageBarcode;
+    private String packageBarcode;
 
 
     /**
      * 条一维条码
      * */
-    private int stripBarcode;
+    private String stripBarcode;
 
     /**
      * 件一条码
      * */
-    private int itemBarcode;
+    private String itemBarcode;
 
     /**
      * 盒支数

@@ -10,7 +10,6 @@
         <result column="check_date" property="checkDate" />
         <result column="check_name" property="checkName" />
         <result column="status" property="status" />
-        <result column="table_name" property="tableName" />
     </resultMap>
 
     <!-- 通用查询映射结果 -->
@@ -64,14 +63,14 @@
 
     <insert id="insertBatch" parameterType="com.hlxd.microcloud.vo.CodeBatch">
         insert into
-        (batch_no,brand_name,code_num,check_date,check_name,status,`table_name`)
-        values (#{vo.batchNo},#{vo.brandName},#{vo.codeNum},#{vo.checkDate},#{vo.checkName},#{vo.status},#{vo.tableName})
+        (batch_no,brand_name,code_num,check_date,check_name,status)
+        values (#{vo.batchNo},#{vo.brandName},#{vo.codeNum},#{vo.checkDate},#{vo.checkName},#{vo.status})
     </insert>
 
     <insert id="createNewTable" parameterType="java.lang.String" statementType="STATEMENT">
         DROP TABLE IF EXISTS ${tableName};
 CREATE TABLE ${tableName}  (
-  `code` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '码',
+  `qrCode` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '码',
   `status` int(1) NULL DEFAULT NULL COMMENT '状态 1：已关联 2：未关联',
   `brand_name` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '牌号',
   `machine_code` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '生产机台',

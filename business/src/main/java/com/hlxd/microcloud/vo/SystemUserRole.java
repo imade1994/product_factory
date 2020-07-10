@@ -23,7 +23,7 @@ public class SystemUserRole implements Serializable {
     /**
      * 角色ID
      * */
-    private String roleId;
+    private String department_id;
 
     /**
      * 用户ID

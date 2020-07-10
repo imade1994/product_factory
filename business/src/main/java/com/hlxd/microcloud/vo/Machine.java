@@ -22,10 +22,10 @@ public class Machine implements Serializable {
 
 
     /**
-     * 机台类型
-     * 1:包装机 2：卷包机
+     * 机台型号
+     *
      * */
-    private String type;
+    private String machineModel;
 
     /**
      * 机组

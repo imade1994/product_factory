@@ -26,7 +26,7 @@ public interface SystemRoleService {
     /**
      * 删除系统角色
      * */
-    void deleteSystemRole(String roleId);
+    void deleteSystemRole(String department_id);
 
     /**
      * 更改系统角色

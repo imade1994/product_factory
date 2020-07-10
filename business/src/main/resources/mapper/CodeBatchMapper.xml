@@ -10,6 +10,21 @@
         <result column="check_date" property="checkDate" />
         <result column="check_name" property="checkName" />
         <result column="status" property="status" />
+        <result column="capsule_num" property="capsuleNum" />
+        <result column="strip_num" property="stripNum" />
+        <result column="supplier" property="supplier" />
+        <result column="check_time" property="checkTime" />
+        <result column="check_status" property="checkStatus" />
+        <result column="type_name" property="typeName" />
+        <collection property="codeBatchDetails" ofType="com.hlxd.microcloud.vo.CodeBatchDetails" javaType="java.util.ArrayList">
+            <result column="id" property="id" />
+            <result column="qrCode" property="qrCode" />
+            <result column="batch_check_date" property="batchCheckDate" />
+            <result column="package_type" property="packageType" />
+            <result column="check_status" property="checkStatus" />
+            <result column="package_name" property="packageType" />
+            <result column="batch_code" property="batchNo" />
+        </collection>
     </resultMap>
 
     <!-- 通用查询映射结果 -->
@@ -36,23 +51,27 @@
     </resultMap>
 
     <select id="getBatch" resultMap="BaseResultMap" parameterType="java.util.HashMap">
-        select * from t_hl_batch_code
+        select
+        thbc.*,thsd.key as package_name
+        from t_hl_batch_code thbc
+        left join t_hl_system_dict thsd
+        on thbc.type_code = thsd.id
         where
         1=1
         <if test="null != brandName and '' != brandName">
-        and brand_name =#{brandName}
+        and thbc.brand_name =#{brandName}
         </if>
         <if test="null != batchNo and '' != batchNo">
-        and batch_no = #{batchNo}
+        and thbc.batch_no = #{batchNo}
         </if>
         <if test="null != beginDate and '' != beginDate">
-        and check_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s')
+        and thbc.check_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="null != endDate and '' != endDate">
-        and check_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+        and thbc.check_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="null != status and '' != status">
-        and status = #{status}
+        and thbc.status = #{status}
         </if>
     </select>
 

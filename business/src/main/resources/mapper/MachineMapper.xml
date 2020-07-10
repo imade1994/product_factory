@@ -5,7 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.Machine">
         <id column="machine_code" property="machineCode" />
-        <result column="type" property="type" />
+        <result column="machine_model" property="machineModel" />
         <result column="status" property="status" />
         <result column="machine_group" property="machineGroup" />
         <result column="room" property="room" />
@@ -15,8 +15,8 @@
     <select id="getMachineList" resultMap="BaseResultMap" parameterType="java.util.HashMap">
         select * from t_hl_base_machine
         where 1=1
-        <if test="null != type and '' != type">
-          and  type = #{type}
+        <if test="null != machineGroup and '' != machineGroup">
+          and  machine_group = #{machineGroup}
         </if>
     </select>
 
@@ -33,10 +33,10 @@
     <insert id="insertMachine" parameterType="java.util.ArrayList">
         insert into
         t_hl_base_machine
-        (machine_code,type,status,machine_group,room)
+        (machine_code,machine_model,status,machine_group,room)
         values
         <foreach collection="list" index="index" item="item"  separator=",">
-            (#{item.machineCode},#{item.type},#{item.status},#{item.machineGroup},#{item.room})
+            (#{item.machineCode},#{item.machineModel},#{item.status},#{item.machineGroup},#{item.room})
         </foreach>
     </insert>
 

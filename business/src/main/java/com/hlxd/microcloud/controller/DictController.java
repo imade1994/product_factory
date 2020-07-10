@@ -8,9 +8,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.hlxd.microcloud.util.CommonUtil.transformMap;
 
 /**
  * CREATED BY IDEA
@@ -31,8 +34,8 @@ public class DictController {
 
 
     @RequestMapping("/getDict")
-    public Map getDictByParam(){
-        Map param = new HashMap();
+    public Map getDictByParam(HttpServletRequest request){
+        Map param = transformMap(request.getParameterMap());
         List<SystemDict> systemDicts = systemDictService.getAllDictList(param);
         param.clear();
         param.put(CommomStatic.STATUS,CommomStatic.SUCCESS);

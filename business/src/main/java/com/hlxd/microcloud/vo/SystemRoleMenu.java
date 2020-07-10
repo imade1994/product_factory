@@ -24,7 +24,7 @@ public class SystemRoleMenu implements Serializable {
     /**
      * 角色ID
      * */
-    private String roleId;
+    private String departmentId;
 
     /**
      * 菜单ID

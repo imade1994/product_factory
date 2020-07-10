@@ -53,10 +53,10 @@ public class RoleController {
 
     @RequestMapping("/deleteRole")
     @Transactional
-    public Map deleteRole(@RequestParam("roleId")String roleId){
+    public Map deleteRole(@RequestParam("department_id")String department_id){
         Map returnMap = new HashMap();
-        systemRoleService.deleteSystemRole(roleId);
-        systemRoleMenuService.deleteSingleSystemRoleMenu(roleId);
+        systemRoleService.deleteSystemRole(department_id);
+        systemRoleMenuService.deleteSingleSystemRoleMenu(department_id);
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
         return returnMap;
@@ -68,7 +68,7 @@ public class RoleController {
         Map returnMap = new HashMap();
         Map paramMap = transformMap(request.getParameterMap());
         if(null != paramMap){
-            if(null != paramMap.get("roleId")){
+            if(null != paramMap.get("department_id")){
                 List<String>  insertList = (List<String>) paramMap.get("insert");
                 List<String>  deleteList = (List<String>) paramMap.get("delete");
                 List<SystemRoleMenu> systemRoleMenus = new ArrayList<>();
@@ -82,7 +82,7 @@ public class RoleController {
                         SystemRoleMenu systemRoleMenu = new SystemRoleMenu();
                         systemRoleMenu.setId(UUID.randomUUID().toString());
                         systemRoleMenu.setMenuId(ids[0]);
-                        systemRoleMenu.setRoleId(ids[1]);
+                        systemRoleMenu.setDepartmentId(ids[1]);
                         systemRoleMenu.setMethodId(ids[2]);
                         systemRoleMenu.setStatus(1);
                         systemRoleMenus.add(systemRoleMenu);
@@ -111,10 +111,10 @@ public class RoleController {
     }
 
     @RequestMapping("/getRoleDetail")
-    public Map getRoleDetail(@RequestParam("roleId")String roleId){
+    public Map getRoleDetail(@RequestParam("department_id")String department_id){
         Map paramMap = new HashMap();
         Map returnMap = new HashMap();
-        paramMap.put("roleId",roleId);
+        paramMap.put("department_id",department_id);
         List<SystemRole> systemRoles = systemRoleService.getAuthorizationRole(paramMap);
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         returnMap.put(CommomStatic.DATA,systemRoles);

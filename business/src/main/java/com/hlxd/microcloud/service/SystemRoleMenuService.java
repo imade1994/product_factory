@@ -31,7 +31,7 @@ public interface SystemRoleMenuService {
     /**
      * 删除角色菜单信息
      * */
-    void deleteSingleSystemRoleMenu(String roleId);
+    void deleteSingleSystemRoleMenu(String department_id);
 
     /**
      *查询角色菜单信息

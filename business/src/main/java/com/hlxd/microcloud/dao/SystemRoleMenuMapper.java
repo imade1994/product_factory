@@ -36,7 +36,7 @@ public interface SystemRoleMenuMapper {
     /**
      * 删除角色菜单信息
      * */
-    void deleteSingleSystemRoleMenu(@Param("roleId")String roleId);
+    void deleteSingleSystemRoleMenu(@Param("department_id")String department_id);
 
     /**
      *查询角色菜单信息

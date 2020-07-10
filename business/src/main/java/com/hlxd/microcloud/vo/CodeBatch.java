@@ -1,8 +1,10 @@
 package com.hlxd.microcloud.vo;
 
 import lombok.Data;
+import scala.math.BigInt;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * CREATED BY IDEA
@@ -27,6 +29,35 @@ public class CodeBatch implements Serializable {
      * 牌号
      * */
     private String brandName;
+
+    /***
+     * 小盒码数量
+     */
+    private BigInt capsuleNum;
+
+    /**
+     * 条盒码数量
+     * */
+    private BigInt stripNum;
+
+
+    /**
+     *
+     * 供应商
+     * */
+    private String supplier;
+
+
+    /**
+     * 检查时间
+     *
+     * */
+    private String checkTime;
+
+
+    /**
+     *
+     * */
 
 
     /**
@@ -53,6 +84,32 @@ public class CodeBatch implements Serializable {
      * 3：已退回
      * */
     private int status;
+
+    /**
+     * 抽检状态
+     *
+     * */
+    private int checkStatus;
+
+
+    /**
+     * 抽检类型
+     * */
+    private int typeCode;
+
+    /**
+     * 抽检类型名
+     * */
+    private  String typeName;
+
+
+
+    /***
+     *
+     * 抽检详情List
+     *
+     * */
+    private List<CodeBatchDetails> codeBatchDetails;
 
 
 

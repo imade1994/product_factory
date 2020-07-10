@@ -31,8 +31,8 @@ public class SystemRoleServiceImpl implements SystemRoleService {
     }
 
     @Override
-    public void deleteSystemRole(String roleId) {
-        systemRoleMapper.deleteSystemRole(roleId);
+    public void deleteSystemRole(String department_id) {
+        systemRoleMapper.deleteSystemRole(department_id);
     }
 
     @Override

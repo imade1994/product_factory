@@ -56,22 +56,22 @@
     </resultMap>
 
     <delete id="deleteSystemRole" parameterType="java.lang.String">
-        delete from t_hl_system_role
-        where id = #{roleId}
+        delete from t_hl_system_department
+        where id = #{department_id}
     </delete>
 
     <update id="updateSystemRole" parameterType="java.util.HashMap">
-        update t_hl_system_role
+        update t_hl_system_department
         <trim prefix="set" suffixOverrides=",">
             <if test="roleName!=null">role_name = #{roleName},</if>
             <if test="department!=null">department = #{department},</if>
             <if test="status!=null">status = #{status},</if>
         </trim>
-        where id = #{roleId}
+        where id = #{department_id}
     </update>
 
     <insert id="addSystemRole" parameterType="com.hlxd.microcloud.vo.SystemRole">
-        insert into t_hl_system_role
+        insert into t_hl_system_department
         (id,role_name,department,create_people,status)
         values
         (#{vo.id},#{vo.roleName},#{vo.department},#{vo.createPeople},#{vo.status})
@@ -102,10 +102,10 @@ thsmm_1.title as c_title,
 thsmm_1.to as c_to,
 thsmm_1.exact as c_exact
 	thsmethod.method as methods
-	from t_hl_system_role thsr
+	from t_hl_system_department thsr
 	left join
-	t_hl_system_role_menu thsrm
-	on thsr.id = thsrm.role_id
+	t_hl_system_department_menu thsrm
+	on thsr.id = thsrm.department_id
 	left join
 	t_hl_system_menu thsm
 	on thsrm.menu_id = thsm.id
@@ -123,7 +123,7 @@ thsmm_1.exact as c_exact
 	and thsrm.status = '1'
 	and thsm.status = '1'
 	and thsmethod.status = '1'
-	and thsr.id = #{roleId}
+	and thsr.id = #{department_id}
     </select>
 
 
@@ -131,10 +131,10 @@ thsmm_1.exact as c_exact
     <select id="getSystemRole" resultMap="BaseResultMap" parameterType="java.util.HashMap">
 	SELECT
 	*
-	FROM t_hl_system_role
+	FROM t_hl_system_department
 	where 1=1
-    <if test="null != roleId and '' != roleId">
-        and id = #{roleId}
+    <if test="null != department_id and '' != department_id">
+        and id = #{department_id}
     </if>
     </select>
 

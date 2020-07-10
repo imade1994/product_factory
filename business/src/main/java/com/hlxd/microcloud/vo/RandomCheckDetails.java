@@ -33,4 +33,9 @@ public class RandomCheckDetails implements Serializable {
      * 包-件码
      * */
     private String qrCode;
+
+    /**
+     * 状态
+     * */
+    private int status;
 }

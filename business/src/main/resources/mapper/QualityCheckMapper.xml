@@ -7,9 +7,11 @@
         <id column="id" property="id" />
         <result column="begin_check_date" property="beginCheckDate" />
         <result column="end_check_date" property="endCheckDate" />
-        <result column="machineCode" property="machineCode" />
+        <result column="machine_code" property="machineCode" />
         <result column="check_type" property="checkType" />
         <result column="quality_type" property="qualityType" />
+        <result column="shift_id" property="shiftId" />
+        <result column="check_people" property="checkPeople" />
         <result column="qrCode" property="qrCode" />
         <result column="check_status" property="checkStatus" />
         <result column="on_line_check" property="onLineCheck" />
@@ -17,6 +19,7 @@
             <id column="d_id" property="id" />
             <id column="random_check_id" property="randomCheckId" />
             <id column="d_qrCode" property="qrCode" />
+            <id column="d_status" property="status" />
         </collection>
     </resultMap>
 
@@ -28,12 +31,15 @@
         thrc.machine_code,
         thrc.check_type,
         thrc.quality_type,
+        thrc.check_people,
+        thrc.shift_id,
         thrc.qr_code,
         thrc.check_status,
         thrc.on_line_check,
         thrcd.id as d_id,
         thrcd.random_check_id,
-        thrcd.qr_code as d_qrCode
+        thrcd.qr_code as d_qrCode,
+        thrcd.status as d_status
         from
         t_hl_random_check thrc
         left join

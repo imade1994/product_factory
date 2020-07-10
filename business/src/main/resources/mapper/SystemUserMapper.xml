@@ -97,13 +97,13 @@ thsmm.exact as meta_exact,
 	thsmethod.method as methods
 	from
 	t_hl_system_user thsu
-	left join t_hl_system_user_role thsur
+	left join t_hl_system_user_department thsur
 	on thsu.id = thsur.user_id
-	left join t_hl_system_role thsr
-	on thsur.role_id = thsr.id
+	left join t_hl_system_department thsr
+	on thsur.department_id = thsr.id
 	left join
-	t_hl_system_role_menu thsrm
-	on thsr.id = thsrm.role_id
+	t_hl_system_department_menu thsrm
+	on thsr.id = thsrm.department_id
 	left join
 	t_hl_system_menu thsm
 	on thsrm.menu_id = thsm.id
@@ -121,6 +121,7 @@ thsmm.exact as meta_exact,
 	and thsrm.status = '1'
 	and thsm.status = '1'
 	and thsmethod.status = '1'
+	and thsm.is_folder = '1'
 	and thsu.user_name= #{username}
 	and thsu.password = #{password}
     </select>

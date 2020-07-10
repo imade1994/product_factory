@@ -34,8 +34,8 @@ public class SystemRoleMenuServiceImpl implements SystemRoleMenuService {
     }
 
     @Override
-    public void deleteSingleSystemRoleMenu(String roleId) {
-        systemRoleMenuMapper.deleteSingleSystemRoleMenu(roleId);
+    public void deleteSingleSystemRoleMenu(String department_id) {
+        systemRoleMenuMapper.deleteSingleSystemRoleMenu(department_id);
     }
 
     @Override

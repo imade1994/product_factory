@@ -1,6 +1,7 @@
 package com.hlxd.microcloud.dao;
 
 import com.hlxd.microcloud.vo.CodeBatch;
+import com.hlxd.microcloud.vo.CodeBatchDetails;
 import com.hlxd.microcloud.vo.CodeDetail;
 import com.hlxd.microcloud.vo.UploadRecord;
 import org.apache.ibatis.annotations.Mapper;
@@ -66,6 +67,22 @@ public interface CodeBatchMapper {
      * 验证是否为失败任务
      * */
     int validateUploadRecord(@Param("id")int id);
+
+    /**
+     * 批次抽检
+     * */
+    int validateBatchCode(Map map);
+
+    /**
+     * 插入抽检详情
+     *
+     * */
+    void insertCheckDetails(@Param("vo") CodeBatchDetails codeBatchDetails);
+
+    /**
+     * 更新批次状态
+     * */
+    void updateBatchStatus(Map map);
 
 
 

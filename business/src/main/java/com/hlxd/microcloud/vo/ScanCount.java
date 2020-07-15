@@ -58,7 +58,7 @@ public class ScanCount implements Serializable {
     /**
      *类型 1：包装机 2：装箱机
      * */
-    private int type;
+    private int typeCode;
 
     /**
      *随机抽检数
@@ -73,9 +73,15 @@ public class ScanCount implements Serializable {
 
     /**
      * 数采产量
-     *
+     *小盒
      * */
-    private int collectionCount;
+    private int collectionCountPackage;
+
+    /**
+     * 数采产量
+     *条盒
+     * */
+    private int collectionCountStrip;
 
     /**
      * 工作效率
@@ -105,7 +111,7 @@ public class ScanCount implements Serializable {
      *日期 年月日
      * format YYYY-mm-DD
      * */
-    private String time;
+    private String lastTime;
 
     /**
      *记录备注

@@ -222,7 +222,7 @@ public final class CommonUtil {
         return returnStr;
     }
 
-  public static ProCode changeCode(ProCode oldProCode) {
+  /*public static ProCode changeCode(ProCode oldProCode) {
     ProCode proCode = new ProCode();
     proCode.setTime(oldProCode.getTime());
     List<ProCode> proCodes = new ArrayList<>();
@@ -234,9 +234,9 @@ public final class CommonUtil {
     proCode.setRemark(oldProCode.getRemark());
     proCode.setType(oldProCode.getType()+1);
     return proCode;
-  }
+  }*/
 
-  public static Map influxDbDateToJsonObject(String code) throws InstantiationException, IllegalAccessException {
+  /*public static Map influxDbDateToJsonObject(String code) throws InstantiationException, IllegalAccessException {
     QueryResult queryResult = new QueryResult();
     Query query = new Query("select * from codeRelation where qrCode = '" + code + "' or baoCode = '"+code+"' or jianCode = '"+code+"' order by time desc", dataBase);
 
@@ -300,7 +300,7 @@ public final class CommonUtil {
       }
     }
     return returnMap;
-  }
+  }*/
 
   /** 生成对应实体对象 */
   public static List getQueryData(
@@ -352,7 +352,7 @@ public final class CommonUtil {
    *插入時序數據庫
    *
    * */
-  public static void insertCodeRelationFromMap(Map map) throws ParseException {
+ /* public static void insertCodeRelationFromMap(Map map) throws ParseException {
     Map<String,List<ProCode>> baoMap = (Map<String, List<ProCode>>) map.get("1");
     log.info("包MAP大小-*----------------------"+baoMap.keySet().size());
     Map<String,List<ProCode>> tiaoMap = (Map<String, List<ProCode>>) map.get("2");
@@ -407,7 +407,7 @@ public final class CommonUtil {
         }
     }
     System.out.println("循环总耗时***********************************"+(new Date().getTime()-beginDate));
-  }
+  }*/
 
     /**
      * map转换数组

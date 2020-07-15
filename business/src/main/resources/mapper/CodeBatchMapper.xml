@@ -8,7 +8,7 @@
         <result column="brand_name" property="brandName" />
         <result column="code_num" property="codeNum" />
         <result column="check_date" property="checkDate" />
-        <result column="check_name" property="checkName" />
+        <result column="check_people" property="checkName" />
         <result column="status" property="status" />
         <result column="capsule_num" property="capsuleNum" />
         <result column="strip_num" property="stripNum" />
@@ -17,24 +17,21 @@
         <result column="check_status" property="checkStatus" />
         <result column="type_name" property="typeName" />
         <collection property="codeBatchDetails" ofType="com.hlxd.microcloud.vo.CodeBatchDetails" javaType="java.util.ArrayList">
-            <result column="id" property="id" />
-            <result column="qrCode" property="qrCode" />
-            <result column="batch_check_date" property="batchCheckDate" />
-            <result column="package_type" property="packageType" />
-            <result column="check_status" property="checkStatus" />
-            <result column="package_name" property="packageType" />
-            <result column="batch_code" property="batchNo" />
+            <result column="d_qrCode" property="qrCode" />
+            <result column="d_package_Type" property="packageType" />
+            <result column="d_batch_no" property="batchNo" />
+            <result column="d_brand_id" property="brandId" />
         </collection>
     </resultMap>
 
     <!-- 通用查询映射结果 -->
     <resultMap id="CodeDetailMap" type="com.hlxd.microcloud.vo.CodeDetail">
-        <id column="code" property="code" />
-        <result column="status" property="status" />
-        <result column="machine_code" property="machineCode" />
+        <id column="qrCode" property="qrCode" />
+        <result column="package_type" property="packageType" />
+        <result column="batch_no" property="batchNo" />
         <result column="brand_name" property="brandName" />
-        <result column="scan_date" property="scanDate" />
-        <result column="validate_status" property="validateStatus" />
+        <result column="code_status" property="codeStatus" />
+        <result column="machine_code" property="machineCode" />
     </resultMap>
 
     <!-- 通用查询映射结果 -->
@@ -75,9 +72,21 @@
         </if>
     </select>
 
-    <select id="getCodeDetail" resultMap="CodeDetailMap" parameterType="java.util.HashMap" statementType="STATEMENT">
-        select * from ${tableName}
-        where validate_status = ${type}
+    <select id="getCodeDetail" resultMap="CodeDetailMap" parameterType="java.util.HashMap">
+    select
+    thsbc.qrCode,
+    thsbc.package_type,
+    thsb.brand_name,
+    thsbc.batch_no,
+    thsbc.code_status,
+    thsc.machine_code
+    from t_hl_system_batch_code thsbc
+    left join t_hl_system_brand thsb
+    on thsbc.brand_id = thsb.id
+    left join t_hl_system_code thsc
+    on thsc.qrCode = thsbc.qrCode
+    where thsbc.batch_no = #{batchNo}
+    and thsbc.package_type = #{packageType}
     </select>
 
     <insert id="insertBatch" parameterType="com.hlxd.microcloud.vo.CodeBatch">
@@ -120,6 +129,27 @@ SET FOREIGN_KEY_CHECKS = 1;
         select count(*) from t_hl_upload_record
         where id = #{id}
     </select>
+
+
+    <select id="validateBatchCode" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        select count(*) from t_hl_system_batch_code
+        where batch_no = #{batchNo}
+        and package_type = #{packageType}
+        and qrCode = #{qrCode}
+    </select>
+    
+    <insert id="insertCheckDetails" parameterType="com.hlxd.microcloud.vo.CodeBatchDetails">
+    insert into t_hl_batch_check_details
+    (batch_no,qrCode,batch_check_date,package_type,check_status)
+    values
+    (#{vo.batchNo},#{vo.qrCode},now(),#{vo.packageType},#{vo.checkStatus})
+    </insert>
+
+    <update id="updateBatchStatus" parameterType="java.util.HashMap" >
+        update t_hl_batch_code
+        set check_status = #{checkStatus}
+        where batch_no = #{batchNo}
+    </update>
 
 
 

@@ -93,18 +93,45 @@
 
 
     <select id="getDictList" resultMap="BaseResultMap" parameterType="java.util.HashMap">
-	SELECT
-	*
-	FROM t_hl_system_dict
-	where 1=1
+        select
+        thsd.id,
+        thsd.parent_id,
+        thsd.key,
+        thsd.value,
+        thsd.create_people,
+        thsd.last_update_date,
+        thsd.status,
+        thsd.create_date,
+        thsd_1.id as c_id,
+        thsd_1.parent_id as c_parent_id,
+        thsd_1.key as c_key,
+        thsd_1.value as c_value,
+        thsd_1.create_people as c_create_people,
+        thsd_1.last_update_date as c_last_update_date,
+        thsd_1.status as c_status,
+        thsd_1.create_date as c_create_date,
+        thsd_2.id as c1_id,
+        thsd_2.parent_id as c1_parent_id,
+        thsd_2.key as c1_key,
+        thsd_2.value as c1_value,
+        thsd_2.create_people as c1_create_people,
+        thsd_2.last_update_date as c1_last_update_date,
+        thsd_2.status as c1_status,
+        thsd_2.create_date as c1_create_date
+        from t_hl_system_dict thsd
+        left join t_hl_system_dict thsd_1
+        on thsd.id = thsd_1.parent_id
+        left join t_hl_system_dict thsd_2
+        on thsd_1.id = thsd_2.parent_id
+        where thsd.status = 1
     <if test="null != parentId and '' != parentId">
-        and parent_id = #{parentId}
+        and thsd.parent_id = #{parentId}
     </if>
     <if test="null != status and '' != status">
-       and status =#{status}
+       and thsd.status =#{status}
     </if>
     <if test="null != id and '' != id">
-        and id =#{id}
+        and thsd.id =#{id}
     </if>
     </select>
 

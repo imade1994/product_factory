@@ -7,8 +7,9 @@
         <id column="machine_code" property="machineCode" />
         <result column="machine_model" property="machineModel" />
         <result column="status" property="status" />
-        <result column="machine_group" property="machineGroup" />
+        <result column="group_code" property="machineGroup" />
         <result column="room" property="room" />
+        <result column="shift_id" property="shiftId" />
     </resultMap>
 
 

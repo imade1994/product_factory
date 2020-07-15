@@ -1,6 +1,7 @@
 package com.hlxd.microcloud.service;
 
 import com.hlxd.microcloud.vo.CodeBatch;
+import com.hlxd.microcloud.vo.CodeBatchDetails;
 import com.hlxd.microcloud.vo.CodeDetail;
 import com.hlxd.microcloud.vo.UploadRecord;
 
@@ -60,4 +61,24 @@ public interface CodeBatchService {
      * 验证是否为失败任务
      * */
     int validateUploadRecord(int id);
+
+
+    /**
+     * 批次抽检
+     * */
+    int validateBatchCode(Map map);
+
+
+
+    /**
+     * 插入抽检详情
+     *
+     * */
+    void insertCheckDetails(CodeBatchDetails codeBatchDetails);
+
+
+    /**
+     * 更新批次状态
+     * */
+    void updateBatchStatus(Map map);
 }

@@ -4,6 +4,8 @@ import com.hlxd.microcloud.service.CodeBatchService;
 import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.util.CommonUtil;
 import com.hlxd.microcloud.vo.CodeBatch;
+import com.hlxd.microcloud.vo.CodeBatchDetails;
+import com.hlxd.microcloud.vo.CodeDetail;
 import com.hlxd.microcloud.vo.UploadRecord;
 //import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.apache.commons.lang.RandomStringUtils;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletRequest;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,23 +48,19 @@ public class CodeBatchController {
     }
 
     @RequestMapping("/getCodeDetail")
-    public Map getCodeDetail(@RequestParam("tableName")String tableName){
+    public Map getCodeDetail(@RequestParam("batchNo")String batchNo){
         Map returnMap = new HashMap();
         Map param = new HashMap();
-        //判断参数中是否存在非法字符串
-        if(CommonUtil.validateParams(tableName)==0){
-            param.put("tableName",tableName);
-            param.put("type","1");
-            Map map = new HashMap();
-            map.put("1",codeBatchService.getCodeDetail(param));
-            param.replace("type","2");
-            map.put("2",codeBatchService.getCodeDetail(param));
-            returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
-            returnMap.put(CommomStatic.DATA,map);
-        }else{
-            returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
-            returnMap.put(CommomStatic.MESSAGE,CommomStatic.wrongTags.get(CommomStatic.illegal_Params));
-        }
+        param.put("batchNo",batchNo);
+        param.put("packageType",1);
+        List<CodeDetail> codeDetails = codeBatchService.getCodeDetail(param);
+        Map temMap = new HashMap();
+        param.replace("packageType",2);
+        List<CodeDetail> codeDetails1 = codeBatchService.getCodeDetail(param);
+        temMap.put("1",codeDetails);
+        temMap.put("2",codeDetails1);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,temMap);
         return returnMap;
     }
 
@@ -104,6 +103,61 @@ public class CodeBatchController {
                 returnMap.put(CommomStatic.MESSAGE,CommomStatic.wrongTags.get(CommomStatic.lack_Params));
             }
         }
+        return returnMap;
+    }
+
+
+    /**
+     * 手动抽检接口
+     *
+     * */
+    @RequestMapping("/validateBatchCode")
+    public Map validateBatchCode(@RequestParam("batchNo")String batchNo,@RequestParam("qrCode")String qrCode,@RequestParam("packageType") BigInteger packageType){
+        Map paramMap  = new HashMap();
+        Map returnMap = new HashMap();
+        paramMap.put("batchNo",batchNo);
+        paramMap.put("qrCode",qrCode);
+        paramMap.put("packageType",packageType);
+        int count  = codeBatchService.validateBatchCode(paramMap);
+        CodeBatchDetails codeBatchDetails = new CodeBatchDetails();
+        codeBatchDetails.setBatchNo(batchNo);
+        codeBatchDetails.setPackageType(packageType);
+        codeBatchDetails.setQrCode(qrCode);
+        switch (count)
+        {
+            case 0:
+                codeBatchDetails.setCheckStatus(0);
+                returnMap.put(CommomStatic.DATA,0);
+                break;
+            case 1:
+                codeBatchDetails.setCheckStatus(1);
+                returnMap.put(CommomStatic.DATA,1);
+                break;
+            default:
+                codeBatchDetails.setCheckStatus(2);
+                returnMap.put(CommomStatic.DATA,2);
+                break;
+        }
+        codeBatchService.insertCheckDetails(codeBatchDetails);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        return returnMap;
+    }
+
+
+
+    /**
+     * 拒收，或者放行批次
+     *
+     * */
+        @RequestMapping("/updateBatchStatus")
+    public Map updateBatchStatus(@RequestParam("batchNo")String batchNo,@RequestParam("checkStatus")Integer checkStatus){
+        Map paramMap = new HashMap();
+        Map returnMap = new HashMap();
+        paramMap.put("batchNo",batchNo);
+        paramMap.put("checkStatus",checkStatus);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,CommomStatic.SUCCESS_MESSAGE);
+        codeBatchService.updateBatchStatus(paramMap);
         return returnMap;
     }
 

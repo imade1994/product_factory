@@ -4,6 +4,7 @@ import lombok.Data;
 import scala.math.BigInt;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 
 /**
  * CREATED BY IDEA
@@ -20,7 +21,7 @@ public class CodeBatchDetails implements Serializable {
     /**
      * id
      * */
-    private BigInt id;
+    private BigInteger id;
 
     /**
      * 批次
@@ -45,7 +46,7 @@ public class CodeBatchDetails implements Serializable {
      *
      * 包装类型
      * */
-    private BigInt packageType;
+    private BigInteger packageType;
 
 
     /**

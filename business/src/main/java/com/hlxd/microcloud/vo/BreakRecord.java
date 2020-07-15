@@ -29,7 +29,12 @@ public class BreakRecord implements Serializable {
     /**
      * 停机开始时间
      * */
-    private String date;
+    private String beginDate;
+
+    /**
+     * 停机开始时间
+     * */
+    private String endDate;
 
     /**
      * 班次班组 1：早 2：中 3：晚

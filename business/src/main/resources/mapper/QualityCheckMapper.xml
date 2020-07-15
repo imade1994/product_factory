@@ -8,13 +8,12 @@
         <result column="begin_check_date" property="beginCheckDate" />
         <result column="end_check_date" property="endCheckDate" />
         <result column="machine_code" property="machineCode" />
-        <result column="check_type" property="checkType" />
-        <result column="quality_type" property="qualityType" />
+        <result column="check_type_code" property="checkType" />
+        <result column="quality_type_code" property="qualityType" />
         <result column="shift_id" property="shiftId" />
         <result column="check_people" property="checkPeople" />
         <result column="qrCode" property="qrCode" />
         <result column="check_status" property="checkStatus" />
-        <result column="on_line_check" property="onLineCheck" />
         <collection property="randomCheckDetails" ofType="com.hlxd.microcloud.vo.RandomCheckDetails">
             <id column="d_id" property="id" />
             <id column="random_check_id" property="randomCheckId" />
@@ -29,17 +28,16 @@
         date_format(thrc.begin_check_date,'%Y-%m-%d %H:%i:%s') as begin_check_date,
         date_format(thrc.end_check_date,'%Y-%m-%d %H:%i:%s') as end_check_date,
         thrc.machine_code,
-        thrc.check_type,
-        thrc.quality_type,
+        thrc.check_type_code,
+        thrc.quality_type_code,
         thrc.check_people,
         thrc.shift_id,
         thrc.qr_code,
         thrc.check_status,
-        thrc.on_line_check,
         thrcd.id as d_id,
         thrcd.random_check_id,
         thrcd.qr_code as d_qrCode,
-        thrcd.status as d_status
+        thrcd.random_check_status_code as d_status
         from
         t_hl_random_check thrc
         left join
@@ -48,10 +46,10 @@
         where
         1=1
         <if test="null != qualityType and '' != qualityType">
-        and quality_type =#{qualityType}
+        and quality_type_code =#{qualityType}
         </if>
         <if test="null != checkType and '' != checkType">
-        and check_type = #{checkType}
+        and check_type_code = #{checkType}
         </if>
         <if test="null != brandId and '' != brandId">
         and brand_id =#{brandId}

@@ -30,11 +30,11 @@ public class ProCode implements Serializable {
     /**
      * 生产日期
      * */
-    private String time;
+    private String relationDate;
     /**
      * 产品ID
      * */
-    private String productId;
+    private String brandId;
     /**
      * 产品名
      * */
@@ -54,7 +54,7 @@ public class ProCode implements Serializable {
     /**
      * 包装规格
      * */
-    private int  type;
+    private int  packageType;
     /**
      * 备注
      * */
@@ -64,6 +64,21 @@ public class ProCode implements Serializable {
      * 无用字段
      * */
     private String produceDate;
+
+    /**
+     *码段批次号
+     * */
+    private String batchNo;
+
+    /**
+     * 工单号
+     * */
+    private String workBatchNo;
+
+    /**
+     * 启用排班ID
+     * */
+    private String shiftId;
 
 
     /***
@@ -81,6 +96,12 @@ public class ProCode implements Serializable {
      * 制丝工单数据
      * *//*
     private Throwing throwing;*/
+
+
+    /**
+     * 查询结果包装规格
+     * */
+    private int originPack;
 
 
 

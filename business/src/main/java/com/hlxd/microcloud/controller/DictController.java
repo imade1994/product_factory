@@ -43,6 +43,19 @@ public class DictController {
         return param;
     }
 
+    @RequestMapping("/getDictList")
+    public Map getDictListByParam(HttpServletRequest request){
+        Map param = transformMap(request.getParameterMap());
+        List<SystemDict> systemDicts = systemDictService.getDictList(param);
+        param.clear();
+        param.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        param.put(CommomStatic.DATA,systemDicts);
+        return param;
+    }
+
+
+
+
 
     @RequestMapping("/addDict")
     public Map addDict(SystemDict systemDict){

@@ -24,6 +24,11 @@ public class RejectCount implements Serializable {
 
     private float countRemark;
 
+    /**
+     * 二维码
+     * */
+    private String qrCode;
+
 
     private String machineCode;
 

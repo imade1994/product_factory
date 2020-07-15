@@ -4,6 +4,7 @@ import lombok.Data;
 import scala.math.BigInt;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -33,12 +34,12 @@ public class CodeBatch implements Serializable {
     /***
      * 小盒码数量
      */
-    private BigInt capsuleNum;
+    private BigInteger capsuleNum;
 
     /**
      * 条盒码数量
      * */
-    private BigInt stripNum;
+    private BigInteger stripNum;
 
 
     /**
@@ -63,7 +64,7 @@ public class CodeBatch implements Serializable {
     /**
      * 数量
      * */
-    private int codeNum;
+    private BigInteger codeNum;
 
 
     /**
@@ -95,7 +96,7 @@ public class CodeBatch implements Serializable {
     /**
      * 抽检类型
      * */
-    private int typeCode;
+    private BigInteger typeCode;
 
     /**
      * 抽检类型名

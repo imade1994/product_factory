@@ -29,9 +29,9 @@ public final class CommomStatic {
 
     public static final String ENDDATE="endDate";
 
-    public static final String TYPE="type";
+    public static final String TYPE="typeCode";
 
-    public static final String TIME="time";
+    public static final String TIME="lastTime";
 
 
     public static final String SUCCESS_MESSAGE="success";

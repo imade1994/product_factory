@@ -64,7 +64,7 @@ public class ScheduleConfig {
     }
 
 
-    @Scheduled(cron = "0 0 0 * * ?")
+   /* @Scheduled(cron = "0 0 0 * * ?")
     @RequestMapping("/upload")
     //@PostConstruct
     public static void upload() throws ParseException, InstantiationException, IllegalAccessException {
@@ -107,7 +107,7 @@ public class ScheduleConfig {
 
 
     }
-
+*/
 
     //@Scheduled(cron = "0 0 0 * * ?")
     @RequestMapping("/count")

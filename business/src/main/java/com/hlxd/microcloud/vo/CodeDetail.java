@@ -3,6 +3,7 @@ package com.hlxd.microcloud.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 
 /**
  * CREATED BY IDEA
@@ -23,8 +24,20 @@ public class CodeDetail implements Serializable {
 
     /**
      * 状态
+     * 状态 0 仓库 1 生产中 2 已退回
      * */
-    private int status;
+    private int codeStatus;
+
+    /**
+     * 批次号
+     *
+     * */
+    private String batchNo;
+
+    /**
+     * 包装类型
+     * */
+    private BigInteger packageType;
 
     /**
      * 牌号

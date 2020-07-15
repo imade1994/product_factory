@@ -45,4 +45,9 @@ public class Machine implements Serializable {
      * */
     private int status;
 
+    /**
+     * 班制ID
+     * */
+    private int shiftId;
+
 }

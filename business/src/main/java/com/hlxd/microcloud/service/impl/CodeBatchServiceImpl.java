@@ -3,6 +3,7 @@ package com.hlxd.microcloud.service.impl;
 import com.hlxd.microcloud.dao.CodeBatchMapper;
 import com.hlxd.microcloud.service.CodeBatchService;
 import com.hlxd.microcloud.vo.CodeBatch;
+import com.hlxd.microcloud.vo.CodeBatchDetails;
 import com.hlxd.microcloud.vo.CodeDetail;
 import com.hlxd.microcloud.vo.UploadRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,5 +67,20 @@ public class CodeBatchServiceImpl implements CodeBatchService {
     @Override
     public int validateUploadRecord(int id) {
         return codeBatchMapper.validateUploadRecord(id);
+    }
+
+    @Override
+    public int validateBatchCode(Map map) {
+        return codeBatchMapper.validateBatchCode(map);
+    }
+
+    @Override
+    public void insertCheckDetails(CodeBatchDetails codeBatchDetails) {
+        codeBatchMapper.insertCheckDetails(codeBatchDetails);
+    }
+
+    @Override
+    public void updateBatchStatus(Map map) {
+        codeBatchMapper.updateBatchStatus(map);
     }
 }

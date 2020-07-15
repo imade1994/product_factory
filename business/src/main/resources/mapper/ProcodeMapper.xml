@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.ProCodeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.ProCode">
+        <result column="qrCode" property="qrCode" />
+        <result column="parent_code" property="parentCode" />
+        <result column="relation_date" property="relationDate" />
+        <result column="brand_name" property="productName" />
+        <result column="machine_code" property="machineCode" />
+        <result column="package_type" property="packageType" />
+        <result column="batch_no" property="batchNo" />
+        <result column="remarks" property="remark" />
+        <result column="work_batch_no" property="workBatchNo" />
+        <result column="shift_id" property="shiftId" />
+        <collection property="proCodes" ofType="com.hlxd.microcloud.vo.ProCode">
+            <result column="c_qrCode" property="qrCode" />
+            <result column="c_parent_code" property="parentCode" />
+            <result column="c_relation_date" property="relationDate" />
+            <result column="c_brand_name" property="productName" />
+            <result column="c_machine_code" property="machineCode" />
+            <result column="c_package_type" property="packageType" />
+            <result column="c_batch_no" property="batchNo" />
+            <result column="c_remarks" property="remark" />
+            <result column="c_work_batch_no" property="workBatchNo" />
+            <result column="c_shift_id" property="shiftId" />
+           <!--<collection property="proCodes" ofType="com.hlxd.microcloud.vo.ProCode">
+               <result column="cc_qr_code" property="qrCode" />
+               <result column="cc_parent_code" property="parentCode" />
+               <result column="cc_relation_date" property="relationDate" />
+               <result column="cc_brand_name" property="productName" />
+               <result column="cc_machine_code" property="machineCode" />
+               <result column="cc_package_type" property="packageType" />
+               <result column="cc_batch_no" property="batchNo" />
+               <result column="cc_remarks" property="remark" />
+               <result column="cc_work_batch_no" property="workBatchNo" />
+               <result column="cc_shift_id" property="shiftId" />
+            </collection>-->
+        </collection>
+    </resultMap>
+
+    <select id="getProCode" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+        select
+				thsc.qrCode,
+				thsc.parent_code,
+				thsc.relation_date,
+				thsc.brand_id,
+				thsc.machine_code,
+				thsb.brand_name,
+				thsc.package_type,
+				thsc.remark,
+				thsc.batch_no,
+				thsc.work_batch_no,
+				thsc.shift_id,
+				thscc.qrCode as c_qrCode,
+				thscc.parent_code as c_parent_code,
+				thscc.relation_date as c_relation_date,
+				thscc.brand_id as c_brand_id,
+				thsb.brand_name as c_brand_name,
+				thscc.machine_code as c_machine_code,
+				thscc.package_type as c_package_type,
+				thscc.remark as c_remark,
+				thscc.batch_no as c_batch_no,
+				thscc.work_batch_no as c_work_batch_no,
+				thscc.shift_id as c_shift_id
+				from t_hl_system_code thsc
+				left join t_hl_system_code thscc
+				on thsc.qrCode = thscc.parent_code
+				left join t_hl_system_brand thsb
+				on thsc.brand_id = thsb.id
+        where thsc.qrCode = #{qrCode}
+    </select>
+
+    <select id="getSingleProCode" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+        select thsc.*,
+         thsb.brand_name
+         from
+        t_hl_system_code thsc
+        left join
+        t_hl_system_brand thsb
+        on thsc.brand_id = thsb.id
+        where qrCode = #{qrCode}
+
+
+    </select>
+
+    <select id="getProductionByPeriod" parameterType="java.util.HashMap" resultType="com.hlxd.microcloud.vo.ProductionCount">
+
+        select (select count(DISTINCT(parent_code))
+				from
+				t_hl_system_code where qrCode in (select
+				qrCode
+				from
+				t_hl_system_code
+				where relation_date between str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+				and machine_code = #{machineCode}
+				and package_type = '2')
+				) as itemCount,
+				(select
+				count(qrCode)
+				from
+				t_hl_system_code
+				where relation_date between str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+				and machine_code = #{machineCode}
+				and package_type = '1') as packageCount,
+				(select
+				count(qrCode)
+				from
+				t_hl_system_code
+				where relation_date between str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+				and machine_code = #{machineCode}
+				and package_type = '2') as stripCount
+				from dual
+
+    </select>
+
+    <select id="validateCode" resultType="java.lang.Integer" parameterType="java.util.HashMap">
+        select
+        count(*)
+        from  t_hl_system_code
+        where relation_date between str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+		and machine_code = #{machineCode}
+		and (qrCode = #{qrCode} or parent_code = #{qrCode})
+
+    </select>
+
+</mapper>

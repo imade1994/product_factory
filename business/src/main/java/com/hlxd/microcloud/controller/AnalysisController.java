@@ -41,11 +41,11 @@ public class AnalysisController {
      * @param machineCode 机台编码查询具体机台
      * */
     @RequestMapping("/getRealTime")
-    public Map getMachineProduce(@RequestParam(value = "machineCode",required = false)String machineCode,@RequestParam("type")String type){
+    public Map getMachineProduce(@RequestParam(value = "machineCode",required = false)String machineCode,@RequestParam("typeCode")String type){
         Map map = new HashMap();
-        map.put("time",getFormateString());
-        //map.put("time","2020-05-14");
-        map.put("type",type);
+        map.put("lastTime",getFormateString());
+        //map.put("lastTime","2020-06-30");
+        map.put("typeCode",type);
         if(null != machineCode){
             map.put("machineCode",machineCode);
         }
@@ -60,7 +60,7 @@ public class AnalysisController {
      * 获取所有机台的启动状态
      * */
      @RequestMapping("/getAllMachineStatus")
-     public Map getAllMachineStatus(@RequestParam("type")String type){
+     public Map getAllMachineStatus(@RequestParam("typeCode")String type){
          Map param = new HashMap();
          param.put(CommomStatic.TYPE,type);
          List<Machine> machines = analysisService.getMachineStatus(param);
@@ -78,7 +78,7 @@ public class AnalysisController {
      * @param type 包装机还是装箱机
      * */
     @RequestMapping("/getPeriod")
-    public Map getMachineProduceFromTo(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate,@RequestParam("type")String type){
+    public Map getMachineProduceFromTo(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate,@RequestParam("typeCode")String type){
         Map map = new HashMap();
         map.put(CommomStatic.BEGINDATE,beginDate);
         map.put(CommomStatic.ENDDATE,endDate);
@@ -86,7 +86,7 @@ public class AnalysisController {
         List<ScanCount> scanCounts = analysisService.getCountStatic(map);
         Map<String,ScanCount> newMap = new HashMap();
         scanCounts.stream().forEach(scanCount -> {
-            newMap.put(scanCount.getTime(),scanCount);
+            newMap.put(scanCount.getLastTime(),scanCount);
         });
         map.clear();
         map.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
@@ -107,7 +107,7 @@ public class AnalysisController {
      * @Param type 机台类型
      * */
     @RequestMapping("/getCountFromPeriod")
-    public Map getCountFromPeriod(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate,@RequestParam("type")String type){
+    public Map getCountFromPeriod(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate,@RequestParam("typeCode")String type){
         return new HashMap();
     }
 
@@ -118,7 +118,7 @@ public class AnalysisController {
      * @param type 包装机还是装箱机
      * */
     @RequestMapping("/getProduceDetail")
-    public Map getProduceDetail(@RequestParam("currentDate")String currentDate,@RequestParam("type")String type){
+    public Map getProduceDetail(@RequestParam("currentDate")String currentDate,@RequestParam("typeCode")String type){
         Map map = new HashMap();
         map.put(CommomStatic.TIME,currentDate);
         map.put(CommomStatic.TYPE,type);

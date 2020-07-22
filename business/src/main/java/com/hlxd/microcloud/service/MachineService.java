@@ -1,6 +1,7 @@
 package com.hlxd.microcloud.service;
 
 import com.hlxd.microcloud.vo.Machine;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,5 +35,12 @@ public interface MachineService {
     /**
      * 新增机台
      * */
-    void insertMachine(List<Machine> machines);
+    void insertMachine(Machine machines);
+
+
+
+    /**
+     * 删除机台
+     * */
+    void deleteMachine(String machineCode);
 }

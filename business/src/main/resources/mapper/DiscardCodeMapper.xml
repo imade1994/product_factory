@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.DiscardMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.DiscardCode">
+        <id column="id" property="id" />
+        <result column="discard_type_code" property="disCardTypeCode" />
+        <result column="discard_date" property="disCardDate" />
+        <result column="shift_id" property="shiftId" />
+        <result column="class_name" property="shiftName" />
+        <result column="qrCode" property="qrCode" />
+        <result column="discard_time" property="discardTime" />
+        <result column="package_type" property="packageType" />
+        <result column="machine_code" property="machineCode" />
+    </resultMap>
+
+    <resultMap id="BaseCancelResultMap" type="com.hlxd.microcloud.vo.CancelRelation">
+        <id column="id" property="id" />
+        <result column="qrCode" property="qrCode" />
+        <result column="parent_code" property="parentCode" />
+        <result column="cancel_date" property="cancelDate" />
+        <result column="machine_code" property="machineCode" />
+        <result column="shift_id" property="shiftId" />
+        <result column="class_name" property="shiftName" />
+        <result column="relation_type" property="relationType" />
+        <collection property="cancelRelations" ofType="com.hlxd.microcloud.vo.CancelRelation" javaType="java.util.ArrayList">
+            <result column="c_qrCode" property="qrCode" />
+            <result column="c_parent_code" property="parentCode" />
+            <result column="c_cancel_date" property="cancelDate" />
+            <result column="c_machine_code" property="machineCode" />
+            <result column="c_shift_id" property="shiftId" />
+            <result column="c_class_name" property="shiftName" />
+            <result column="c_relation_type" property="relationType" />
+        </collection>
+    </resultMap>
+
+    <select id="getDiscardCodeList" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+        select
+        thdc.*,
+        thssd.class_name
+        from t_hl_discard_code thdc
+        left join t_hl_system_shift_details thssd
+        on thssd.id = thdc.shift_id
+        where thdc.package_type = #{packageType}
+        and machine_code = #{machineCode}
+    </select>
+
+
+    <select id="getCancelRelationList" parameterType="java.util.HashMap" resultMap="BaseCancelResultMap">
+        select
+
+        distinct(thcr.parent_code) as qrCode,
+        thcr.cancel_date,
+        thcr.machine_code,
+        thcr.shift_id,
+        thssd.class_name,
+        thcr.relation_type,
+		thcr1.qrCode as c_qrCode,
+		thcr1.cancel_date as c_cancel_date,
+        thcr1.machine_code as c_machine_code,
+        thssd.class_name as c_class_name,
+        thcr1.shift_id as c_shift_id,
+        thcr1.relation_type as c_relation_type
+        from
+        t_hl_cancel_relation thcr
+				left join
+				t_hl_cancel_relation thcr1
+				on thcr1.parent_code = thcr.parent_code
+				left join t_hl_system_shift_details thssd
+				on thcr.shift_id = thssd.id
+				where thcr.relation_type = #{relationType}
+				and thcr.machine_code = #{machineCode}
+    </select>
+
+</mapper>

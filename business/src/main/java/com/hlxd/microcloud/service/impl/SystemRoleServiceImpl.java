@@ -2,6 +2,7 @@ package com.hlxd.microcloud.service.impl;
 
 import com.hlxd.microcloud.dao.SystemRoleMapper;
 import com.hlxd.microcloud.service.SystemRoleService;
+import com.hlxd.microcloud.vo.SystemMenu;
 import com.hlxd.microcloud.vo.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,8 +37,8 @@ public class SystemRoleServiceImpl implements SystemRoleService {
     }
 
     @Override
-    public void updateSystemRole(Map map) {
-        systemRoleMapper.updateSystemRole(map);
+    public void updateSystemRole(SystemRole systemRole) {
+        systemRoleMapper.updateSystemRole(systemRole);
     }
 
     @Override
@@ -48,5 +49,10 @@ public class SystemRoleServiceImpl implements SystemRoleService {
     @Override
     public List<SystemRole> getAuthorizationRole(Map map) {
         return systemRoleMapper.getAuthorizationRole(map);
+    }
+
+    @Override
+    public List<SystemMenu> getDepartmentMenu(Map map) {
+        return systemRoleMapper.getDepartmentMenu(map);
     }
 }

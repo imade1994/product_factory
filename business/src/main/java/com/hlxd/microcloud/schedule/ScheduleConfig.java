@@ -162,5 +162,18 @@ public class ScheduleConfig {
         return true;
     }
 
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void initStatisticByTime(){
+
+
+
+
+
+
+
+    }
+
+
+
 
 }

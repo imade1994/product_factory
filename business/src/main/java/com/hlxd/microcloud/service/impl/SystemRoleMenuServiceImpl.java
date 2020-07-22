@@ -24,13 +24,13 @@ public class SystemRoleMenuServiceImpl implements SystemRoleMenuService {
     SystemRoleMenuMapper systemRoleMenuMapper;
 
     @Override
-    public void addSystemRoleMenu(List<SystemRoleMenu> systemRoleMenus) {
+    public void addSystemRoleMenu(SystemRoleMenu systemRoleMenus) {
         systemRoleMenuMapper.addSystemRoleMenu(systemRoleMenus);
     }
 
     @Override
-    public void deleteSystemRoleMenu(List<String> ids) {
-        systemRoleMenuMapper.deleteSystemRoleMenu(ids);
+    public void deleteSystemRoleMenu(Map map) {
+        systemRoleMenuMapper.deleteSystemRoleMenu(map);
     }
 
     @Override

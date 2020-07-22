@@ -1,5 +1,6 @@
 package com.hlxd.microcloud.service;
 
+import com.hlxd.microcloud.vo.SystemMenu;
 import com.hlxd.microcloud.vo.SystemRole;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ public interface SystemRoleService {
     /**
      * 更改系统角色
      * */
-    void updateSystemRole(Map map);
+    void updateSystemRole(SystemRole systemRole);
 
     /**
      * 查询系统角色
@@ -42,6 +43,12 @@ public interface SystemRoleService {
      * 查询角色授权信息
      * */
     List<SystemRole> getAuthorizationRole(Map map);
+
+
+    /**
+     * 查询部门授权菜单
+     * */
+    List<SystemMenu> getDepartmentMenu(Map map);
 
 
 }

@@ -9,7 +9,7 @@
         <result column="realtime_relate" property="realtimeRelate" />
         <result column="realtime_scan_reject" property="realtimeScanReject" />
         <result column="realtime_scan" property="realtimeScan" />
-        <result column="brand_name" property="brandName" />
+        <result column="brand_id" property="brandName" />
         <result column="last_time" property="lastTime" />
         <result column="shift_id" property="period" />
         <result column="random_check" property="randomCheck" />
@@ -57,8 +57,7 @@
         select
 thbm.machine_code,
 (case
-when (select count(*) from t_hl_realtime_work where thbm.machine_code = machine_code)=0 then 0
-when (select count(*) from t_hl_realtime_work where thbm.machine_code = machine_code)>0 and thrw.sys_status is null then 2
+when (select count(*) from t_hl_realtime_work where thbm.machine_code = machine_code)>0 and TIMESTAMPDIFF(MINUTE,thrw.last_time,now()) > 2 then 0
 else thrw.sys_status
 end
 ) as sys_status
@@ -73,7 +72,7 @@ end
 
     <select id="getCountStatic" parameterType="java.util.HashMap" resultMap="BaseResultMap">
     select sum(realtime_relate) as relateCount,sum(realtime_reject) as relateReject,sum(realtime_collection_package) as realtime_collection_package,sum(realtime_collection_strip) as realtime_collection_strip,sum(relate_time_break_time) as relate_time_break_time,
-(1-sum(relate_time_break_time/((thssd.end_date-thssd.begin_date)*60))/count(*)) as workEfficiency,
+(1-sum(relate_time_break_time/TIMESTAMPDIFF(MINUTE,STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s'),thrw.last_time))/count(*)) as workEfficiency,
 sum(realtime_scan/(realtime_scan+realtime_scan_reject))/count(*) as scanEfficiency,
 last_time,type_code
     from  t_hl_realtime_work thrw
@@ -115,7 +114,7 @@ last_time,type_code
         on thrw.shift_id = thssd.id
         left join
         t_hl_random_check thrck
-        on  thrck.begin_check_date between date_add(STR_TO_DATE(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),'%Y-%m-%d'),INTERVAL thssd.begin_date HOUR) and date_add(STR_TO_DATE(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),'%Y-%m-%d'),INTERVAL thssd.end_date HOUR) and thrck.machine_code = thrw.machine_code
+        on  thrck.begin_check_date between STR_TO_DATE(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') and STR_TO_DATE(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrck.machine_code = thrw.machine_code
         left join t_hl_random_check_detail thrcd
         on thrcd.random_check_id = thrck.id
         left join t_hl_base_machine thbm
@@ -126,7 +125,7 @@ last_time,type_code
             left join t_hl_system_shift_details thssd1
             on thsf1.id = thssd1.shift_id
             where thsf1.id = thbm.shift_id
-            and thrw.last_time between  date_add(str_to_date(#{lastTime},'%Y-%m-%d'),INTERVAL thssd1.begin_date HOUR) and date_add(str_to_date(#{lastTime},'%Y-%m-%d'),INTERVAL thssd1.end_date HOUR)
+            and thrw.last_time between  str_to_date(CONCAT(#{lastTime},' ',thssd1.begin_date),'%Y-%m-%d %H:%i:%s') and str_to_date(CONCAT(#{lastTime},' ',thssd1.end_date),'%Y-%m-%d %H:%i:%s')
             )
         </if>
         <if test="null != machineCode and '' != machineCode">

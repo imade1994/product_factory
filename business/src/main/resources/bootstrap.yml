@@ -4,7 +4,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://10.210.160.20:8066/qrCode
+    url: jdbc:mysql://10.210.160.20:3306/Qrcode?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false
     username: root
     password: Hlxd@123456
     configuration:
@@ -40,7 +40,7 @@ server:
 eureka: # 一定要编写一个eureka的地址
   client: # 目的是为了让客户端可以通过eureka找到SpringCloudConfig微服务
     service-url:
-      defaultZone: http://admin:root@127.0.0.1:9001/eureka
+      defaultZone: http://admin:root@127.0.0.1:9001/eureka/
   instance:
     instance-id: microdept.com
     prefer-ip-address: true

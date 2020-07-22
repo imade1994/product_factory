@@ -17,16 +17,18 @@
         select * from t_hl_base_machine
         where 1=1
         <if test="null != machineGroup and '' != machineGroup">
-          and  machine_group = #{machineGroup}
+          and  group_code = #{machineGroup}
         </if>
     </select>
 
     <update id="updateMachine" parameterType="com.hlxd.microcloud.vo.Machine">
         update t_hl_base_machine
         <trim prefix="set" suffixOverrides=",">
-            <if test="vo.machineGroup!=null">machine_group = #{vo.machineGroup},</if>
+            <if test="vo.machineGroup!=null">group_code = #{vo.machineGroup},</if>
             <if test="vo.room!=null">room = #{vo.room},</if>
             <if test="vo.status!=null">status = #{vo.status},</if>
+            <if test="vo.machineModel!=null">machine_model = #{vo.machineModel},</if>
+            <if test="vo.shiftId!=null">shift_id = #{vo.shiftId},</if>
         </trim>
         where machine_code = #{vo.machineCode}
     </update>
@@ -34,12 +36,16 @@
     <insert id="insertMachine" parameterType="java.util.ArrayList">
         insert into
         t_hl_base_machine
-        (machine_code,machine_model,status,machine_group,room)
+        (machine_code,machine_model,status,group_code,room,shift_id)
         values
-        <foreach collection="list" index="index" item="item"  separator=",">
-            (#{item.machineCode},#{item.machineModel},#{item.status},#{item.machineGroup},#{item.room})
-        </foreach>
+        (#{vo.machineCode},#{vo.machineModel},#{vo.status},#{vo.machineGroup},#{vo.room},#{vo.shiftId})
+
     </insert>
+
+    <delete id="deleteMachine" parameterType="java.lang.String">
+        delete from t_hl_base_machine
+        where machine_code = #{machineCode}
+    </delete>
 
 
 

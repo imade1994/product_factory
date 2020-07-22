@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.BasicEquipmentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.BasicEquipment">
+        <id column="id" property="id" />
+        <result column="equipment_series_no" property="equipmentSeriesNo" />
+        <result column="equipment_code" property="equipmentCode" />
+        <result column="equipment_name" property="equipmentName" />
+        <result column="equipment_type" property="equipmentType" />
+        <result column="equipment_model" property="equipmentModel" />
+        <result column="purchase_date" property="purchaseDate" />
+        <result column="work_status" property="workStatus" />
+        <result column="relation_machine" property="relationMachine" />
+        <result column="contract_no" property="contractNo" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+
+    <select id="getBasicEquipment" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+        select
+        *
+        from t_hl_base_equipment
+        where 1=1
+        <if test="null != equipmentName and '' != equipmentName ">
+            AND equipment_name like  CONCAT('%',#{equipmentName},'%')
+        </if>
+        <if test="null != equipmentModel and ''!= equipmentModel">
+           AND equipment_model = #{equipmentModel}
+        </if>
+        <if test="null != workStatus and ''!= workStatus">
+           AND work_status = #{workStatus}
+        </if>
+        <if test="null != beginDate and '' != beginDate">
+           AND purchase_date  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="null != endDate and '' != endDate">
+            and purchase_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="null != contractNo and ''!= contractNo">
+            AND contract_no = #{contractNo}
+        </if>
+    </select>
+
+
+    <delete id="deleteBasicEquipment" parameterType="java.util.HashMap">
+        delete from t_hl_base_equipment
+        where id = #{id}
+    </delete>
+
+
+    <update id="updateBasicEquipment" parameterType="java.util.HashMap">
+        update t_hl_base_equipment
+        <trim prefix="set" suffixOverrides=",">
+            <if test="null != equipmentSeriesNo">equipment_series_no =#{equipmentSeriesNo},</if>
+            <if test="null != equipmentCode">equipment_code =#{equipmentCode},</if>
+            <if test="null != equipmentType">equipment_type =#{equipmentType},</if>
+            <if test="null != equipmentName">equipment_name =#{equipmentName},</if>
+            <if test="null != equipmentModel">equipment_model =#{equipmentModel},</if>
+            <if test="null != purchaseDate">purchase_date =#{purchaseDate},</if>
+            <if test="null != workStatus">work_status =#{workStatus},</if>
+            <if test="null != relationMachine">relation_machine =#{relationMachine},</if>
+            <if test="null != contractNo">contract_no =#{contractNo},</if>
+        </trim>
+        where id =#{id}
+    </update>
+
+    <insert id="insertBatchBasicEquipment" parameterType="java.util.ArrayList">
+        insert into
+        t_hl_base_equipment
+        (equipment_series_no,equipment_code,equipment_type,equipment_model,purchase_date,work_status,relation_machine,remark,contract_no,equipment_name)
+        values
+        <foreach collection="list" separator="," index="index" item="item" >
+            (#{item.equipmentSeriesNo},#{item.equipmentCode},#{item.equipmentType},#{item.equipmentName},
+            #{item.equipmentModel},#{item.purchaseDate},#{item.workStatus},#{item.relationMachine},
+            #{item.contractNo},#{item.remark})
+        </foreach>
+    </insert>
+
+
+    <insert id="insertBasicEquipment" parameterType="java.util.ArrayList">
+        insert into
+        t_hl_base_equipment
+        (equipment_series_no,equipment_code,equipment_type,equipment_model,purchase_date,work_status,relation_machine,remark,contract_no,equipment_name)
+         values(#{equipmentSeriesNo},#{equipmentCode},#{equipmentType},
+            #{equipmentModel},#{purchaseDate},#{workStatus},#{relationMachine},
+            #{contractNo},#{remark},#{equipmentName})
+    </insert>
+
+</mapper>

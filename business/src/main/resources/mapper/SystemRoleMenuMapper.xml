@@ -9,21 +9,18 @@
         where department_id = #{department_id}
     </delete>
 
-    <insert id="addSystemRoleMenu" parameterType="java.util.ArrayList">
+    <insert id="addSystemRoleMenu" parameterType="com.hlxd.microcloud.vo.SystemRoleMenu">
         INSERT INTO t_hl_system_department_menu
         (id,department_id,method_id,menu_id,status)
         values
-        <foreach collection="list" separator="," index="index">
-            (#{index.id},#{index.department_id},#{index.methodId},#{index.menuId},#{index.status})
-        </foreach>
+        (#{id},#{departmentId},#{methodId},#{menuId},#{status})
     </insert>
 
-    <delete id="deleteSystemRoleMenu" parameterType="java.util.ArrayList">
+    <delete id="deleteSystemRoleMenu" parameterType="java.util.HashMap">
         delete from t_hl_system_department_menu
-        where id in
-        <foreach collection="list" separator="," index="index" item="item" open="(" close=")" >
-            #{item}
-        </foreach>
+        where department_id = #{departmentId}
+        and menu_Id = #{menuId}
+
     </delete>
 
 

@@ -5,6 +5,7 @@ import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.vo.Machine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -72,9 +73,9 @@ public class MachineController {
      *
      * */
     @RequestMapping("/addMachine")
-    public Map addMachine(List<Machine> machines){
+    public Map addMachine(Machine machines){
         Map returnMap = new HashMap();
-        if(null == machines ||machines.size()<0){
+        if(null == machines){
             returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
             returnMap.put(CommomStatic.MESSAGE,CommomStatic.lack_Params);
         }else{
@@ -82,6 +83,18 @@ public class MachineController {
             returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
             returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
         }
+        return returnMap;
+    }
+
+    /**
+     * 删除机台
+     * */
+    @RequestMapping("/deleteMachine")
+    public Map deleteMachine(@RequestParam("machineCode")String machineCode){
+        Map returnMap = new HashMap();
+        machineService.deleteMachine(machineCode);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
         return returnMap;
     }
 

@@ -5,10 +5,12 @@ import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.util.CommonUtil;
 import com.hlxd.microcloud.vo.Brand;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +43,9 @@ public class BrandController {
     }
 
     @RequestMapping("/insertBrand")
-    public Map insertBrand(List<Brand> brands){
+    public Map insertBrand(Brand brand){
+        List<Brand> brands = new ArrayList<>();
+        brands.add(brand);
         Map returnMap = new HashMap();
         if(null != brands && brands.size()>0){
             brandService.insertBrand(brands);

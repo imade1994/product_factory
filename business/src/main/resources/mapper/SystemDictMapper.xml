@@ -53,8 +53,8 @@
 
     <insert id="insertSystemDict" parameterType="com.hlxd.microcloud.vo.SystemDict">
         insert into t_hl_system_dict
-        (id,parent_id,`key`,`value`,last_update_date,create_date,create_people,status)
-        values (#{vo.id},#{vo.parentId},#{vo.key},#{vo.value},now(),now(),#{vo.createPeople},'1')
+        (parent_id,`key`,`value`,last_update_date,create_date,create_people,status)
+        values (#{vo.parentId},#{vo.key},#{vo.value},now(),now(),#{vo.createPeople},'1')
     </insert>
     <select id="getAllDictList" resultMap="BaseResultMap">
        select

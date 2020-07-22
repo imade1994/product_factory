@@ -64,6 +64,17 @@ public class RandomCheckRecord implements Serializable {
      * */
     private String qrCode;
 
+    /**
+     * 牌号
+     * */
+    private String brandName;
+
+
+    /**
+     * 牌号代码
+     * */
+    private String brandId;
+
 
     /**
      * 抽检结果

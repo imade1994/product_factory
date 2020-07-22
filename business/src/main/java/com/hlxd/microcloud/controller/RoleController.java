@@ -3,10 +3,12 @@ package com.hlxd.microcloud.controller;
 import com.hlxd.microcloud.service.SystemRoleMenuService;
 import com.hlxd.microcloud.service.SystemRoleService;
 import com.hlxd.microcloud.util.CommomStatic;
+import com.hlxd.microcloud.vo.SystemMenu;
 import com.hlxd.microcloud.vo.SystemRole;
 import com.hlxd.microcloud.vo.SystemRoleMenu;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,6 +53,8 @@ public class RoleController {
         return returnMap;
     }
 
+
+
     @RequestMapping("/deleteRole")
     @Transactional
     public Map deleteRole(@RequestParam("department_id")String department_id){
@@ -61,52 +65,37 @@ public class RoleController {
         returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
         return returnMap;
     }
-
-    @RequestMapping("/updateRole")
+    /**
+     * 新增角色菜单
+     * */
+    @RequestMapping("/updateRoleMenu")
     @Transactional
-    public Map updateRole(HttpServletRequest request){
+    public Map updateRole(@RequestParam("id")String roleId,@RequestParam("menuId")String menuId,
+                          @RequestParam("status")Integer status){
         Map returnMap = new HashMap();
-        Map paramMap = transformMap(request.getParameterMap());
-        if(null != paramMap){
-            if(null != paramMap.get("department_id")){
-                List<String>  insertList = (List<String>) paramMap.get("insert");
-                List<String>  deleteList = (List<String>) paramMap.get("delete");
-                List<SystemRoleMenu> systemRoleMenus = new ArrayList<>();
-                for(String s:insertList){
-                    String[] ids = s.split(",");
-                    if(ids.length<3){
-                        returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
-                        returnMap.put(CommomStatic.MESSAGE,"参数长度有误！");
-                        return returnMap;
-                    }else{
-                        SystemRoleMenu systemRoleMenu = new SystemRoleMenu();
-                        systemRoleMenu.setId(UUID.randomUUID().toString());
-                        systemRoleMenu.setMenuId(ids[0]);
-                        systemRoleMenu.setDepartmentId(ids[1]);
-                        systemRoleMenu.setMethodId(ids[2]);
-                        systemRoleMenu.setStatus(1);
-                        systemRoleMenus.add(systemRoleMenu);
-                    }
-
-                }
-                systemRoleService.updateSystemRole(paramMap);
-                if(insertList.size()>0){
-                    systemRoleMenuService.addSystemRoleMenu(systemRoleMenus);
-                }
-                if(deleteList.size()>0){
-                    systemRoleMenuService.deleteSystemRoleMenu(deleteList);
-                }
-                returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
-                returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
-            }else{
-                returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
-                returnMap.put(CommomStatic.MESSAGE,"必要参数为空！");
-            }
-
-        }else{
-            returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
-            returnMap.put(CommomStatic.MESSAGE,"参数全部为空！");
-        }
+        SystemRoleMenu systemRoleMenu = new SystemRoleMenu();
+        systemRoleMenu.setId(UUID.randomUUID().toString());
+        systemRoleMenu.setDepartmentId(roleId);
+        systemRoleMenu.setMenuId(menuId);
+        systemRoleMenu.setStatus(status);
+        systemRoleMenu.setMethodId("8969cb38-ba72-11ea-8ade-286ed488cd06");
+        systemRoleMenuService.addSystemRoleMenu(systemRoleMenu);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
+        return returnMap;
+    }
+    /**
+     * 删除角色菜单
+     * */
+    @RequestMapping("/deleteRoleMenu")
+    public Map deleteRoleMenu(@RequestParam("departmentId")String departmentId,@RequestParam("menuId")String menuId){
+        Map param = new HashMap();
+        Map returnMap = new HashMap();
+        param.put("departmentId",departmentId);
+        param.put("menuId",menuId);
+        systemRoleMenuService.deleteSystemRoleMenu(param);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
         return returnMap;
     }
 
@@ -129,6 +118,26 @@ public class RoleController {
         returnMap.put(CommomStatic.DATA,systemRoles);
         return returnMap;
     }
+
+
+    @RequestMapping("/getDepartmentMenu")
+    public Map getDepartmentMenu(@RequestParam("id")String departmentId){
+        Map param = new HashMap();
+        Map returnMap = new HashMap();
+        param.put("id",departmentId);
+        List<SystemMenu> systemMenus  = systemRoleService.getDepartmentMenu(param);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,systemMenus);
+        return returnMap;
+
+
+
+
+
+    }
+
+
+
 
 
 

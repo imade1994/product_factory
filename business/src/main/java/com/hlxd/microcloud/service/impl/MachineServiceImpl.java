@@ -35,8 +35,13 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
-    public void insertMachine(List<Machine> machines) {
+    public void insertMachine(Machine machines) {
         machineMapper.insertMachine(machines);
+    }
+
+    @Override
+    public void deleteMachine(String machineCode) {
+        machineMapper.deleteMachine(machineCode);
     }
 
 

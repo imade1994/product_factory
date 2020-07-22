@@ -1,5 +1,6 @@
 package com.hlxd.microcloud.dao;
 
+import com.hlxd.microcloud.vo.SystemMenu;
 import com.hlxd.microcloud.vo.SystemRole;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -32,7 +33,7 @@ public interface SystemRoleMapper {
     /**
      * 更改系统角色
      * */
-    void updateSystemRole(Map map);
+    void updateSystemRole(@Param("vo")SystemRole systemRole);
 
     /**
      * 查询系统角色
@@ -44,5 +45,10 @@ public interface SystemRoleMapper {
      * 查询角色授权信息
      * */
     List<SystemRole> getAuthorizationRole(Map map);
+
+    /**
+     * 查询部门授权菜单
+     * */
+    List<SystemMenu> getDepartmentMenu(Map map);
 
 }

@@ -78,7 +78,7 @@ public class ProCode implements Serializable {
     /**
      * 启用排班ID
      * */
-    private String shiftId;
+    private int shiftId;
 
 
     /***

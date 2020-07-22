@@ -56,6 +56,16 @@
         </collection>
     </resultMap>
 
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.SystemUser">
+        <id column="id" property="id" />
+        <result column="user_name" property="userName" />
+        <result column="password" property="passWord" />
+        <result column="department" property="department" />
+        <result column="create_people" property="createPeople" />
+        <result column="check_date" property="checkDate" />
+        <result column="status" property="status" />
+    </resultMap>
+
 
     <select id="login" resultMap="AuthorizationResultMap" parameterType="java.util.HashMap">
 
@@ -124,13 +134,86 @@ thsmm.exact as meta_exact,
 	and thsm.is_folder = '1'
 	and thsu.user_name= #{username}
 	and thsu.password = #{password}
+	order by thsm.order_series
+    </select>
+
+    <insert id="addUser" parameterType="com.hlxd.microcloud.vo.SystemUser">
+        insert into t_hl_system_user
+        (id,user_name,password,department,create_people,check_date,status)
+        values
+        (#{vo.id},#{vo.userName},#{vo.passWord},#{vo.department},#{vo.createPeople},#{vo.checkDate},#{vo.status})
+    </insert>
+
+    <delete id="deleteUser" parameterType="java.lang.String">
+        delete from t_hl_system_user where id = #{id}
+    </delete>
+
+    <update id="updateUser" parameterType="java.util.HashMap">
+        update t_hl_system_user
+        <trim prefix="set" suffixOverrides=",">
+            <if test="null != passWord and ''!= passWord ">
+                passWord = #{passWord},
+            </if>
+            <if test="null != status and '' != status">
+                status = #{status}
+            </if>
+        </trim>
+        where id = #{id}
+
+
+
+    </update>
+
+    <select id="getAllUser" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+        select * from t_hl_system_user
+        where 1=1
+        <if test="null != userName and '' != userName">
+            and user_name like concat('%',#{userName},'%')
+        </if>
+        <if test="null != department and '' != department">
+            and department = #{department}
+        </if>
+        <if test="null != status and '' != status">
+            and status = #{status}
+        </if>
     </select>
 
 
+    <insert id="addUserMenu" parameterType="java.util.HashMap">
+        insert into t_hl_system_user_menu
+        (id,user_id,menu_id,method_id,status)
+        values
+        (#{id},#{userId},#{menuId},#{methodId},#{status})
+    </insert>
+
+    <delete id="deleteUserMenu" parameterType="java.util.HashMap">
+        delete from t_hl_system_user_menu
+        where user_id = #{userId}
+        <if test="null != menuId and '' != menuId">
+            and menu_id = #{menuId}
+        </if>
+
+    </delete>
+
+    <select id="getUserMenu" parameterType="java.util.HashMap" resultType="com.hlxd.microcloud.vo.SystemMenu">
+        select
+        thsum.menu_id as id,
+        thsum.method_id as methodId,
+        thsum.status as status,
+        thsmm.title as menuName
+        from t_hl_system_user thsu
+        left join t_hl_system_user_menu thsum
+        on thsu.id = thsum.user_id
+        left join t_hl_system_menu thsm
+        on thsum.menu_id = thsm.id
+        left join  t_hl_system_menu_meta thsmm
+        on thsm.id = thsmm.menu_id
+		where  thsu.status = '1'
+        and thsu.id = #{userId}
 
 
 
-
+    </select>
 
 
 

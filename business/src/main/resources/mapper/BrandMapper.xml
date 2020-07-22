@@ -10,7 +10,7 @@
         <result column="strip_barcode" property="stripBarcode" />
         <result column="item_barcode" property="itemBarcode" />
         <result column="cigarettes" property="cigarettes" />
-        <result column="packges" property="packages" />
+        <result column="packages" property="packages" />
         <result column="strips" property="strips" />
     </resultMap>
 

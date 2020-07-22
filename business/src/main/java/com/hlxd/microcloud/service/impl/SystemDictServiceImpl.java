@@ -40,7 +40,7 @@ public class SystemDictServiceImpl implements SystemDictService {
             if(null != systemDict.getParentId()){
                 param.put("id",systemDict.getParentId());
                 if(null != systemDict.getParentId()&& systemDict.getParentId().equals("0")){
-                    systemDict.setId(UUID.randomUUID().toString());
+                    //systemDict.setId();
                     systemDictMapper.insertSystemDict(systemDict);
                     returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
                     returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
@@ -50,7 +50,7 @@ public class SystemDictServiceImpl implements SystemDictService {
                         returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
                         returnMap.put(CommomStatic.MESSAGE,"父类不存在！");
                     }else{
-                        systemDict.setId(UUID.randomUUID().toString());
+                        //systemDict.setId(UUID.randomUUID().toString());
                         systemDictMapper.insertSystemDict(systemDict);
                         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
                         returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);

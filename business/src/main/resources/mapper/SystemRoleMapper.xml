@@ -60,14 +60,14 @@
         where id = #{department_id}
     </delete>
 
-    <update id="updateSystemRole" parameterType="java.util.HashMap">
+    <update id="updateSystemRole" parameterType="com.hlxd.microcloud.vo.SystemRole">
         update t_hl_system_department
         <trim prefix="set" suffixOverrides=",">
-            <if test="roleName!=null">role_name = #{roleName},</if>
-            <if test="department!=null">department = #{department},</if>
-            <if test="status!=null">status = #{status},</if>
+            <if test="vo.roleName!=null">role_name = #{vo.roleName},</if>
+            <if test="vo.department!=null">department = #{vo.department},</if>
+            <if test="vo.status!=null">status = #{vo.status},</if>
         </trim>
-        where id = #{department_id}
+        where id = #{vo.department_id}
     </update>
 
     <insert id="addSystemRole" parameterType="com.hlxd.microcloud.vo.SystemRole">
@@ -100,7 +100,7 @@ thsm_1.component as c_component,
 thsm_1.status as c_status,
 thsmm_1.title as c_title,
 thsmm_1.to as c_to,
-thsmm_1.exact as c_exact
+thsmm_1.exact as c_exact,
 	thsmethod.method as methods
 	from t_hl_system_department thsr
 	left join
@@ -124,6 +124,7 @@ thsmm_1.exact as c_exact
 	and thsm.status = '1'
 	and thsmethod.status = '1'
 	and thsr.id = #{department_id}
+	order by thsm.order_series
     </select>
 
 
@@ -131,11 +132,30 @@ thsmm_1.exact as c_exact
     <select id="getSystemRole" resultMap="BaseResultMap" parameterType="java.util.HashMap">
 	SELECT
 	*
-	FROM t_hl_system_department
+	FROM t_hl_system_department thsd
 	where 1=1
     <if test="null != department_id and '' != department_id">
         and id = #{department_id}
     </if>
+    </select>
+
+
+    <select id="getDepartmentMenu" parameterType="java.util.HashMap" resultType="com.hlxd.microcloud.vo.SystemMenu">
+        select
+        thsdm.menu_id as id,
+        thsdm.method_id as methodId,
+        thsdm.status as status,
+        thsmm.title as menuName
+        from t_hl_system_department thsd
+        left join t_hl_system_department_menu thsdm
+        on thsd.id = thsdm.department_id
+        left join t_hl_system_menu thsm
+        on thsdm.menu_id = thsm.id
+        left join  t_hl_system_menu_meta thsmm
+        on thsm.id = thsmm.menu_id
+		where thsm.component != 'Redirect'
+		and thsm.status = '1'
+        and thsd.id = #{id}
     </select>
 
 

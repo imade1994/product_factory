@@ -35,5 +35,10 @@ public interface MachineMapper {
     /**
      * 新增机台
      * */
-    void insertMachine(List<Machine> machines);
+    void insertMachine(@Param("vo")Machine machines);
+
+    /**
+     * 删除机台
+     * */
+    void deleteMachine(@Param("machineCode")String machineCode);
 }

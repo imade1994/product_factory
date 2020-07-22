@@ -20,13 +20,13 @@ public interface SystemRoleMenuService {
     /**
      * 新增角色菜单
      * */
-    void addSystemRoleMenu(List<SystemRoleMenu> systemRoleMenus);
+    void addSystemRoleMenu(SystemRoleMenu systemRoleMenus);
 
     /**
      *
      * 批量删除指定
      * */
-    void deleteSystemRoleMenu(List<String> ids);
+    void deleteSystemRoleMenu(Map map);
 
     /**
      * 删除角色菜单信息

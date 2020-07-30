@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.CodeBatch">
         <id column="batch_no" property="batchNo" />
         <result column="brand_name" property="brandName" />
+        <result column="brand_code" property="brandCode" />
         <result column="code_num" property="codeNum" />
         <result column="check_date" property="checkDate" />
         <result column="check_people" property="checkName" />
@@ -32,6 +33,7 @@
         <result column="brand_name" property="brandName" />
         <result column="code_status" property="codeStatus" />
         <result column="machine_code" property="machineCode" />
+        <result column="machine_name" property="machineName" />
     </resultMap>
 
     <!-- 通用查询映射结果 -->
@@ -49,14 +51,16 @@
 
     <select id="getBatch" resultMap="BaseResultMap" parameterType="java.util.HashMap">
         select
-        thbc.*,thsd.key as package_name
+        thbc.*,thsd.key as package_name,thsb.brand_name
         from t_hl_batch_code thbc
         left join t_hl_system_dict thsd
         on thbc.type_code = thsd.id
+        left join t_hl_system_brand thsb
+        on thsb.brand_code  = thbc.brand_code
         where
         1=1
-        <if test="null != brandName and '' != brandName">
-        and thbc.brand_name =#{brandName}
+        <if test="null != brandCode and '' != brandCode">
+        and thbc.brand_code =#{brandCode}
         </if>
         <if test="null != batchNo and '' != batchNo">
         and thbc.batch_no = #{batchNo}
@@ -79,20 +83,23 @@
     thsb.brand_name,
     thsbc.batch_no,
     thsbc.code_status,
-    thsc.machine_code
+    thbm.machine_code,
+    thbm.machine_name
     from t_hl_system_batch_code thsbc
     left join t_hl_system_brand thsb
     on thsbc.brand_id = thsb.id
     left join t_hl_system_code thsc
     on thsc.qrCode = thsbc.qrCode
+    left join t_hl_base_machine thbm
+    on thbm.machine_code = thsc.machine_code
     where thsbc.batch_no = #{batchNo}
     and thsbc.package_type = #{packageType}
     </select>
 
     <insert id="insertBatch" parameterType="com.hlxd.microcloud.vo.CodeBatch">
         insert into
-        (batch_no,brand_name,code_num,check_date,check_name,status)
-        values (#{vo.batchNo},#{vo.brandName},#{vo.codeNum},#{vo.checkDate},#{vo.checkName},#{vo.status})
+        (batch_no,brand_code,code_num,check_date,check_name,status)
+        values (#{vo.batchNo},#{vo.brandCode},#{vo.codeNum},#{vo.checkDate},#{vo.checkName},#{vo.status})
     </insert>
 
     <insert id="createNewTable" parameterType="java.lang.String" statementType="STATEMENT">
@@ -140,9 +147,9 @@ SET FOREIGN_KEY_CHECKS = 1;
     
     <insert id="insertCheckDetails" parameterType="com.hlxd.microcloud.vo.CodeBatchDetails">
     insert into t_hl_batch_check_details
-    (batch_no,qrCode,batch_check_date,package_type,check_status)
+    (id,batch_no,qrCode,batch_check_date,package_type,check_status)
     values
-    (#{vo.batchNo},#{vo.qrCode},now(),#{vo.packageType},#{vo.checkStatus})
+    (#{id},#{vo.batchNo},#{vo.qrCode},now(),#{vo.packageType},#{vo.checkStatus})
     </insert>
 
     <update id="updateBatchStatus" parameterType="java.util.HashMap" >

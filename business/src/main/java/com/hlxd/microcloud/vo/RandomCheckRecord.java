@@ -21,7 +21,7 @@ public class RandomCheckRecord implements Serializable {
     /**
      * id
      * */
-    private int id;
+    private String id;
 
     /**
      *
@@ -42,9 +42,20 @@ public class RandomCheckRecord implements Serializable {
     private String machineCode;
 
     /**
+     * 机台名
+     * */
+    private String machineName;
+
+    /**
      * 班组
      * */
     private int shiftId;
+
+    /**
+     * 班组名
+     *
+     * */
+    private String shiftName;
 
     /**
      * 抽检类型

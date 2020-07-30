@@ -9,6 +9,7 @@
         <result column="relation_date" property="relationDate" />
         <result column="brand_name" property="productName" />
         <result column="machine_code" property="machineCode" />
+        <result column="machine_name" property="machineName" />
         <result column="package_type" property="packageType" />
         <result column="batch_no" property="batchNo" />
         <result column="remarks" property="remark" />
@@ -20,6 +21,7 @@
             <result column="c_relation_date" property="relationDate" />
             <result column="c_brand_name" property="productName" />
             <result column="c_machine_code" property="machineCode" />
+            <result column="c_machine_name" property="machineName" />
             <result column="c_package_type" property="packageType" />
             <result column="c_batch_no" property="batchNo" />
             <result column="c_remarks" property="remark" />
@@ -46,7 +48,8 @@
 				thsc.parent_code,
 				thsc.relation_date,
 				thsc.brand_id,
-				thsc.machine_code,
+				thbm.machine_code,
+				thbm.machine_name,
 				thsb.brand_name,
 				thsc.package_type,
 				thsc.remark,
@@ -59,6 +62,7 @@
 				thscc.brand_id as c_brand_id,
 				thsb.brand_name as c_brand_name,
 				thscc.machine_code as c_machine_code,
+				thbm1.machine_name as c_machine_name,
 				thscc.package_type as c_package_type,
 				thscc.remark as c_remark,
 				thscc.batch_no as c_batch_no,
@@ -69,17 +73,34 @@
 				on thsc.qrCode = thscc.parent_code
 				left join t_hl_system_brand thsb
 				on thsc.brand_id = thsb.id
+				left join t_hl_base_machine thbm
+				on thsc.machine_code = thbm.machine_code
+				left join t_hl_base_machine thbm1
+				on thscc.machine_code = thbm1.machine_code
         where thsc.qrCode = #{qrCode}
     </select>
 
     <select id="getSingleProCode" parameterType="java.util.HashMap" resultMap="BaseResultMap">
-        select thsc.*,
+        select
+        thsc.qrCode,
+        thsc.parent_code,
+        thsc.relation_date,
+        thsc.brand_id,
+        thsc.package_type,
+        thsc.remark,
+        thsc.batch_no,
+        thsc.work_batch_no,
+        thsc.shift_id,
+        thbm.machine_code,
+        thbm.machine_name,
          thsb.brand_name
          from
         t_hl_system_code thsc
         left join
         t_hl_system_brand thsb
         on thsc.brand_id = thsb.id
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thsc.machine_code
         where qrCode = #{qrCode}
 
 
@@ -112,6 +133,7 @@
 				and machine_code = #{machineCode}
 				and package_type = '2') as stripCount
 				from dual
+
 
     </select>
 

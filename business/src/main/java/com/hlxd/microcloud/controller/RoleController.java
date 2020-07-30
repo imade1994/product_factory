@@ -65,6 +65,22 @@ public class RoleController {
         returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
         return returnMap;
     }
+
+
+    /**
+     * 更新部门
+     *
+     * */
+    @RequestMapping("/updateDepartment")
+    public Map updateSystemRole(SystemRole systemRole){
+        Map returnMap = new HashMap();
+        if(null != systemRole && null !=systemRole.getId())
+        systemRoleService.updateSystemRole(systemRole);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
+        return returnMap;
+
+    }
     /**
      * 新增角色菜单
      * */

@@ -36,5 +36,10 @@ public interface BrandMapper {
      * */
     void insertBrand(List<Brand> brands);
 
+    /**
+     * 删除牌号
+     * */
+    void deleteBrand(@Param("id")String id);
+
 
 }

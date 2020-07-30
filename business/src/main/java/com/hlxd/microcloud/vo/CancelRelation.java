@@ -20,7 +20,7 @@ public class CancelRelation implements Serializable {
     /**
      * id
      * */
-    private BigInteger id;
+    private String id;
 
     /**
      * 编码

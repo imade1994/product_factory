@@ -19,12 +19,17 @@ public class BreakRecord implements Serializable {
     /**
      * id
      * */
-    private int id;
+    private String id;
 
     /**
      * 机台号
      * */
     private String machineCode;
+
+    /**
+     * 机台名
+     * */
+    private String machineName;
 
     /**
      * 停机开始时间

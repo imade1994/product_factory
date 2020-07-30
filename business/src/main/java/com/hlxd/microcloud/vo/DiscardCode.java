@@ -21,7 +21,7 @@ public class DiscardCode implements Serializable {
     /**
      * id
      * */
-    private BigInteger id;
+    private String id;
 
 
     /**
@@ -39,6 +39,11 @@ public class DiscardCode implements Serializable {
      * 机台
      * */
     private String machineCode;
+
+    /**
+     * 机台名称
+     * */
+    private String machineName;
 
 
     /**

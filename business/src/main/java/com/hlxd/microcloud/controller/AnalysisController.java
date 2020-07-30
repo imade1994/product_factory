@@ -2,6 +2,7 @@ package com.hlxd.microcloud.controller;
 
 import com.hlxd.microcloud.service.AnalysisService;
 import com.hlxd.microcloud.util.CommomStatic;
+import com.hlxd.microcloud.vo.CountScan;
 import com.hlxd.microcloud.vo.Machine;
 import com.hlxd.microcloud.vo.ScanCount;
 import lombok.extern.slf4j.Slf4j;
@@ -78,20 +79,79 @@ public class AnalysisController {
      * @param type 包装机还是装箱机
      * */
     @RequestMapping("/getPeriod")
-    public Map getMachineProduceFromTo(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate,@RequestParam("typeCode")String type){
+    public Map getMachineProduceFromTo(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate,@RequestParam("typeCode")String type,
+                                       @RequestParam("queryType")int queryType,@RequestParam("groupBy")int groupBy){
         Map map = new HashMap();
+        Map returnMap = new HashMap();
         map.put(CommomStatic.BEGINDATE,beginDate);
         map.put(CommomStatic.ENDDATE,endDate);
-        map.put(CommomStatic.TYPE,type);
-        List<ScanCount> scanCounts = analysisService.getCountStatic(map);
-        Map<String,ScanCount> newMap = new HashMap();
-        scanCounts.stream().forEach(scanCount -> {
-            newMap.put(scanCount.getLastTime(),scanCount);
-        });
-        map.clear();
-        map.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
-        map.put(CommomStatic.DATA,newMap);
-        return map;
+        map.put("groupBy",groupBy);
+        map.put("type",type);
+        List<CountScan> scanCountList = new ArrayList<>();
+        switch (queryType){
+            case 1:
+                switch (groupBy){
+                    case 1:
+                        scanCountList = analysisService.getScanRateByMachineCode(map);
+                        break;
+                    case 2:
+                        scanCountList = analysisService.getScanRateByBrand(map);
+                        break;
+                    case 3:
+                        scanCountList = analysisService.getScanRateByDay(map);
+                    default:
+                        break;
+                }
+                break;
+            case 2:
+                switch (groupBy){
+                    case 1:
+                        scanCountList = analysisService.getRelateRateByMachineCode(map);
+                        break;
+                    case 2:
+                        scanCountList = analysisService.getRelateRateByBrandId(map);
+                        break;
+                    case 3:
+                        scanCountList = analysisService.getRelateRateByDay(map);
+                    default:
+                        break;
+                }
+                break;
+            case 3:
+                switch (groupBy){
+                    case 1:
+                        scanCountList = analysisService.getWorkRateByMachineCode(map);
+                        break;
+                    case 2:
+                        scanCountList = analysisService.getWorkRateByBrandId(map);
+                        break;
+                    case 3:
+                        scanCountList = analysisService.getWorkRateByDay(map);
+                    default:
+                        break;
+                }
+                break;
+            case 4:
+                scanCountList = analysisService.getRejectCount(map);
+                break;
+            case 5:
+                switch (groupBy){
+                    case 1:
+                        scanCountList = analysisService.getCodeUseByDay(map);
+                        break;
+                    case 2:
+                        scanCountList = analysisService.getCodeUseByMachine(map);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,scanCountList);
+        return returnMap;
     }
 
 

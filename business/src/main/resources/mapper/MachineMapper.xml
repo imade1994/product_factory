@@ -4,47 +4,62 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.Machine">
-        <id column="machine_code" property="machineCode" />
+        <id column="id" property="id" />
+        <result column="machine_code" property="machineCode" />
+        <result column="machine_name" property="machineName" />
         <result column="machine_model" property="machineModel" />
         <result column="status" property="status" />
         <result column="group_code" property="machineGroup" />
         <result column="room" property="room" />
         <result column="shift_id" property="shiftId" />
+        <result column="shift_name" property="shiftName" />
+        <result column="group_name" property="groupName" />
     </resultMap>
 
 
     <select id="getMachineList" resultMap="BaseResultMap" parameterType="java.util.HashMap">
-        select * from t_hl_base_machine
+        select thbm.*,
+        thsd.`key` as group_name,
+        thss.shift_name
+        from
+        t_hl_base_machine thbm
+        left join t_hl_system_shift thss
+        on thss.id = thbm.shift_id
+        left join t_hl_system_dict thsd
+        on thsd.parent_id = '1' and thsd.`value` = thbm.group_code
         where 1=1
         <if test="null != machineGroup and '' != machineGroup">
           and  group_code = #{machineGroup}
         </if>
+        order by machine_code asc
     </select>
 
     <update id="updateMachine" parameterType="com.hlxd.microcloud.vo.Machine">
         update t_hl_base_machine
         <trim prefix="set" suffixOverrides=",">
             <if test="vo.machineGroup!=null">group_code = #{vo.machineGroup},</if>
+            <if test="vo.machineCode!=null">machine_code = #{vo.machineCode},</if>
+            <if test="vo.machineName!=null">machine_Name = #{vo.machineName},</if>
             <if test="vo.room!=null">room = #{vo.room},</if>
             <if test="vo.status!=null">status = #{vo.status},</if>
             <if test="vo.machineModel!=null">machine_model = #{vo.machineModel},</if>
             <if test="vo.shiftId!=null">shift_id = #{vo.shiftId},</if>
         </trim>
-        where machine_code = #{vo.machineCode}
+        where id = #{vo.id}
     </update>
     
     <insert id="insertMachine" parameterType="java.util.ArrayList">
         insert into
         t_hl_base_machine
-        (machine_code,machine_model,status,group_code,room,shift_id)
+        (machine_code,machine_model,status,group_code,room,shift_id,machine_name)
         values
-        (#{vo.machineCode},#{vo.machineModel},#{vo.status},#{vo.machineGroup},#{vo.room},#{vo.shiftId})
+        (#{vo.machineCode},#{vo.machineModel},#{vo.status},#{vo.machineGroup},#{vo.room},#{vo.shiftId},#{vo.machineName})
 
     </insert>
 
     <delete id="deleteMachine" parameterType="java.lang.String">
         delete from t_hl_base_machine
-        where machine_code = #{machineCode}
+        where id = #{id}
     </delete>
 
 

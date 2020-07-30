@@ -7,6 +7,7 @@ import com.hlxd.microcloud.vo.Brand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletRequest;
@@ -73,12 +74,13 @@ public class BrandController {
     }
 
 
-
-
-
-
-
-
-
+    @RequestMapping("/deleteBrand")
+    public Map deleteBrand(@RequestParam("id")String id){
+        Map returnMap = new HashMap();
+        brandService.deleteBrand(id);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
+        return returnMap;
+    }
 
 }

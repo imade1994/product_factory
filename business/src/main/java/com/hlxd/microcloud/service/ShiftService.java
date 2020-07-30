@@ -55,4 +55,21 @@ public interface ShiftService {
     void insertShiftDetails(ShiftDetails shiftDetails);
 
 
+    /**
+     * 删除班组
+     * */
+    void deleteShift(String id);
+
+    /**
+     * 验证班组是否存在
+     * */
+    int validateExist(String shiftName);
+
+
+    /**
+     * 校验是否存在下级
+     * */
+    int validateChildren(String id);
+
+
 }

@@ -22,6 +22,12 @@ public class Brand implements Serializable {
 
 
     /**
+     * 牌号
+     * */
+    private String brandCode;
+
+
+    /**
      * 品牌名
      * */
     private String brandName;

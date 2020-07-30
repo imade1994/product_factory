@@ -43,6 +43,7 @@ public class ProCode implements Serializable {
      * 设备编码
      * */
     private String machineCode;
+
     /**
      * 设备名
      * */

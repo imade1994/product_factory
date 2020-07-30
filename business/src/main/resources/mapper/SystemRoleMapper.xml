@@ -67,7 +67,7 @@
             <if test="vo.department!=null">department = #{vo.department},</if>
             <if test="vo.status!=null">status = #{vo.status},</if>
         </trim>
-        where id = #{vo.department_id}
+        where id = #{vo.id}
     </update>
 
     <insert id="addSystemRole" parameterType="com.hlxd.microcloud.vo.SystemRole">

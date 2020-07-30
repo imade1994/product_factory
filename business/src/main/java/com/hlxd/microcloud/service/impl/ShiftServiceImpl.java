@@ -60,4 +60,19 @@ public class ShiftServiceImpl implements ShiftService {
     public void insertShiftDetails(ShiftDetails shiftDetails) {
         shiftMapper.insertShiftDetails(shiftDetails);
     }
+
+    @Override
+    public void deleteShift(String id) {
+        shiftMapper.deleteShift(id);
+    }
+
+    @Override
+    public int validateExist(String shiftName) {
+        return shiftMapper.validateExist(shiftName);
+    }
+
+    @Override
+    public int validateChildren(String id) {
+        return shiftMapper.validateChildren(id);
+    }
 }

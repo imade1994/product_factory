@@ -7,6 +7,7 @@ import com.hlxd.microcloud.vo.Shift;
 import com.hlxd.microcloud.vo.ShiftDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,10 +45,16 @@ public class ShiftController {
 
     @RequestMapping("/insertShift")
     public Map insertShift(Shift shift){
-        shiftService.insertShift(shift);
         Map returnMap = new HashMap();
-        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
-        returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
+        int count = shiftService.validateExist(shift.getShiftName());
+        if(count>0){
+            returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
+            returnMap.put(CommomStatic.MESSAGE,"同名班组已存在！");
+        }else{
+            shiftService.insertShift(shift);
+            returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+            returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
+        }
         return returnMap;
     }
 
@@ -59,6 +66,26 @@ public class ShiftController {
         returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
         return returnMap;
     }
+
+
+    @RequestMapping("/deleteShift")
+    public Map deleteShift(@RequestParam("id")String shiftId){
+        Map returnMap = new HashMap();
+        int count  = shiftService.validateChildren(shiftId);
+        if(count>0){
+            returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
+            returnMap.put(CommomStatic.MESSAGE,"请先删除子项！");
+    } else {
+            shiftService.deleteShift(shiftId);
+            returnMap.put(CommomStatic.STATUS, CommomStatic.SUCCESS);
+            returnMap.put(CommomStatic.MESSAGE, CommomStatic.SUCCESS_MESSAGE);
+        }
+        return returnMap;
+
+    }
+
+
+
 
     @RequestMapping("/insertShiftDetails")
     public Map insertShiftDetails(ShiftDetails shiftDetails){

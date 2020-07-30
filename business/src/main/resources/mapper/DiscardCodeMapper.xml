@@ -13,6 +13,7 @@
         <result column="discard_time" property="discardTime" />
         <result column="package_type" property="packageType" />
         <result column="machine_code" property="machineCode" />
+        <result column="machine_Name" property="machineName" />
     </resultMap>
 
     <resultMap id="BaseCancelResultMap" type="com.hlxd.microcloud.vo.CancelRelation">
@@ -37,11 +38,22 @@
 
     <select id="getDiscardCodeList" parameterType="java.util.HashMap" resultMap="BaseResultMap">
         select
-        thdc.*,
+
+
+        thdc.id,
+        thdc.discard_type_code,
+        thdc.discard_date,
+        thdc.shift_id,
+        thdc.qrCode,
+        thdc.discard_time,
+        thdc.package_type,
+        thbm.machine_code
         thssd.class_name
         from t_hl_discard_code thdc
         left join t_hl_system_shift_details thssd
         on thssd.id = thdc.shift_id
+        left join t_hl_base_machine thbm
+        on thbm.id = thdc.machine_code
         where thdc.package_type = #{packageType}
         and machine_code = #{machineCode}
     </select>
@@ -52,23 +64,29 @@
 
         distinct(thcr.parent_code) as qrCode,
         thcr.cancel_date,
-        thcr.machine_code,
+        thbm1.machine_code,
+        thbm1.machine_name,
         thcr.shift_id,
         thssd.class_name,
         thcr.relation_type,
 		thcr1.qrCode as c_qrCode,
 		thcr1.cancel_date as c_cancel_date,
-        thcr1.machine_code as c_machine_code,
+        thbm.machine_code as c_machine_code,
+        thbm.machine_name as c_machine_name,
         thssd.class_name as c_class_name,
         thcr1.shift_id as c_shift_id,
         thcr1.relation_type as c_relation_type
         from
         t_hl_cancel_relation thcr
+        left join t_hl_base_machine thbm1
+        on thbm1.machine_code = thcr.machine_code
 				left join
 				t_hl_cancel_relation thcr1
 				on thcr1.parent_code = thcr.parent_code
 				left join t_hl_system_shift_details thssd
 				on thcr.shift_id = thssd.id
+				left join t_hl_base_machine thbm
+				on thcr1.machine_code = thbm.machine_code
 				where thcr.relation_type = #{relationType}
 				and thcr.machine_code = #{machineCode}
     </select>

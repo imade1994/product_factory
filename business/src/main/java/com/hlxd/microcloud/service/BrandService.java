@@ -37,4 +37,9 @@ public interface BrandService {
      * */
     void insertBrand(List<Brand> brands);
 
+    /**
+     * 删除牌号
+     * */
+    void deleteBrand(String id);
+
 }

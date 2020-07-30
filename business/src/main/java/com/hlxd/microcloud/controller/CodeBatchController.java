@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * CREATED BY IDEA
@@ -123,6 +124,7 @@ public class CodeBatchController {
         codeBatchDetails.setBatchNo(batchNo);
         codeBatchDetails.setPackageType(packageType);
         codeBatchDetails.setQrCode(qrCode);
+        codeBatchDetails.setId(UUID.randomUUID().toString());
         switch (count)
         {
             case 0:

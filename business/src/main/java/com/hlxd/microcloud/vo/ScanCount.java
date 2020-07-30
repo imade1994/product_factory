@@ -45,6 +45,17 @@ public class ScanCount implements Serializable {
 
 
     /**
+     * 机台
+     * */
+    private String machineCode;
+
+    /**
+     * 牌号
+     * */
+    private String brandId;
+
+
+    /**
      *品牌名，牌号
      * */
     private String brandName;

@@ -31,6 +31,12 @@ public class CodeBatch implements Serializable {
      * */
     private String brandName;
 
+
+    /**
+     * 牌号编码
+     * */
+    private String brandCode;
+
     /***
      * 小盒码数量
      */

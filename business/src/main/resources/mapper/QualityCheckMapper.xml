@@ -8,11 +8,15 @@
         <result column="begin_check_date" property="beginCheckDate" />
         <result column="end_check_date" property="endCheckDate" />
         <result column="machine_code" property="machineCode" />
+        <result column="machine_name" property="machineName" />
         <result column="check_type_code" property="checkType" />
         <result column="quality_type_code" property="qualityType" />
         <result column="shift_id" property="shiftId" />
+        <result column="brand_id" property="brandId" />
+        <result column="brand_name" property="brandName" />
+        <result column="class_name" property="shiftName" />
         <result column="check_people" property="checkPeople" />
-        <result column="qrCode" property="qrCode" />
+        <result column="qr_code" property="qrCode" />
         <result column="check_status" property="checkStatus" />
         <collection property="randomCheckDetails" ofType="com.hlxd.microcloud.vo.RandomCheckDetails">
             <id column="d_id" property="id" />
@@ -23,12 +27,13 @@
     </resultMap>
 
     <resultMap id="QrCodeDetailsMap" type="com.hlxd.microcloud.vo.ProCode">
-        <result column="qrCode" property="qrCode" />
+        <result column="qr_code" property="qrCode" />
         <result column="parent_code" property="parentCode" />
         <result column="relation_date" property="relationDate" />
         <result column="brand_name" property="productName" />
         <result column="brand_id" property="brandId" />
         <result column="machine_code" property="machineCode" />
+        <result column="machine_name" property="machineName" />
         <result column="package_type" property="packageType" />
         <result column="batch_no" property="batchNo" />
         <result column="remarks" property="remark" />
@@ -41,6 +46,7 @@
             <result column="c_brand_name" property="productName" />
             <result column="c_brand_name" property="brandId" />
             <result column="c_machine_code" property="machineCode" />
+            <result column="c_machine_name" property="machineName" />
             <result column="c_package_type" property="packageType" />
             <result column="c_batch_no" property="batchNo" />
             <result column="c_remarks" property="remark" />
@@ -54,11 +60,15 @@
         select thrc.id,
         date_format(thrc.begin_check_date,'%Y-%m-%d %H:%i:%s') as begin_check_date,
         date_format(thrc.end_check_date,'%Y-%m-%d %H:%i:%s') as end_check_date,
-        thrc.machine_code,
+        thbm.machine_code,
+        thbm.machine_name,
         thrc.check_type_code,
         thrc.quality_type_code,
         thrc.check_people,
         thrc.shift_id,
+        thrc.brand_id,
+        thsb.brand_name,
+        thssd.class_name,
         thrc.qr_code,
         thrc.check_status,
         thrcd.id as d_id,
@@ -70,6 +80,12 @@
         left join
         t_hl_random_check_detail thrcd
         on thrcd.random_check_id = thrc.id
+        left join t_hl_system_brand thsb
+        on thrc.brand_id  = thsb.id
+        left join t_hl_system_shift_details thssd
+        on thssd.id = thrc.shift_id
+        left join t_hl_base_machine thbm
+        on thrc.machine_code = thbm.machine_code
         where
         1=1
         <if test="null != qualityType and '' != qualityType">
@@ -87,7 +103,7 @@
         <if test="null != endCheckDate and '' != endCheckDate">
             and end_check_date <![CDATA[<=]]> str_to_date(#{endCheckDate},'%Y-%m-%d %H:%i:%s')
         </if>
-        order by id desc
+        order by begin_check_date desc
     </select>
 
 
@@ -98,7 +114,8 @@
 				thsc.parent_code,
 				thsc.relation_date,
 				thsc.brand_id,
-				thsc.machine_code,
+                thbm.machine_code,
+                thbm.machine_name,
 				thsb.brand_name,
 				thsc.package_type,
 				thsc.remark,
@@ -111,6 +128,7 @@
 				thscc.brand_id as c_brand_id,
 				thsb.brand_name as c_brand_name,
 				thscc.machine_code as c_machine_code,
+                thbm.machine_name as c_machine_name,
 				thscc.package_type as c_package_type,
 				thscc.remark as c_remark,
 				thscc.batch_no as c_batch_no,
@@ -121,27 +139,30 @@
 				on thsc.qrCode = thscc.parent_code
 				left join t_hl_system_brand thsb
 				on thsc.brand_id = thsb.id
+				left join t_hl_base_machine thbm
+				on thbm.machine_code = thsc.machine_code
         where thsc.qrCode = #{qrCode}
         <if test="null != packageType and '' != packageType ">
             and thsc.package_type = #{packageType}
         </if>
+        order by machine_code asc
     </select>
 
 
     <insert id="insertRandomCheck" parameterType="com.hlxd.microcloud.vo.RandomCheckRecord">
         insert into t_hl_random_check
-        (end_check_date,machine_code,check_type_code,quality_type_code,qr_code,check_status,begin_check_date,shift_id,brand_id,check_people)
+        (id,end_check_date,machine_code,check_type_code,quality_type_code,qr_code,check_status,begin_check_date,shift_id,brand_id,check_people)
         values
-        (#{vo.endCheckDate},#{vo.machineCode},#{vo.checkType},#{vo.qualityType},#{vo.qrCode},#{vo.checkStatus},#{vo.beginCheckDate}
+        (#{vo.id},#{vo.endCheckDate},#{vo.machineCode},#{vo.checkType},#{vo.qualityType},#{vo.qrCode},#{vo.checkStatus},#{vo.beginCheckDate}
         ,#{vo.shiftId},#{vo.brandId},#{vo.checkPeople})
     </insert>
 
     <insert id="insertRandomCheckDetails" parameterType="java.util.ArrayList">
         insert into t_hl_random_check_detail
-        (random_check_id,qr_code,random_check_status_code)
+        (id,random_check_id,qr_code,random_check_status_code)
         values
         <foreach collection="list" index="index" item="item" separator=",">
-            (#{item.randomCheckId},#{item.qrCode},#{item.status})
+            (#{item.id},#{item.randomCheckId},#{item.qrCode},#{item.status})
         </foreach>
     </insert>
 

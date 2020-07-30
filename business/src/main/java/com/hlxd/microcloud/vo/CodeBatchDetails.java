@@ -21,7 +21,7 @@ public class CodeBatchDetails implements Serializable {
     /**
      * id
      * */
-    private BigInteger id;
+    private String id;
 
     /**
      * 批次

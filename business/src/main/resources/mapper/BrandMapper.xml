@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.Brand">
         <id column="id" property="id" />
         <result column="brand_name" property="brandName" />
+        <result column="brand_code" property="brandCode" />
         <result column="package_barcode" property="packageBarcode" />
         <result column="strip_barcode" property="stripBarcode" />
         <result column="item_barcode" property="itemBarcode" />
@@ -29,6 +30,7 @@
             <if test="vo.cigarettes!=null">cigarettes = #{vo.cigarettes},</if>
             <if test="vo.packages!=null">packages = #{vo.packages},</if>
             <if test="vo.strips!=null">strips = #{vo.strips},</if>
+            <if test="vo.brandCode!=null">brand_code = #{vo.brandCode},</if>
         </trim>
         where id = #{vo.id}
     </update>
@@ -36,13 +38,19 @@
     <insert id="insertBrand" parameterType="java.util.ArrayList">
         insert into
         t_hl_system_brand
-        (id,brand_name,package_barcode,strip_barcode,item_barcode,cigarettes,packages,strips)
+        (id,brand_name,package_barcode,strip_barcode,item_barcode,cigarettes,packages,strips,brandCode)
         values
         <foreach collection="list" index="index" item="item"  separator=",">
             (#{item.id},#{item.brandName},#{item.packageBarcode},#{item.stripBarcode},#{item.itemBarcode},
-            #{item.cigarettes},#{item.packages},#{item.strips})
+            #{item.cigarettes},#{item.packages},#{item.strips},#{brandCode})
         </foreach>
     </insert>
+
+    <delete id="deleteBrand" parameterType="java.lang.String">
+        delete from t_hl_system_brand
+        where id=#{id}
+
+    </delete>
 
 
 

@@ -1,5 +1,6 @@
 package com.hlxd.microcloud.service;
 
+import com.hlxd.microcloud.vo.CountScan;
 import com.hlxd.microcloud.vo.Machine;
 import com.hlxd.microcloud.vo.RejectCount;
 import com.hlxd.microcloud.vo.ScanCount;
@@ -36,4 +37,70 @@ public interface AnalysisService {
     void batchInsertScanCount(List<ScanCount> scanCounts);
 
     void batchInsertRejectCount(List<RejectCount> rejectCounts);
+
+
+    /**
+     * 读码率
+     * */
+    List<CountScan> getScanRateByMachineCode(Map map);
+    /**
+     * 读码率
+     * */
+    List<CountScan> getScanRateByBrand(Map map);
+
+    /**
+     * 读码率
+     * */
+    List<CountScan> getScanRateByDay(Map map);
+
+    /**
+     * 关联率
+     * */
+    List<CountScan> getRelateRateByDay(Map map);
+
+    /**
+     * 关联率
+     * */
+    List<CountScan> getRelateRateByMachineCode(Map map);
+
+
+    /**
+     * 关联率
+     * */
+    List<CountScan> getRelateRateByBrandId(Map map);
+
+
+    /**
+     * 作业率
+     * */
+    List<CountScan> getWorkRateByMachineCode(Map map);
+
+    /**
+     * 作业率
+     * */
+    List<CountScan> getWorkRateByDay(Map map);
+
+
+
+    /**
+     * 作业率
+     * */
+    List<CountScan> getWorkRateByBrandId(Map map);
+
+
+    /**
+     * 剔除分析
+     * */
+    List<CountScan> getRejectCount(Map map);
+
+    /**
+     * 码段使用率
+     * */
+    List<CountScan> getCodeUseByDay(Map map);
+
+
+    /**
+     * 码段使用率
+     * */
+    List<CountScan> getCodeUseByMachine(Map map);
 }

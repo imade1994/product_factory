@@ -39,4 +39,9 @@ public class BrandServiceImpl implements BrandService {
     public void insertBrand(List<Brand> brands) {
         brandMapper.insertBrand(brands);
     }
+
+    @Override
+    public void deleteBrand(String id) {
+        brandMapper.deleteBrand(id);
+    }
 }

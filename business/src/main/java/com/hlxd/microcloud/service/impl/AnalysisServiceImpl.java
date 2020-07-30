@@ -2,6 +2,7 @@ package com.hlxd.microcloud.service.impl;
 
 import com.hlxd.microcloud.dao.AnalysisMapper;
 import com.hlxd.microcloud.service.AnalysisService;
+import com.hlxd.microcloud.vo.CountScan;
 import com.hlxd.microcloud.vo.Machine;
 import com.hlxd.microcloud.vo.RejectCount;
 import com.hlxd.microcloud.vo.ScanCount;
@@ -50,5 +51,65 @@ public class AnalysisServiceImpl implements AnalysisService {
     public void batchInsertRejectCount(List<RejectCount> rejectCounts) {
         analysisMapper.batchInsertRejectCount(rejectCounts);
 
+    }
+
+    @Override
+    public List<CountScan> getScanRateByMachineCode(Map map) {
+        return analysisMapper.getScanRateByMachineCode(map);
+    }
+
+    @Override
+    public List<CountScan> getScanRateByBrand(Map map) {
+        return analysisMapper.getScanRateByBrand(map);
+    }
+
+    @Override
+    public List<CountScan> getScanRateByDay(Map map) {
+        return analysisMapper.getScanRateByDay(map);
+    }
+
+    @Override
+    public List<CountScan> getRelateRateByDay(Map map) {
+        return analysisMapper.getRelateRateByDay(map);
+    }
+
+    @Override
+    public List<CountScan> getRelateRateByMachineCode(Map map) {
+        return analysisMapper.getRelateRateByMachineCode(map);
+    }
+
+    @Override
+    public List<CountScan> getRelateRateByBrandId(Map map) {
+        return analysisMapper.getRelateRateByBrandId(map);
+    }
+
+    @Override
+    public List<CountScan> getWorkRateByMachineCode(Map map) {
+        return analysisMapper.getWorkRateByMachineCode(map);
+    }
+
+    @Override
+    public List<CountScan> getWorkRateByDay(Map map) {
+        return analysisMapper.getWorkRateByDay(map);
+    }
+
+    @Override
+    public List<CountScan> getWorkRateByBrandId(Map map) {
+        return analysisMapper.getWorkRateByBrandId(map);
+    }
+
+    @Override
+    public List<CountScan> getRejectCount(Map map) {
+        return analysisMapper.getRejectCount(map);
+    }
+
+    @Override
+    public List<CountScan> getCodeUseByDay(Map map) {
+        return analysisMapper.getCodeUseByDay(map);
+    }
+
+    @Override
+    public List<CountScan> getCodeUseByMachine(Map map) {
+        return analysisMapper.getCodeUseByMachine(map);
     }
 }

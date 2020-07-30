@@ -29,6 +29,12 @@ public interface ShiftMapper {
 
 
     /**
+     * 删除班组
+     * */
+    void deleteShift(@Param("id")String id);
+
+
+    /**
      * 更新班组信息
      * */
     void updateShift(@Param("vo") Shift shift);
@@ -44,6 +50,11 @@ public interface ShiftMapper {
     int validateParent(Map map);
 
     /**
+     * 校验是否存在下级
+     * */
+    int validateChildren(@Param("id")String id);
+
+    /**
      * 更新组详情
      * */
     void updateShiftDetails(@Param("vo")ShiftDetails shiftDetails);
@@ -57,6 +68,11 @@ public interface ShiftMapper {
      * 新建分组
      * */
     void insertShiftDetails(@Param("vo")ShiftDetails shiftDetails);
+
+    /**
+     * 验证班组是否存在
+     * */
+    int validateExist(@Param("shiftName")String shiftName);
 
 
 }

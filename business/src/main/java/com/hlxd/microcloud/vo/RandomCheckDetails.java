@@ -21,13 +21,13 @@ public class RandomCheckDetails implements Serializable {
      * id
      *
      * */
-    private int id;
+    private String id;
 
     /**
      *
      * 抽检Id
      * */
-    private int randomCheckId;
+    private String randomCheckId;
 
     /**
      * 包-件码

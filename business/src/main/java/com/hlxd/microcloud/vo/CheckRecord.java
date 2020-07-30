@@ -18,7 +18,7 @@ public class CheckRecord implements Serializable {
     /**
      * id
      * */
-    private int id;
+    private String id;
     /**
      * 抽检时间
      * */
@@ -37,6 +37,11 @@ public class CheckRecord implements Serializable {
      * */
 
     private String machineCode;
+
+    /**
+     * 机台名
+     * */
+    private String machineName;
 
 
 }

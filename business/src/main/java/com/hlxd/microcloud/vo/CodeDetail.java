@@ -49,6 +49,12 @@ public class CodeDetail implements Serializable {
      * */
     private String machineCode;
 
+
+    /**
+     * 机台名
+     * */
+    private String machineName;
+
     /**
      * 读码时间
      * */

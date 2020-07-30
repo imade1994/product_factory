@@ -17,6 +17,7 @@ import javax.servlet.ServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * CREATED BY IDEA
@@ -71,15 +72,19 @@ public class QualityCheckController {
                 randomCheckRecord.setBrandId(proCode.getBrandId());
                 randomCheckRecord.setMachineCode(proCode.getMachineCode());
                 randomCheckRecord.setShiftId(proCode.getShiftId());
-                List<RandomCheckRecord> randomCheckRecords = qualityCheckService.getRandomCheckList(param);
-                int newId = null==randomCheckRecords.get(0)?1:randomCheckRecords.get(0).getId();
+                //List<RandomCheckRecord> randomCheckRecords = qualityCheckService.getRandomCheckList(param);
+                //int newId = null==randomCheckRecords.get(0)?1:randomCheckRecords.get(0).getId()+1;
+                String newId = UUID.randomUUID().toString();
                 randomCheckRecord.setId(newId);
                 qualityCheckService.insertRandomCheck(randomCheckRecord);
                 List<RandomCheckDetails> randomCheckDetails = randomCheckRecord.getRandomCheckDetails();
                 for(RandomCheckDetails randomCheckDetails1:randomCheckDetails){
+                    randomCheckDetails1.setId(UUID.randomUUID().toString());
                     randomCheckDetails1.setRandomCheckId(newId);
                 }
-                qualityCheckService.insertRandomCheckDetails(randomCheckDetails);
+                if(null != randomCheckDetails || randomCheckDetails.size()>0){
+                    qualityCheckService.insertRandomCheckDetails(randomCheckDetails);
+                }
                 returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
                 returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
             }else{

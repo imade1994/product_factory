@@ -15,10 +15,22 @@ import java.io.Serializable;
  */
 @Data
 public class Machine implements Serializable {
+
+    /**
+     * id
+     *
+     * */
+    private int id;
+
     /**
      * 机台号
      * */
     private String machineCode;
+
+    /**
+     * 名称
+     * */
+    private String machineName;
 
 
     /**
@@ -31,6 +43,11 @@ public class Machine implements Serializable {
      * 机组
      * */
     private String machineGroup;
+
+    /**
+     * 机组名
+     * */
+    private String groupName;
 
 
     /**
@@ -49,5 +66,10 @@ public class Machine implements Serializable {
      * 班制ID
      * */
     private int shiftId;
+
+    /**
+     * 班制名
+     * */
+    private String shiftName;
 
 }

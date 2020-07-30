@@ -36,11 +36,11 @@ public class ShiftDetails implements Serializable {
     /**
      * 开始时间
      * */
-    private int beginDate;
+    private String beginDate;
 
     /**
      * 结束时间
      * */
-    private int endDate;
+    private String endDate;
 
 }

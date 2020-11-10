@@ -43,6 +43,13 @@ public interface ProCodeMapper {
      int validateCode(Map map);
 
 
+    /**
+     * 查询统计产量  箱
+     *
+     * */
+    ProductionCount getItemProductionByPeriod(Map map);
+
+
 
 
 }

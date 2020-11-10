@@ -1,9 +1,6 @@
 package com.hlxd.microcloud.service;
 
-import com.hlxd.microcloud.vo.CountScan;
-import com.hlxd.microcloud.vo.Machine;
-import com.hlxd.microcloud.vo.RejectCount;
-import com.hlxd.microcloud.vo.ScanCount;
+import com.hlxd.microcloud.vo.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,11 +25,16 @@ public interface AnalysisService {
     List<ScanCount> getCountStatic(Map map);
 
     /**
+     * 获取条码信息
+     * */
+    List<CodeUnion> getCodeByParentCode(Map map);
+
+    /**
      * 获取机台的启动状态
      * */
     List<Machine> getMachineStatus(Map map);
 
-    List<ScanCount> getScanCount(Map map);
+    List<RealTimeStatistic> getScanCount(Map map);
 
     void batchInsertScanCount(List<ScanCount> scanCounts);
 
@@ -103,4 +105,78 @@ public interface AnalysisService {
      * 码段使用率
      * */
     List<CountScan> getCodeUseByMachine(Map map);
+
+
+    /**
+     * 读码率详情
+     * */
+    List<CountScan> getScanRateByDayDetails(Map map);
+
+    /**
+     * 读码率详情
+     * */
+    List<CountScan> getScanRateByMachineDetails(Map map);
+
+
+    /**
+     * 关联率详情
+     * */
+    List<CountScan> getRelateRateByDayDetails(Map map);
+
+
+    /**
+     * 关联率详情
+     * */
+    List<CountScan> getRelateRateByMachineDetails(Map map);
+
+
+    /**
+     * 作业率详情
+     * */
+    List<CountScan> getWorkRateByDayDetails(Map map);
+
+
+
+    /**
+     * 作业率详情
+     * */
+    List<CountScan> getWorkRateByMachineDetails(Map map);
+
+
+
+    /**
+     * 查询烟包或烟条或件码重复关联
+     * */
+    List<RepeatCount> getRepeatCount(Map map);
+
+    /**
+     * 获取单个码的重复关联数据
+     * */
+    List<ProCode> getRepeatList(Map map);
+
+    /**
+     * 查询烟包或烟条或件码重复关联
+     * total
+     * */
+    int getRepeatCountTotal(Map map);
+
+
+    /**
+     * 获取单个码的重复关联数据
+     * total
+     * */
+    int getRepeatListTotal(Map map);
+
+
+
+    /**
+     * 获取包装机或装封箱机 所有统计数据
+     * */
+    AllMachineCount getAllMachineCountByGroupCode(String typeCode);
+
+
+    /**
+     * 获取包装机或装封箱机 当前班组数据
+     * */
+    List<MachineCount> getAllMachineCount(String typeCode);
 }

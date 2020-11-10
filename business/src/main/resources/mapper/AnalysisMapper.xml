@@ -3,49 +3,89 @@
 <mapper namespace="com.hlxd.microcloud.dao.AnalysisMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.ScanCount">
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.RealTimeStatistic">
         <id column="machine_code" property="machineCode" />
         <result column="machine_name" property="machineName" />
+        <result column="currentShiftId" property="currentShiftId" />
+        <result column="currentClassName" property="currentClassName" />
+        <collection property="scanCounts" ofType="com.hlxd.microcloud.vo.ScanCount">
+            <result column="realtime_reject" property="realtimeReject" />
+            <result column="realtime_relate" property="realtimeRelate" />
+            <result column="realtime_scan_reject" property="realtimeScanReject" />
+            <result column="realtime_scan" property="realtimeScan" />
+            <result column="brand_id" property="brandId" />
+            <result column="brand_name" property="brandName" />
+            <result column="last_time" property="lastTime" />
+            <result column="shift_id" property="period" />
+            <result column="class_name" property="shiftName" />
+            <result column="random_check" property="randomCheck" />
+            <result column="random_check_fail" property="randomCheckFail" />
+            <result column="relate_time_break_count" property="relateTimeBreakCount" />
+            <result column="relate_time_break_time" property="relateTimeBreakTime" />
+            <result column="type_code" property="typeCode" />
+            <result column="relateCount" property="relateCount" />
+            <result column="relateReject" property="relateReject" />
+            <result column="realtime_collection_package" property="collectionCountPackage" />
+            <result column="realtime_collection_strip" property="collectionCountStrip" />
+            <result column="workEfficiency" property="workEfficiency" />
+            <result column="scanEfficiency" property="scanEfficiency" />
+            <collection property="rejectCounts" ofType="com.hlxd.microcloud.vo.RejectCount">
+                <result column="rejectCount" property="countRemark"/>
+                <result column="reject_type_code" property="rejectType"/>
+            </collection>
+            <collection property="breakRecords" ofType="com.hlxd.microcloud.vo.BreakRecord">
+                <result column="break_time_count" property="breakTimeOut"/>
+                <result column="break_count" property="breakCount"/>
+                <result column="begin_date" property="beginDate"/>
+                <result column="end_date" property="endDate"/>
+            </collection>
+            <collection property="randomCheckRecords" ofType="com.hlxd.microcloud.vo.RandomCheckRecord">
+                <result column="begin_check_date" property="beginCheckDate"/>
+                <result column="check_type" property="checkType"/>
+                <result column="quality_type" property="qualityType"/>
+                <result column="qr_code" property="qrCode"/>
+                <result column="check_status" property="checkStatus"/>
+                <result column="on_line_check" property="onLineCheck"/>
+                <collection property="randomCheckDetails" ofType="com.hlxd.microcloud.vo.RandomCheckDetails">
+                    <result column="check_qrCode" property="qrCode"/>
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <resultMap id="allMachineMap" type="com.hlxd.microcloud.vo.AllMachineCount">
+
         <result column="realtime_reject" property="realtimeReject" />
         <result column="realtime_relate" property="realtimeRelate" />
         <result column="realtime_scan_reject" property="realtimeScanReject" />
         <result column="realtime_scan" property="realtimeScan" />
-        <result column="brand_id" property="brandId" />
+        <result column="randomCheckCount" property="randomCheckCount" />
+        <result column="randomCheckFailCount" property="randomCheckFailCount" />
+        <result column="breakDownCount" property="breakDownCount" />
+        <result column="breakTimeCount" property="breakTimeCount" />
+        <result column="packageRejectCount" property="packageRejectCount" />
+        <result column="stripRejectCount" property="stripRejectCount" />
+
+    </resultMap>
+
+    <resultMap id="MachineMap" type="com.hlxd.microcloud.vo.MachineCount">
+
+        <result column="machine_code" property="machineCode" />
+        <result column="class_name" property="shiftName" />
         <result column="brand_name" property="brandName" />
-        <result column="last_time" property="lastTime" />
-        <result column="shift_id" property="period" />
-        <result column="random_check" property="randomCheck" />
-        <result column="random_check_fail" property="randomCheckFail" />
-        <result column="relate_time_break_count" property="relateTimeBreakCount" />
-        <result column="relate_time_break_time" property="relateTimeBreakTime" />
-        <result column="type_code" property="typeCode" />
-        <result column="relateCount" property="relateCount" />
-        <result column="relateReject" property="relateReject" />
-        <result column="realtime_collection_package" property="collectionCountPackage" />
-        <result column="realtime_collection_strip" property="collectionCountStrip" />
-        <result column="workEfficiency" property="workEfficiency" />
-        <result column="scanEfficiency" property="scanEfficiency" />
-        <collection property="rejectCounts" ofType="com.hlxd.microcloud.vo.RejectCount">
-            <result column="rejectCount" property="countRemark"/>
-            <result column="reject_type_code" property="rejectType"/>
-        </collection>
-        <collection property="breakRecords" ofType="com.hlxd.microcloud.vo.BreakRecord">
-            <result column="break_time_count" property="breakTimeOut"/>
-            <result column="break_count" property="breakCount"/>
-            <result column="begin_date" property="beginDate"/>
-            <result column="end_date" property="endDate"/>
-        </collection>
-        <collection property="randomCheckRecords" ofType="com.hlxd.microcloud.vo.RandomCheckRecord">
-            <result column="begin_check_date" property="beginCheckDate"/>
-            <result column="check_type" property="checkType"/>
-            <result column="quality_type" property="qualityType"/>
-            <result column="qr_code" property="qrCode"/>
-            <result column="check_status" property="checkStatus"/>
-            <result column="on_line_check" property="onLineCheck"/>
-            <collection property="randomCheckDetails" ofType="com.hlxd.microcloud.vo.RandomCheckDetails">
-                <result column="check_qrCode" property="qrCode"/>
-            </collection>
-        </collection>
+        <result column="realtime_reject" property="realtimeReject" />
+        <result column="realtime_relate" property="realtimeRelate" />
+        <result column="realtime_scan_reject" property="realtimeScanReject" />
+        <result column="realtime_scan" property="realtimeScan" />
+        <result column="randomCheckCount" property="randomCheckCount" />
+        <result column="randomCheckFailCount" property="randomCheckFailCount" />
+        <result column="breakDownCount" property="breakDownCount" />
+        <result column="breakTimeCount" property="breakTimeCount" />
+        <result column="packageRejectCount" property="packageRejectCount" />
+        <result column="stripRejectCount" property="stripRejectCount" />
+        <result column="beginDate" property="beginDate" />
+        <result column="endDate" property="endDate" />
+
     </resultMap>
 
     <!-- 通用查询映射结果 -->
@@ -55,6 +95,40 @@
         <result column="type" property="type" />
         <result column="sys_status" property="status" />
     </resultMap>
+
+    <resultMap id="BaseRepeatMap" type="com.hlxd.microcloud.vo.RepeatDetails">
+        <result column="qrCode" property="qrCode" />
+        <result column="parentCode" property="parentCode" />
+        <result column="relationDate" property="relationDate" />
+        <result column="brandName" property="productName" />
+        <result column="machineName" property="machineName" />
+        <result column="shiftName" property="shiftName" />
+    </resultMap>
+    <resultMap id="CodeUnionMap" type="com.hlxd.microcloud.vo.CodeUnion">
+        <result column="qrcode" property="qrCode" />
+        <result column="parentCode" property="packageCode" />
+        <result column="relationDate" property="relationDate" />
+        <result column="brandName" property="brandName" />
+        <result column="machineName" property="machineName" />
+        <result column="machine_code" property="machineCode" />
+        <result column="shiftName" property="shiftName" />
+    </resultMap>
+
+    <select id="getCodeByParentCode" parameterType="java.util.HashMap" resultMap="CodeUnionMap">
+        select
+        distinct(thsc.machine_code) as machine_code,
+        thbm.machine_name as machineName,
+        thsc.relation_date
+         from t_hl_system_code  thsc
+        LEFT JOIN
+        t_hl_base_machine thbm
+        on thbm.machine_code = thsc.machine_code
+        where parent_code = #{qrCode}  and package_type = '1'
+        order by relation_date desc
+        limit 1
+    </select>
+
+
 
 
 
@@ -68,18 +142,15 @@
     <select id="getMachineStatus" resultMap="BaseMachineMap" parameterType="java.util.HashMap">
         select
 thbm.machine_name,
-(case
-when (select count(*) from t_hl_realtime_work where thbm.id = machine_code)>0 and TIMESTAMPDIFF(MINUTE,thrw.last_time,now()) > 2 then 0
-else thrw.sys_status
-end
-) as sys_status
-        from
-        t_hl_base_machine thbm
-        left join t_hl_realtime_work thrw
-        on thrw.machine_code = thbm.machine_code  and DATE_FORMAT(thrw.last_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')
-        where thbm.status = 1
-        and thbm.group_code = #{typeCode}
-        order by machine_name asc
+thbm.machine_code,
+case when (select count(*) from t_hl_realtime_work where thbm.machine_code = machine_code)>0 and TIMESTAMPDIFF(MINUTE,(select last_time from t_hl_realtime_work where produce_date = DATE_FORMAT(today.begin_date,'%Y-%m-%d') and shift_id = today.shift_id and machine_code =  thbm.machine_code order by last_time desc limit 1),now()) > 2
+then 0
+else (select status from t_hl_realtime_work where produce_date = DATE_FORMAT(today.begin_date,'%Y-%m-%d') and shift_id = today.shift_id and machine_code =  thbm.machine_code order by last_time desc limit 1)
+  end ) as sys_status
+  from t_hl_base_machine thbm
+  left join t_hl_system_current_machine_time today on today.machine_code = thbm.machine_code
+  where thbm.status = 1 and thbm.group_code = #{typeCode}
+ order by machine_name asc
     </select>
 
 
@@ -92,21 +163,19 @@ last_time,type_code
 		left join t_hl_system_shift_details thssd
 		on thssd.id = thrw.shift_id
     where type_code = #{typeCode}
-    and last_time <![CDATA[>=]]>str_to_date(#{beginDate},'%Y-%m-%d')
-    AND last_time <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d')
+    and DATE_FORMAT(last_time,'%Y-%m-%d') <![CDATA[>=]]>str_to_date(#{beginDate},'%Y-%m-%d')
+    AND DATE_FORMAT(last_time,'%Y-%m-%d') <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d')
     group by last_time,type_code
 
     </select>
     <select id="getScanCount" parameterType="java.util.HashMap" resultMap="BaseResultMap">
         select
-        thrw.realtime_reject,
-        thrw.realtime_relate,
-        thrw.realtime_scan_reject,
-        thrw.realtime_scan,
+        thrw.realtime_reject as realtime_reject ,
+        thrw.realtime_relate as realtime_relate,
+        thrw.realtime_scan_reject as realtime_scan_reject,
+        thrw.realtime_scan as realtime_scan,
         thrw.brand_id,
         thsb.brand_name,
-        thrw.last_time,
-        thrw.shift_id,
         thrw.random_check,
         thrw.random_check_fail,
         thrw.relate_time_break_count,
@@ -115,8 +184,10 @@ last_time,type_code
         thrw.realtime_collection_package,
         thrw.realtime_collection_strip,
         thrw.sys_status,
+        thrw.shift_id,
+        thssd.class_name,
         reject.rejectCount,
-        thbm.machine_code,
+        today.machine_code,
         thbm.machine_name,
         reject.reject_type_code,
         thtb.break_time_count,
@@ -126,56 +197,125 @@ last_time,type_code
         thrck.quality_type_code,
         thrck.qr_code,
         thrck.check_status,
-        thrcd.qr_code as check_qrCode
+        thrcd.qr_code as check_qrCode,
+        today.shift_id as currentShiftId,
+        today.class_name as currentClassName
         from
         t_hl_realtime_work thrw
-        left join
-        (select count(*) as rejectCount,reject_type_code,machine_code,reject_date,type_code,shift_id
-        from t_hl_reject_details
-        group by machine_code,reject_type_code,reject_date,type_code,shift_id) as reject
-        on reject.machine_code = thrw.machine_code and reject.type_code = thrw.type_code and reject.shift_id = thrw.shift_id and reject.reject_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
-        left join
-        (select SUM(break_time_count) as break_time_count,count(*) as break_count,break_date,shift_id,machine_code
-        from t_hl_time_break
-        group by break_date,shift_id,machine_code) as thtb
-        on thtb.machine_code = thrw.machine_code  and thtb.shift_id = thrw.shift_id and thtb.break_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
-        left join
-        t_hl_system_shift_details thssd
-        on thrw.shift_id = thssd.id
-        left join
-        t_hl_random_check thrck
-        on  thrck.begin_check_date between STR_TO_DATE(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') and STR_TO_DATE(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrck.machine_code = thrw.machine_code
-        left join t_hl_random_check_detail thrcd
-        on thrcd.random_check_id = thrck.id
+        left join t_hl_system_current_machine_time today
+        on  thrw.machine_code = today.machine_code
         left join t_hl_base_machine thbm
         on thrw.machine_code = thbm.machine_code
         left join t_hl_system_brand thsb
         on thsb.brand_code = thrw.brand_id
-        where 1=1
-        <if test="null != lastTime and '' != lastTime">
-            and thrw.shift_id = (select thssd1.id from t_hl_system_shift thsf1
-            left join t_hl_system_shift_details thssd1
-            on thsf1.id = thssd1.shift_id
-            where thsf1.id = thbm.shift_id
-            and thrw.last_time between  str_to_date(CONCAT(#{lastTime},' ',thssd1.begin_date),'%Y-%m-%d %H:%i:%s') and str_to_date(CONCAT(#{lastTime},' ',thssd1.end_date),'%Y-%m-%d %H:%i:%s')
-            )
-        </if>
+        left join
+        (select sum(reject_count) as rejectCount,reject_type_code,machine_code,reject_date,type_code,shift_id
+        from t_hl_reject_count
+        group by machine_code,reject_type_code,reject_date,type_code,shift_id) as reject
+        on reject.machine_code = thrw.machine_code and reject.type_code = thrw.type_code and reject.shift_id = thrw.shift_id and reject.reject_date <![CDATA[>=]]> today.begin_date and reject.reject_date <![CDATA[<=]]> today.end_date
+        left join
+        (select SUM(break_time_count) as break_time_count,count(*) as break_count,break_date,shift_id,machine_code
+        from t_hl_time_break
+        group by break_date,shift_id,machine_code) as thtb
+        on thtb.machine_code = thrw.machine_code  and thtb.shift_id = thrw.shift_id and thtb.break_date <![CDATA[>=]]> today.begin_date and thtb.break_date <![CDATA[<=]]> today.end_date
+        left join
+        t_hl_random_check thrck
+        on  thrck.begin_check_date<![CDATA[>=]]> today.begin_date and thrck.end_check_date <![CDATA[<=]]> today.end_date and thrck.machine_code = thrw.machine_code
+        left join t_hl_random_check_detail thrcd
+        on thrcd.random_check_id = thrck.id
+        left join
+        t_hl_system_shift_details thssd
+        on thrw.shift_id = thssd.id
+        where thrw.last_time <![CDATA[>=]]> today.begin_date and thrw.last_time <![CDATA[<=]]> today.end_date
         <if test="null != machineCode and '' != machineCode">
         and thrw.machine_code = #{machineCode}
         </if>
         <if test=" null != typeCode and '' != typeCode">
-           and thrw.type_code = #{typeCode}
+           and thbm.group_code = #{typeCode}
         </if>
         <if test=" null != beginDate and '' != beginDate">
-            and thrw.last_time <![CDATA[>=]]>str_to_date(#{beginDate},'%Y-%m-%d')
+            and DATE_FORMAT(thrw.last_time,'%Y-%m-%d') <![CDATA[>=]]>str_to_date(#{beginDate},'%Y-%m-%d')
         </if>
         <if test=" null != endDate and '' != endDate">
-            and thrw.last_time <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d')
+            and DATE_FORMAT(thrw.last_time,'%Y-%m-%d') <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d')
         </if>
-        order by machine_name asc
+        order by today.machine_code desc,thrw.last_time desc
+
+    </select>
+    <select id="getAllMachineCountByGroupCode" parameterType="java.lang.String" resultMap="allMachineMap">
+        select
+        sum(thrw.realtime_reject) as realtime_reject ,
+        sum(thrw.realtime_relate) as realtime_relate,
+        sum(thrw.realtime_scan_reject) as realtime_scan_reject,
+        sum(thrw.realtime_scan) as realtime_scan,
+        count(thrd.qrCode) as packageRejectCount,
+        count(thrd1.qrCode) as stripRejectCount,
+        sum(thrw.random_check) as randomCheckCount,
+        sum(thrw.random_check_fail)as randomCheckFailCount,
+        sum(thrw.relate_time_break_count)as breakDownCount,
+        sum(thrw.relate_time_break_time)as breakTimeCount
+        from t_hl_realtime_work thrw
+        left join
+        t_hl_system_current_machine_time as today
+        on thrw.machine_code = today.machine_code
+        left join t_hl_reject_detail thrd
+        on thrd.reject_time <![CDATA[>=]]> today.begin_date and thrd.reject_time<![CDATA[<=]]> today.end_date and thrd.machine_code = thrw.machine_code and thrd.type_code = '1'
+        left join t_hl_reject_detail thrd1
+        on thrd.reject_time <![CDATA[>=]]> today.begin_date and thrd.reject_time <![CDATA[<=]]> today.end_date and thrd.machine_code = thrw.machine_code and thrd.type_code = '2'
+        where thrw.last_time <![CDATA[>=]]> today.begin_date and thrw.last_time <![CDATA[<=]]> today.end_date
+        and thrw.type_code = #{typeCode}
 
 
 
+
+    </select>
+
+    <select id="getAllMachineCount" parameterType="java.lang.String" resultMap="MachineMap">
+        select
+        thrw.machine_code,
+        today.class_name,
+        thsb.brand_name,
+        thrw.realtime_reject ,
+        thrw.realtime_relate ,
+        thrw.realtime_scan_reject ,
+        thrw.realtime_scan,
+        (select count(*) from t_hl_reject_detail thrd where thrd.machine_code = thrw.machine_code and thrd.shift_id = thrw.shift_id and thrd.type_code = '1') as packageRejectCount,
+        (select count(*) from t_hl_reject_detail thrd where thrd.machine_code = thrw.machine_code and thrd.shift_id = thrw.shift_id and thrd.type_code = '2') as stripRejectCount,
+        thrw.random_check as randomCheckCount,
+        thrw.random_check_fail as randomCheckFailCount,
+        thrw.relate_time_break_count as breakDownCount,
+        thrw.relate_time_break_time as breakTimeCount,
+        today.beginDate,
+        today.endDate
+        from t_hl_realtime_work thrw
+        left join
+        (select thbm.machine_code,
+        thssd.id as shift_id,
+        thssd.class_name,
+        STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') as beginDate,
+        (
+        case
+        when STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]>  STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')        then DATE_ADD(STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+        when STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]>  STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')        then STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        end ) as endDate
+        from
+        t_hl_base_machine thbm
+        left join t_hl_system_shift thss on thbm.shift_id = thss.id
+        left join t_hl_system_shift_details thssd on thss.id = thssd.shift_id
+        where
+        (case
+        when  STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]>  STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then now() <![CDATA[>=]]>  STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') and now() <![CDATA[<=]]>  DATE_ADD(STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+        when STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]>  STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then now() <![CDATA[>=]]>  STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') and now() <![CDATA[<=]]>  STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        end
+        )) as today
+        on today.machine_code = thrw.machine_code
+        left join t_hl_system_brand thsb
+        on thsb.brand_code = thrw.brand_id
+        where thrw.type_code = #{typeCode}
+        and thrw.shift_id = today.shift_id
+        and thrw.last_time <![CDATA[>=]]>  today.beginDate and thrw.last_time <![CDATA[<=]]>  today.endDate
     </select>
 
     <insert id="batchInsertScanCount" parameterType="java.util.ArrayList" >
@@ -204,14 +344,15 @@ last_time,type_code
         sum(thrw.realtime_collection_package) as collectionPackage,
         sum(thrw.realtime_scan) as packCount,
         sum(thrw.realtime_scan-realtime_scan_reject) as packSuccess,
-        sum(1-(TRUNCATE((thrw.realtime_scan_reject/thrw.realtime_scan),2)))/count(*) as packRate,
-        thbm.machine_name as machineName
+        convert(sum(realtime_scan-realtime_scan_reject)/sum(realtime_scan),decimal(15,6)) as packRate,
+        thbm.machine_name as machineName,
+        thrw.machine_code as machineCode
         from t_hl_realtime_work thrw
         left join t_hl_base_machine thbm
         on thrw.machine_code = thbm.machine_code
-        where last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
-        and type_code = #{type}
-        group by machineName
+        where  DATE_FORMAT(last_time,'%Y-%m-%d') <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and  DATE_FORMAT(last_time,'%Y-%m-%d') <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
+        group by machineName,machineCode
         order by machineName asc
     </select>
 
@@ -221,13 +362,15 @@ last_time,type_code
         sum(thrw.realtime_collection_package) as collectionPackage,
         sum(thrw.realtime_scan) as packCount,
         sum(thrw.realtime_scan-thrw.realtime_scan_reject) as packSuccess,
-        sum(1-(TRUNCATE((thrw.realtime_scan_reject/thrw.realtime_scan),2)))/count(thrw.id) as packRate,
+        convert(sum(realtime_scan-realtime_scan_reject)/sum(realtime_scan),decimal(15,6)) as packRate,
         thsb.brand_name as brandName
         from t_hl_realtime_work thrw
         left join t_hl_system_brand thsb
         on thrw.brand_id = thsb.brand_code
-        where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
-        and thrw.type_code = #{type}
+        left join t_hl_base_machine thbm
+        on thrw.machine_code = thbm.machine_code
+        where  DATE_FORMAT(thrw.last_time,'%Y-%m-%d')   <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
         group by brandName
     </select>
 
@@ -239,11 +382,13 @@ last_time,type_code
         sum(realtime_collection_package) as collectionPackage,
         sum(realtime_scan) as packCount,
         sum(realtime_scan-realtime_scan_reject) as packSuccess,
-        sum(1-(TRUNCATE((realtime_scan_reject/realtime_scan),2)))/count(*) as packRate,
+        convert(sum(realtime_scan-realtime_scan_reject)/sum(realtime_scan),decimal(15,6)) as packRate,
         DATE_FORMAT(last_time,'%Y-%m-%d') as productDate
-        from t_hl_realtime_work
-        where last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
-        and type_code = #{type}
+        from t_hl_realtime_work thrw
+        left join t_hl_base_machine thbm
+        on thrw.machine_code = thbm.machine_code
+        where DATE_FORMAT(last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and DATE_FORMAT(last_time,'%Y-%m-%d') <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
         group by productDate
     </select>
 
@@ -252,11 +397,13 @@ last_time,type_code
         sum(realtime_collection_strip) as collectionStrip,
         sum(realtime_relate+realtime_reject) as stripCount,
         sum(realtime_relate) as stripSuccess,
-        sum(TRUNCATE(realtime_relate/(realtime_relate+realtime_reject),2))/count(*) as stripRate,
+        convert(sum(realtime_relate-realtime_reject)/sum(realtime_relate),decimal(15,6)) as stripRate,
         DATE_FORMAT(last_time,'%Y-%m-%d') as productDate
-        from t_hl_realtime_work
-        where last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
-        and type_code = #{type}
+        from t_hl_realtime_work thrw
+        left join t_hl_base_machine thbm
+        on thrw.machine_code = thbm.machine_code
+        where DATE_FORMAT(last_time,'%Y-%m-%d') <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and DATE_FORMAT(last_time,'%Y-%m-%d') <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
         group by productDate
     </select>
 
@@ -265,14 +412,15 @@ last_time,type_code
         sum(thrw.realtime_collection_strip) as collectionStrip,
         sum(thrw.realtime_relate+thrw.realtime_reject) as stripCount,
         sum(thrw.realtime_relate) as stripSuccess,
-        sum(TRUNCATE(thrw.realtime_relate/(thrw.realtime_relate+thrw.realtime_reject),2))/count(*) as stripRate,
-        thbm.machine_name as machineName
+        convert(sum(realtime_relate-realtime_reject)/sum(realtime_relate),decimal(15,6)) as stripRate,
+        thbm.machine_name as machineName,
+        thrw.machine_code as machineCode
         from t_hl_realtime_work thrw
         left join t_hl_base_machine thbm
         on thrw.machine_code = thbm.machine_code
-        where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
-        and thrw.type_code = #{type}
-        group by machineName
+        where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
+        group by machineName,machineCode
         order by machineName asc
     </select>
 
@@ -281,13 +429,15 @@ last_time,type_code
         sum(thrw.realtime_collection_strip) as collectionStrip,
         sum(thrw.realtime_relate+thrw.realtime_reject) as stripCount,
         sum(thrw.realtime_relate) as stripSuccess,
-        sum(TRUNCATE(thrw.realtime_relate/(thrw.realtime_relate+thrw.realtime_reject),2))/count(thrw.*) as stripRate,
+        convert(sum(realtime_relate-realtime_reject)/sum(realtime_relate),decimal(15,6)) as stripRate,
         thsb.brand_name as brandName
         from t_hl_realtime_work thrw
         left join t_hl_system_brand thsb
-        on thsb.brand_code = thrw.brand_ib
-        where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
-        and thrw.type_code = #{type}
+        on thsb.brand_code = thrw.brand_id
+        left join t_hl_base_machine thbm
+        on thrw.machine_code = thbm.machine_code
+        where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
         group by brandName
     </select>
 
@@ -295,16 +445,37 @@ last_time,type_code
         select
         sum(thrw.relate_time_break_count) as breakCount,
         sum(thrw.relate_time_break_time) as breakTimeCount,
-        sum(TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time)) as systemTime,
-        sum(TRUNCATE((1-(thrw.relate_time_break_time/(TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time)))),4))/count(*) as workRate,
-        thbm.machine_name as machineName
+        sum(( case
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date != DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(DATE_ADD(thrw.last_time,INTERVAL -1 DAY),'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        else 0
+        end
+        )) as systemTime,
+        (1-convert((
+        sum(relate_time_break_time) /sum(
+        ( case
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date != DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(DATE_ADD(thrw.last_time,INTERVAL -1 DAY),'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        else 0 end ))
+        ),decimal(15,6))) as workRate,
+        thbm.machine_name as machineName,
+        thrw.machine_code as machineCode
         from t_hl_realtime_work thrw
         left join t_hl_system_shift_details thssd
         on thrw.shift_id = thssd.id
         left join t_hl_base_machine thbm
         on thbm.machine_code = thrw.machine_code
-        where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
-        group by machineName
+        where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
+        group by machineName,machineCode
         order by machineName asc
     </select>
 
@@ -313,13 +484,35 @@ last_time,type_code
         select
         sum(thrw.relate_time_break_count) as breakCount,
         sum(thrw.relate_time_break_time) as breakTimeCount,
-        sum(TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time)) as systemTime,
-        sum(TRUNCATE((1-(thrw.relate_time_break_time/(TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time)))),4))/count(*) as workRate,
+        sum(( case
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date != DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(DATE_ADD(thrw.last_time,INTERVAL -1 DAY),'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        else 0
+        end
+        )) as systemTime,
+        (1-convert((
+        sum(relate_time_break_time) /sum(
+        ( case
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date != DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(DATE_ADD(thrw.last_time,INTERVAL -1 DAY),'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        else 0 end ))
+        ),decimal(15,6))) as workRate,
         DATE_FORMAT(last_time,'%Y-%m-%d') as productDate
         from t_hl_realtime_work thrw
         left join t_hl_system_shift_details thssd
         on thrw.shift_id = thssd.id
-        where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thrw.machine_code
+        where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
         group by productDate
     </select>
 
@@ -329,35 +522,64 @@ last_time,type_code
         select
         sum(thrw.relate_time_break_count) as breakCount,
         sum(thrw.relate_time_break_time) as breakTimeCount,
-        sum(TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time)) as systemTime,
-        sum(TRUNCATE((1-(thrw.relate_time_break_time/(TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time)))),4))/count(*) as workRate,
+        sum(( case
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date != DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(DATE_ADD(thrw.last_time,INTERVAL -1 DAY),'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        else 0
+        end
+        )) as systemTime,
+        (1-convert((
+        sum(relate_time_break_time) /sum(
+        ( case
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date != DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(DATE_ADD(thrw.last_time,INTERVAL -1 DAY),'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        else 0 end ))
+        ),decimal(15,6))) as workRate,
         thsb.brand_name as brandName
         from t_hl_realtime_work thrw
         left join t_hl_system_shift_details thssd
         on thrw.shift_id = thssd.id
         left join t_hl_system_brand thsb
         on thsb.brand_code = thrw.brand_id
-        where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thrw.machine_code
+        where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
         group by brandName
     </select>
 
     <select id="getRejectCount" parameterType="java.util.HashMap" resultType="com.hlxd.microcloud.vo.CountScan">
         select
-COUNT(*) as rejectCount,
+sum(thrd.reject_count) as rejectCount,
 thrd.reject_type_code as rejectTypeCode,
 thsd.key as rejectReason
-from t_hl_reject_details thrd
+from t_hl_reject_count thrd
 left join t_hl_system_dict thsd
-on (thsd.parent_id = 8 or thsd.parent_id = 13 ) and thrd.reject_type_code  = thsd.`value`
+on  thrd.reject_type_code  = thsd.`value`
+left join t_hl_base_machine thbm
+on thbm.machine_code = thrd.machine_code
 where
-thrd.type_code = #{type}
+<if test="type == 1 ">
+    thrd.type_code = #{type}
+</if>
+<if test="type == 2">
+    thrd.type_code = #{type}
+</if>
+<if test=" type != 1 and type != 2">
+    thbm.group_code = #{type}
+    and thrd.reject_type_code != '22' and thrd.reject_type_code != '23' and thrd.reject_type_code != '25'
+</if>
 and str_to_date(thrd.reject_date,'%Y-%m-%d ') <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and str_to_date(thrd.reject_date,'%Y-%m-%d ') <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+and thsd.parent_id = 13
 group by rejectTypeCode,rejectReason
-
-
-
-
-
     </select>
 
     <select id="getCodeUseByDay" resultType="com.hlxd.microcloud.vo.CountScan" parameterType="java.util.HashMap">
@@ -377,7 +599,7 @@ group by rejectTypeCode,rejectReason
 				from t_hl_realtime_work thrw
 				left join t_hl_system_brand thsb
 				on thrw.brand_id = thsb.brand_code
-				where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+				where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
 				group by productDate) a
 				left join
         (select
@@ -386,7 +608,7 @@ group by rejectTypeCode,rejectReason
 				from t_hl_realtime_work thrw
 				left join t_hl_discard_code thdc
 				on thrw.machine_code = thdc.machine_code and thdc.shift_id = thrw.shift_id and thdc.discard_date = thrw.produce_date and thdc.package_type = '1'
-				where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+				where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
 				group by productDate) b
 				on a.productDate = b.productDate
         left join
@@ -396,7 +618,7 @@ group by rejectTypeCode,rejectReason
 				from t_hl_realtime_work thrw
 				left join t_hl_discard_code thdc
 				on thrw.machine_code = thdc.machine_code and thdc.shift_id = thrw.shift_id and thdc.discard_date = thrw.produce_date and thdc.package_type = '2'
-				where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+				where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
 				group by productDate) c
 				on a.productDate = c.productDate
 				left join
@@ -406,7 +628,7 @@ group by rejectTypeCode,rejectReason
 				from t_hl_realtime_work thrw
 				left join t_hl_cancel_relation thcr
 				on thrw.machine_code = thcr.machine_code and thcr.shift_id = thrw.shift_id and DATE_FORMAT(thcr.cancel_date,'%Y-%m-%d') = thrw.produce_date and thcr.relation_type = '2'
-				where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+				where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
 			  group by productDate
 				) d
 				on a.productDate = d.productDate
@@ -425,51 +647,300 @@ select
 				sum(realtime_scan) as packageScanCount,
 				sum(realtime_scan/thsb.packages)as stripScanCount,
 				sum(realtime_relate/thsb.packages)as stripSuccessRelateCount,
-				thbm.machine_name as machineName
+				thbm.machine_name as machineName,
+				thrw.machine_code as machineCode
 				from t_hl_realtime_work thrw
 				left join t_hl_base_machine thbm
 				on thbm.machine_code = thrw.machine_code
 				left join t_hl_system_brand thsb
 				on thrw.brand_id = thsb.brand_code
-				where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
-				group by machine_name) a
+				where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+				group by machineName,machineCode) a
 				left join
         (select
 				COUNT( thdc.qrCode) as packageDiscardCount,
-				thbm.machine_name as machineName
+				thbm.machine_name as machineName,
+				thrw.machine_code as machineCode
 				from t_hl_realtime_work thrw
 				left join t_hl_discard_code thdc
 				on thrw.machine_code = thdc.machine_code and thdc.shift_id = thrw.shift_id and thdc.discard_date = thrw.produce_date and thdc.package_type = '1'
 				left join t_hl_base_machine thbm
 				on thbm.machine_code = thrw.machine_code
-				where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
-				group by machine_name) b
-				on a.machineName = b.machineName
+				where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+				group by machineName,machineCode) b
+				on a.machineCode = b.machineCode
         left join
 				(select
 				COUNT( thdc.qrCode) as stripDiscardCount,
-				thbm.machine_name as machineName
+				thbm.machine_name as machineName,
+				thrw.machine_code as machineCode
 				from t_hl_realtime_work thrw
 				left join t_hl_discard_code thdc
 				on thrw.machine_code = thdc.machine_code and thdc.shift_id = thrw.shift_id and thdc.discard_date = thrw.produce_date and thdc.package_type = '2'
 				left join t_hl_base_machine thbm
 				on thbm.machine_code = thrw.machine_code
-				where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
-				group by machine_name) c
-				on a.machineName = c.machineName
+				where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+				group by machineName,machineCode) c
+				on a.machineCode = c.machineCode
 				left join
 				(select
 				count(thcr.qrCode) as stripDisCardRelateCount,
-				thbm.machine_name as machineName
+				thbm.machine_name as machineName,
+				thrw.machine_code as machineCode
 				from t_hl_realtime_work thrw
 				left join t_hl_cancel_relation thcr
 				on thrw.machine_code = thcr.machine_code and thcr.shift_id = thrw.shift_id and DATE_FORMAT(thcr.cancel_date,'%Y-%m-%d') = thrw.produce_date and thcr.relation_type = '2'
 				left join t_hl_base_machine thbm
 				on thbm.machine_code = thrw.machine_code
-				where thrw.last_time <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and thrw.last_time <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
-			  group by machine_name
+				where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d ') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+			  group by machineName,machineCode
 				) d
-				on a.machineName = d.machineName
+				on a.machineCode = d.machineCode
+    </select>
+
+
+
+    <select id="getScanRateByDayDetails" resultType="com.hlxd.microcloud.vo.CountScan" parameterType="java.util.HashMap">
+select
+        sum(realtime_collection_package) as collectionPackage,
+        sum(realtime_scan) as packCount,
+        sum(realtime_scan-realtime_scan_reject) as packSuccess,
+        convert(sum(realtime_scan-realtime_scan_reject)/sum(realtime_scan),decimal(15,6)) as packRate,
+        thbm.machine_name as machineName,
+		thssd.class_name as shiftName,
+		thrw.shift_id as shiftId,
+		thsb.brand_name as brandName
+        from t_hl_realtime_work thrw
+        left join t_hl_system_shift_details thssd
+        on thrw.shift_id = thssd.id
+        left join t_hl_system_brand thsb
+        on thsb.brand_code = thrw.brand_id
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thrw.machine_code
+        where thrw.produce_date = #{productDate}
+        and thbm.group_code = #{type}
+        group by machineName,shiftName,brandName,shiftId
+        order by machineName,shiftId,brandName
+    </select>
+
+
+    <select id="getScanRateByMachineDetails" resultType="com.hlxd.microcloud.vo.CountScan" parameterType="java.util.HashMap">
+select
+        sum(realtime_collection_package) as collectionPackage,
+        sum(realtime_scan) as packCount,
+        sum(realtime_scan-realtime_scan_reject) as packSuccess,
+        convert(sum(realtime_scan-realtime_scan_reject)/sum(realtime_scan),decimal(15,6)) as packRate,
+        thrw.produce_date as productDate,
+		thssd.class_name as shiftName,
+		thsb.brand_name as brandName,
+		thrw.shift_id as shiftId
+        from t_hl_realtime_work thrw
+        left join t_hl_system_shift_details thssd
+        on thrw.shift_id = thssd.id
+        left join t_hl_system_brand thsb
+        on thsb.brand_code = thrw.brand_id
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thrw.machine_code
+        where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
+        and thrw.machine_code = #{machineCode}
+        group by productDate,shiftName,brandName,shiftId
+        order by productDate,shiftId,brandName
+    </select>
+
+    <select id="getRelateRateByDayDetails" resultType="com.hlxd.microcloud.vo.CountScan" parameterType="java.util.HashMap">
+    select
+        sum(realtime_collection_strip) as collectionStrip,
+        sum(realtime_relate+realtime_reject) as stripCount,
+        sum(realtime_relate) as stripSuccess,
+        convert(sum(realtime_relate-realtime_reject)/sum(realtime_relate),decimal(15,6))as stripRate,
+        thbm.machine_name as machineName,
+		thssd.class_name as shiftName,
+		thrw.shift_id as shiftId,
+		thsb.brand_name as brandName
+        from t_hl_realtime_work thrw
+        left join t_hl_system_shift_details thssd
+        on thrw.shift_id = thssd.id
+        left join t_hl_system_brand thsb
+        on thsb.brand_code = thrw.brand_id
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thrw.machine_code
+        where thrw.produce_date = #{productDate}
+        and thbm.group_code = #{type}
+        group by machineName,shiftName,brandName,shiftId
+        order by machineName,shiftId,brandName
+    </select>
+
+    <select id="getRelateRateByMachineDetails" resultType="com.hlxd.microcloud.vo.CountScan" parameterType="java.util.HashMap">
+        select
+        sum(thrw.realtime_collection_strip) as collectionStrip,
+        sum(thrw.realtime_relate+thrw.realtime_reject) as stripCount,
+        sum(thrw.realtime_relate) as stripSuccess,
+        convert(sum(realtime_relate-realtime_reject)/sum(realtime_relate),decimal(15,6))as stripRate,
+        thrw.produce_date as productDate,
+		thssd.class_name as shiftName,
+		thrw.shift_id as shiftId,
+		thsb.brand_name as brandName
+        from t_hl_realtime_work thrw
+        left join t_hl_system_shift_details thssd
+        on thrw.shift_id = thssd.id
+        left join t_hl_system_brand thsb
+        on thsb.brand_code = thrw.brand_id
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thrw.machine_code
+        where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
+        and thrw.machine_code = #{machineCode}
+        group by productDate,shiftName,brandName,shiftId
+        order by productDate,shiftId,brandName
+    </select>
+
+
+    <select id="getWorkRateByDayDetails" resultType="com.hlxd.microcloud.vo.CountScan" parameterType="java.util.HashMap">
+        select
+        sum(thrw.relate_time_break_count) as breakCount,
+        sum(thrw.relate_time_break_time) as breakTimeCount,
+        sum(( case
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date != DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(DATE_ADD(thrw.last_time,INTERVAL -1 DAY),'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        else 0
+        end
+        )) as systemTime,
+        (1-convert((
+        sum(relate_time_break_time) /sum(
+        ( case
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date != DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(DATE_ADD(thrw.last_time,INTERVAL -1 DAY),'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        else 0 end ))
+        ),decimal(15,6))) as workRate,
+        thbm.machine_name as machineName,
+		thssd.class_name as shiftName,
+		thrw.shift_id as shiftId,
+		thsb.brand_name as brandName
+        from t_hl_realtime_work thrw
+        left join t_hl_system_shift_details thssd
+        on thrw.shift_id = thssd.id
+        left join t_hl_system_brand thsb
+        on thsb.brand_code = thrw.brand_id
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thrw.machine_code
+        where thrw.produce_date = #{productDate}
+        and thbm.group_code = #{type}
+        group by machineName,shiftName,brandName,shiftId
+        order by machineName,shiftId,brandName
+    </select>
+
+    <select id="getWorkRateByMachineDetails" resultType="com.hlxd.microcloud.vo.CountScan" parameterType="java.util.HashMap">
+        select
+        sum(thrw.relate_time_break_count) as breakCount,
+        sum(thrw.relate_time_break_time) as breakTimeCount,
+        sum(( case
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date != DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(DATE_ADD(thrw.last_time,INTERVAL -1 DAY),'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then (TIMESTAMPDIFF(MINUTE,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        else 0
+        end
+        )) as systemTime,
+        (1-convert((
+        sum(relate_time_break_time) /sum(
+        ( case
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date != DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(DATE_ADD(thrw.last_time,INTERVAL -1 DAY),'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s') and thrw.produce_date = DATE_FORMAT(thrw.last_time,'%Y-%m-%d')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        when str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]> str_to_date(CONCAT(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then (TIMESTAMPDIFF(SECOND,concat(DATE_FORMAT(thrw.last_time,'%Y-%m-%d'),' ',thssd.begin_date),thrw.last_time))
+        else 0 end ))
+        ),decimal(15,6))) as workRate,
+        thrw.produce_date as productDate,
+		thssd.class_name as shiftName,
+		thrw.shift_id as shiftId,
+		thsb.brand_name as brandName
+        from t_hl_realtime_work thrw
+        left join t_hl_system_shift_details thssd
+        on thrw.shift_id = thssd.id
+        left join t_hl_system_brand thsb
+        on thsb.brand_code = thrw.brand_id
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thrw.machine_code
+        where DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d') and DATE_FORMAT(thrw.last_time,'%Y-%m-%d')  <![CDATA[<=]]>  str_to_date(#{endDate},'%Y-%m-%d')
+        and thbm.group_code = #{type}
+        and thrw.machine_code = #{machineCode}
+        group by productDate,shiftName,brandName,shiftId
+        order by productDate,shiftId,brandName
+    </select>
+
+
+    <select id="getRepeatCount" parameterType="java.util.HashMap" resultType="com.hlxd.microcloud.vo.RepeatCount">
+         select count(*) as repeatCount,
+         qrCode
+from
+t_hl_system_code
+where package_type = #{packageType}
+group by qrCode
+having count(*)>1
+limit #{formIndex},#{size}
+    </select>
+
+    <select id="getRepeatCountTotal" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+         select
+
+         count(a.qrCode) from
+         (select count(*) as repeatCount,
+         qrCode
+from
+t_hl_system_code
+where package_type = #{packageType}
+group by qrCode
+having count(*)>1) as a
+    </select>
+
+    <select id="getRepeatListTotal" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+select
+count(thsc.qrCode)
+from
+t_hl_system_code thsc
+left join t_hl_base_machine thbm
+on thsc.machine_code = thbm.machine_code
+left join t_hl_system_brand thsb
+on thsb.brand_code = thsc.brand_id
+left join t_hl_system_shift_details thssd
+on thsc.shift_id = thssd.id
+where qrCode = #{qrCode}
+and package_type  = #{packageType}
+limit #{fromIndex},#{size}
+    </select>
+
+    <select id="getRepeatList" parameterType="java.util.HashMap" resultMap="BaseRepeatMap">
+select
+thsc.qrCode,
+thsc.parent_code as parentCode,
+thsc.relation_date as relationDate,
+thbm.machine_name as machineName,
+thsb.brand_name as brandName,
+thssd.class_name as shiftName
+from
+t_hl_system_code thsc
+left join t_hl_base_machine thbm
+on thsc.machine_code = thbm.machine_code
+left join t_hl_system_brand thsb
+on thsb.brand_code = thsc.brand_id
+left join t_hl_system_shift_details thssd
+on thsc.shift_id = thssd.id
+where qrCode = #{qrCode}
+and package_type  = #{packageType}
+limit #{fromIndex},#{size}
     </select>
 
 

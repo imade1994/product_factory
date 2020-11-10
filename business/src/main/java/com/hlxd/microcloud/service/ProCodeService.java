@@ -30,10 +30,21 @@ public interface ProCodeService {
     ProCode getSingleProCode(Map map);
 
     /**
-     * 查询统计产量
+     * 查询统计产量 包 条
      *
      * */
     ProductionCount getProductionByPeriod(Map map);
+
+    /**
+     * 查询统计产量  箱
+     *
+     * */
+    ProductionCount getItemProductionByPeriod(Map map);
+
+
+
+
+
 
     /**
      * 校验码是否存在于选定时间段内

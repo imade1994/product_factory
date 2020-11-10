@@ -2,9 +2,7 @@ package com.hlxd.microcloud.controller;
 
 import com.hlxd.microcloud.service.AnalysisService;
 import com.hlxd.microcloud.util.CommomStatic;
-import com.hlxd.microcloud.vo.CountScan;
-import com.hlxd.microcloud.vo.Machine;
-import com.hlxd.microcloud.vo.ScanCount;
+import com.hlxd.microcloud.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,11 +48,35 @@ public class AnalysisController {
         if(null != machineCode){
             map.put("machineCode",machineCode);
         }
-        List<ScanCount>  scanCounts = analysisService.getScanCount(map);
+        List<RealTimeStatistic>  scanCounts = analysisService.getScanCount(map);
         map.clear();
         map.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         map.put(CommomStatic.DATA,scanCounts);
         return map;
+    }
+
+
+    /**
+     *条码信息校验
+     * */
+    @RequestMapping("/validateQrCode")
+    public Map getValidateQrCode(@RequestParam("qrCode")String qrCode){
+        Map returnMap = new HashMap();
+        Map param = new HashMap();
+        param.put("qrCode",qrCode);
+        List<CodeUnion> codeUnions = analysisService.getCodeByParentCode(param);
+        if(null != codeUnions && codeUnions.size()>0){
+            Map temMap = new HashMap();
+            CodeUnion codeUnion = codeUnions.get(0);
+            temMap.put("machineName",null == codeUnion.getMachineName()?"":codeUnion.getMachineName());
+            temMap.put("machineCode",codeUnion.getMachineCode());
+            returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+            returnMap.put(CommomStatic.DATA,temMap);
+        }else{
+            returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
+            returnMap.put(CommomStatic.MESSAGE,"码未关联！");
+        }
+        return returnMap;
     }
 
     /**
@@ -155,6 +177,74 @@ public class AnalysisController {
     }
 
 
+
+    /**
+     * 获取统计产量详情
+     *
+     * */
+    @RequestMapping("/getPeriodDetails")
+    public Map getMachineProduceDetails(@RequestParam(value = "beginDate",required = false)String beginDate,@RequestParam(value = "endDate",required = false)String endDate,@RequestParam("typeCode")String type,
+                                        @RequestParam("queryType")int queryType,@RequestParam("groupBy")int groupBy,
+                                        @RequestParam(value = "produceDate",required = false)String produceDate,@RequestParam(value = "machineCode",required = false)String machineCode){
+        Map map = new HashMap();
+        Map returnMap = new HashMap();
+        map.put("type",type);
+        List<CountScan> scanCountList = new ArrayList<>();
+        switch (queryType){
+            case 1:
+                switch (groupBy){
+                    case 1:
+                        map.put(CommomStatic.BEGINDATE,beginDate);
+                        map.put(CommomStatic.ENDDATE,endDate);
+                        map.put("machineCode",machineCode);
+                        scanCountList = analysisService.getScanRateByMachineDetails(map);
+                        break;
+                    case 3:
+                        map.put("productDate",produceDate);
+                        scanCountList = analysisService.getScanRateByDayDetails(map);
+                    default:
+                        break;
+                }
+                break;
+            case 2:
+                switch (groupBy){
+                    case 1:
+                        map.put(CommomStatic.BEGINDATE,beginDate);
+                        map.put(CommomStatic.ENDDATE,endDate);
+                        map.put("machineCode",machineCode);
+                        scanCountList = analysisService.getRelateRateByMachineDetails(map);
+                        break;
+                    case 3:
+                        map.put("productDate",produceDate);
+                        scanCountList = analysisService.getRelateRateByDayDetails(map);
+                    default:
+                        break;
+                }
+                break;
+            case 3:
+                switch (groupBy){
+                    case 1:
+                        map.put(CommomStatic.BEGINDATE,beginDate);
+                        map.put(CommomStatic.ENDDATE,endDate);
+                        map.put("machineCode",machineCode);
+                        scanCountList = analysisService.getWorkRateByMachineDetails(map);
+                        break;
+                    case 3:
+                        map.put("productDate",produceDate);
+                        scanCountList = analysisService.getWorkRateByDayDetails(map);
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,scanCountList);
+        return returnMap;
+    }
+
+
     /**
      * 获取统计数据，
      * 1：产量
@@ -182,19 +272,82 @@ public class AnalysisController {
         Map map = new HashMap();
         map.put(CommomStatic.TIME,currentDate);
         map.put(CommomStatic.TYPE,type);
-        List<ScanCount> scanCountList = analysisService.getScanCount(map);
+        List<RealTimeStatistic> scanCountList = analysisService.getScanCount(map);
         map.clear();
-        Map<String,List<ScanCount>> returnMap = new HashMap();
-        for(ScanCount scanCount:scanCountList){
-            List<ScanCount> scanCounts = returnMap.get(scanCount.getMachineName())==null?new ArrayList<>():returnMap.get(scanCount.getMachineName());
-            scanCounts.add(scanCount);
-            returnMap.put(scanCount.getMachineName(),scanCounts);
-        }
         map.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
-        map.put(CommomStatic.DATA,returnMap);
+        map.put(CommomStatic.DATA,scanCountList);
         return map;
     }
 
+    /**
+     * 获取同一机组 内所有机台一天内的产量
+     *
+     * */
+    @RequestMapping("/getAllMachineCountByGroupCode")
+    public Map getAllMachineCountByGroupCode(@RequestParam("typeCode")String typeCode){
+        Map returnMap = new HashMap();
+        AllMachineCount allMachineCount = analysisService.getAllMachineCountByGroupCode(typeCode);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,allMachineCount);
+        return returnMap;
+    }
+
+    /**
+     * 获取所有设备的当前班组的产量信息
+     * */
+    @RequestMapping("/getAllMachineCount")
+    public Map  getAllMachineCount(@RequestParam("typeCode")String typeCode){
+        Map returnMap = new HashMap();
+        List<MachineCount> machineCounts = analysisService.getAllMachineCount(typeCode);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,machineCounts);
+        return returnMap;
+    }
+
+
+
+
+    /**
+     * 获取重复码及重复次数
+     * */
+    @RequestMapping("/getRepeatCount")
+    public Map getRepeatCount(@RequestParam("packageType")String packageType,@RequestParam("index")int index,@RequestParam("size")int size){
+        Map map = new HashMap();
+        Map returnMap = new HashMap();
+        map.put("packageType",packageType);
+        map.put("formIndex",(index-1)*size);
+        map.put("size",size);
+        List<RepeatCount> scanCountList = analysisService.getRepeatCount(map);
+        int total = analysisService.getRepeatCountTotal(map);
+        map.clear();
+        map.put("data",scanCountList);
+        map.put("total",total);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,map);
+        return map;
+    }
+
+    /**
+     * 获取重复码详情
+     * */
+    @RequestMapping("getRepeatList")
+    public Map getRepeatList(@RequestParam("packageType")String packageType,@RequestParam("qrCode")String qrCode,
+                             @RequestParam("index")int index,@RequestParam("size")int size){
+        Map map = new HashMap();
+        Map returnMap = new HashMap();
+        map.put("packageType",packageType);
+        map.put("qrCode",qrCode);
+        map.put("fromIndex",(index-1)*size);
+        map.put("size",size);
+        List<ProCode> repeatCountList = analysisService.getRepeatList(map);
+        int total = analysisService.getRepeatListTotal(map);
+        map.clear();
+        map.put("total",total);
+        map.put("data",repeatCountList);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,map);
+        return returnMap;
+    }
 
 
 

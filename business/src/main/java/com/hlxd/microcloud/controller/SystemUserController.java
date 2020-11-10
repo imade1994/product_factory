@@ -5,12 +5,14 @@ import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.util.CommonUtil;
 import com.hlxd.microcloud.vo.SystemMenu;
 import com.hlxd.microcloud.vo.SystemUser;
+import com.hlxd.microcloud.vo.SystemUserRole;
+import com.hlxd.microcloud.vo.UserSync;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletRequest;
+import javax.websocket.server.PathParam;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,8 @@ public class SystemUserController {
 
     @Autowired
     SystemUserService userService;
+
+
 
 
 
@@ -141,6 +145,90 @@ public class SystemUserController {
         List<SystemMenu> menuList=userService.getUserMenu(param);
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         returnMap.put(CommomStatic.DATA,menuList);
+        return returnMap;
+    }
+
+
+    /**
+     * 用户注册接口
+     * */
+    @RequestMapping("/register")
+    @Transactional
+    public Map userRegister(@RequestBody UserSync userSync){
+
+        Map returnMap = new HashMap();
+        if(null != userSync && null != userSync.getAccount()){
+            int count  = userService.countUserName(userSync.getAccount());
+            if(count<=0){
+                SystemUser systemUser = new SystemUser();
+                String userId = UUID.randomUUID().toString();
+                systemUser.setUserName(userSync.getAccount());
+                systemUser.setPassWord("hlxd@82777999");
+                systemUser.setId(userId);
+                systemUser.setDepartment("ADMIN");
+                systemUser.setCreatePeople("门户注册");
+                systemUser.setStatus(1);
+                userService.addUser(systemUser);
+                SystemUserRole systemUserRole = new SystemUserRole();
+                systemUserRole.setDepartment_id("10ac82ad-dd2b-11ea-97ee-286ed488cd06");
+                systemUserRole.setUserId(userId);
+                systemUserRole.setStatus(1);
+                userService.addDepartmentRole(systemUserRole);
+                returnMap.put("code",1);
+                returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
+            }else{
+                returnMap.put("code",0);
+                returnMap.put(CommomStatic.MESSAGE,"用户名已存在！");
+            }
+        }else{
+            returnMap.put("code",0);
+            returnMap.put(CommomStatic.MESSAGE,"参数异常！");
+        }
+
+        return returnMap;
+    }
+
+
+
+    /**
+     *用户验证接口
+     * */
+    @RequestMapping("/validateAccount/{account}")
+    public Map validateUser(@PathVariable("account") String account){
+        Map returnMap  = new HashMap();
+        int count = userService.countUserName(account);
+        if(count>0){
+            returnMap.put("code","1");
+            returnMap.put("data",true);
+        }else{
+            returnMap.put("code","1");
+            returnMap.put("data",false);
+        }
+        return returnMap;
+
+    }
+
+
+    /**
+     * 用户注销接口
+     * */
+    @RequestMapping("/logOut/{account}")
+    @Transactional
+    public Map LogoutFormDoor(@PathVariable("account")String account){
+        Map param = new HashMap();
+        Map returnMap = new HashMap();
+        param.put("userNameComplete",account);
+        List<SystemUser>  systemUsers = userService.getAllUser(param);
+        if(systemUsers.size()>0){
+            String userId = systemUsers.get(0).getId();
+            userService.deleteUserByAccount(userId);
+            userService.deleteUserDepartment(userId);
+            returnMap.put("code",1);
+            returnMap.put("msg","success");
+        }else{
+            returnMap.put("code",1);
+            returnMap.put("msg","用户不存在！");
+        }
         return returnMap;
     }
 

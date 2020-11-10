@@ -4,30 +4,16 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://10.210.160.20:3306/Qrcode?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false
+    url: jdbc:mysql://10.165.45.245:3306/qrcode?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false
     username: root
     password: Hlxd@123456
     configuration:
       MapUnderscoreToCamelCase: true
     dbcp2:
-      min-idle: 5
-      initial-size: 5
-      max-total: 5
-      max-wait-millis: 200
-#请求和响应GZIP压缩支持
-feign:
-  httpclient:
-    enabled: false
-  okhttp:
-    enabled: true
-  compression:
-    request:
-      enabled: true
-      mime-types: text/xml,application/xml,application/json
-      min-request-size: 2048
-    response:
-      enabled: true
-
+      min-idle: 20
+      initial-size: 10
+      max-total: 100
+      max-wait-millis: -1
 
 mybatis:
   mapper-locations: classpath:/mapper/*Mapper.xml
@@ -53,18 +39,7 @@ info:
 logging:
   level:
     com.hlxd.microcloud.dao : debug
-
 security:
   basic:
     enabled: false
-  user:
-    name: admin
-    password: root
-#  oauth2:
-#    client:
-#      client-id: ouyaaa
-#      client-secret: ouyaaa
-#      access-token-uri: http://127.0.0.1:9900
-#      user-authorization-uri: http://127.0.0.1:9900/oauth/authorize
-#    resource:
-#      token-info-uri: http://127.0.0.1:9900/oauth/check_token
+

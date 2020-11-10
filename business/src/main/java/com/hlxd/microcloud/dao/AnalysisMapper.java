@@ -1,10 +1,8 @@
 package com.hlxd.microcloud.dao;
 
-import com.hlxd.microcloud.vo.CountScan;
-import com.hlxd.microcloud.vo.Machine;
-import com.hlxd.microcloud.vo.RejectCount;
-import com.hlxd.microcloud.vo.ScanCount;
+import com.hlxd.microcloud.vo.*;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +23,12 @@ public interface AnalysisMapper {
      * 根据条件筛选实时数据
      *
      * */
-    List<ScanCount> getScanCount(Map map);
+    List<RealTimeStatistic> getScanCount(Map map);
+
+    /**
+     * 获取条码信息
+     * */
+    List<CodeUnion> getCodeByParentCode(Map map);
 
 
     /**
@@ -33,6 +36,17 @@ public interface AnalysisMapper {
      *
      * */
     List<ScanCount> getCountStatic(Map map);
+
+    /**
+     * 获取包装机或装封箱机 所有统计数据
+     * */
+    AllMachineCount getAllMachineCountByGroupCode(@Param("typeCode")String typeCode);
+
+    /**
+     * 获取包装机或装封箱机 当前班组数据
+     * */
+    List<MachineCount> getAllMachineCount(@Param("typeCode")String typeCode);
+
 
 
     /**
@@ -60,6 +74,17 @@ public interface AnalysisMapper {
      * */
     List<CountScan> getScanRateByDay(Map map);
 
+
+    /**
+     * 读码率详情
+     * */
+    List<CountScan> getScanRateByDayDetails(Map map);
+
+    /**
+     * 读码率详情
+     * */
+    List<CountScan> getScanRateByMachineDetails(Map map);
+
     /**
      * 关联率
      * */
@@ -75,6 +100,18 @@ public interface AnalysisMapper {
      * 关联率
      * */
     List<CountScan> getRelateRateByBrandId(Map map);
+
+    /**
+     * 关联率详情
+     * */
+    List<CountScan> getRelateRateByDayDetails(Map map);
+
+
+    /**
+     * 关联率详情
+     * */
+    List<CountScan> getRelateRateByMachineDetails(Map map);
+
 
 
     /**
@@ -94,6 +131,18 @@ public interface AnalysisMapper {
      * */
     List<CountScan> getWorkRateByBrandId(Map map);
 
+    /**
+     * 作业率详情
+     * */
+    List<CountScan> getWorkRateByDayDetails(Map map);
+
+
+
+    /**
+     * 作业率详情
+     * */
+    List<CountScan> getWorkRateByMachineDetails(Map map);
+
 
     /**
      * 剔除分析
@@ -110,6 +159,34 @@ public interface AnalysisMapper {
      * 码段使用率
      * */
     List<CountScan> getCodeUseByMachine(Map map);
+
+
+
+    /**
+     * 查询烟包或烟条或件码重复关联
+     * */
+    List<RepeatCount> getRepeatCount(Map map);
+
+    /**
+     * 查询烟包或烟条或件码重复关联
+     * total
+     * */
+    int getRepeatCountTotal(Map map);
+
+
+
+    /**
+     * 获取单个码的重复关联数据
+     * */
+    List<ProCode> getRepeatList(Map map);
+
+    /**
+     * 获取单个码的重复关联数据
+     * total
+     * */
+    int getRepeatListTotal(Map map);
+
+
 
 
 

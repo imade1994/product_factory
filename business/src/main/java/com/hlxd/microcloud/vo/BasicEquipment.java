@@ -42,6 +42,11 @@ public class BasicEquipment implements Serializable {
     private BigInteger equipmentType;
 
     /**
+     * 设备类型名称
+     * */
+    private String equipmentTypeName;
+
+    /**
      * 设备名称
      * */
     private String equipmentName;

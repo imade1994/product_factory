@@ -44,5 +44,10 @@ public class MachineServiceImpl implements MachineService {
         machineMapper.deleteMachine(machineCode);
     }
 
+    @Override
+    public List<String> getRoom() {
+        return machineMapper.getRoom();
+    }
+
 
 }

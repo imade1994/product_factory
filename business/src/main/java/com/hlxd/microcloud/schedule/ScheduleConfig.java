@@ -1,12 +1,11 @@
 package com.hlxd.microcloud.schedule;
 
 import com.hlxd.microcloud.service.AnalysisService;
+import com.hlxd.microcloud.service.BatchTaskService;
+import com.hlxd.microcloud.service.InitService;
 import com.hlxd.microcloud.util.CommonUtil;
 import com.hlxd.microcloud.util.ThreadManager;
-import com.hlxd.microcloud.vo.CodeCount;
-import com.hlxd.microcloud.vo.ProCode;
-import com.hlxd.microcloud.vo.RejectCount;
-import com.hlxd.microcloud.vo.ScanCount;
+import com.hlxd.microcloud.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.influxdb.InfluxDB;
@@ -57,10 +56,79 @@ public class ScheduleConfig {
     @Autowired
     AnalysisService analysisService;
 
+    @Autowired
+    BatchTaskService batchTaskService;
+
+    @Autowired
+    InitService initService;
+
     @PostConstruct
     public void init(){
         scheduleConfig = this;
         scheduleConfig.analysisService = this.analysisService;
+        scheduleConfig.batchTaskService = this.batchTaskService;
+        //unionCode();
+    }
+
+    @Scheduled(cron = "0 0 1 * * ?")
+    public  void unionCode(){
+        Map param = new HashMap();
+        param.put("end",0);
+        param.put("begin",-1);
+        List<CodeUnion> codeUnionList = batchTaskService.getCodeUnion(param);
+        int forCount = codeUnionList.size()%1000 == 0 ?codeUnionList.size()/1000:(codeUnionList.size()/1000)+1;
+        for(int i=0;i<forCount;i++){
+            List<CodeUnion> subList = new ArrayList<>();
+            if (((i+1)*1000 ) < codeUnionList.size()){
+                subList = codeUnionList.subList(i*1000,(i+1)*1000);
+            }else{
+                subList = codeUnionList.subList(i*1000,codeUnionList.size());
+            }
+            List<CodeUnion> finalSubList = subList;
+            Callable<Boolean> queryCall = new Callable<Boolean>() {
+                @Override
+                public Boolean call()  {
+                    try{
+
+                        batchTaskService.BatchInsertCodeUnion(finalSubList);
+                    }catch (Exception e){
+                        return false;
+                    }
+                    return true;
+                }
+            };
+            FutureTask<Boolean> CodeUnion = new FutureTask<>(queryCall);
+            ThreadManager.getLongPool().execute(CodeUnion);
+        }
+
+    }
+
+    @Scheduled(cron = "0 0/1 * * * ? ")
+    public void updateMachineTime(){
+        List<InitMachineTimeVo> machineTimeList1 =  initService.getInitMachineTime();
+        List<InitMachineTimeVo> machineTimeList2 =  initService.getInitMachineTimeFromTable();
+        for(InitMachineTimeVo initMachineTimeVo:machineTimeList1){
+            for(InitMachineTimeVo initMachineTimeVo1:machineTimeList2){
+                if(initMachineTimeVo.getMachineCode().equals(initMachineTimeVo1.getMachineCode())){
+                    boolean flag = compactDetails(initMachineTimeVo,initMachineTimeVo1);
+                    if(!flag){
+                        log.info("*********************换班，更换班组为+"+initMachineTimeVo.getClassName()+"更换前为+"+initMachineTimeVo1.getClassName());
+                        initService.updateMachineTime(initMachineTimeVo);
+                    }
+                }
+            }
+
+
+
+        }
+        log.info("**********************当前未发生换班**********************************");
+    }
+    public boolean compactDetails(InitMachineTimeVo vo1,InitMachineTimeVo vo2){
+        if(vo1.getBeginDate().equals(vo2.getBeginDate())&&vo1.getEndDate().equals(vo2.getEndDate())){
+            return true;
+        }else{
+            return false;
+        }
     }
 
 
@@ -163,14 +231,7 @@ public class ScheduleConfig {
     }
 
     @Scheduled(cron = "0 0 0 * * ?")
-    public void initStatisticByTime(){
-
-
-
-
-
-
-
+    public void initStatisticByDay(){
     }
 
 

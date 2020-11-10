@@ -41,6 +41,11 @@ public class ProCodeServiceImpl implements ProCodeService {
     }
 
     @Override
+    public ProductionCount getItemProductionByPeriod(Map map) {
+        return proCodeMapper.getItemProductionByPeriod(map);
+    }
+
+    @Override
     public int validateCode(Map map) {
         return proCodeMapper.validateCode(map);
     }

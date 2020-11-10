@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.CodeCheckMapper">
+
+
+    <resultMap id="baseInitMap" type="com.hlxd.microcloud.vo.CodeCheckVo">
+        <result column="qrcode" property="qrcode" />
+        <result column="machine_name" property="machineName" />
+        <result column="relation_date" property="produceDate" />
+    </resultMap>
+
+
+    <select id="getCodeCheckVo" parameterType="java.lang.String" resultMap="baseInitMap" >
+        select
+        qr_code as qrcode,
+        machine_name,
+        relation_date
+        from t_hl_system_package_code thspc
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thspc.machine_code
+        where qr_code = #{qrcode}
+    </select>
+
+    <delete id="deleteCodeCheck" parameterType="java.util.ArrayList">
+        delete from t_hl_system_package_code
+        where
+        qr_code in (
+        <foreach collection="list" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+
+    </delete>
+
+</mapper>

@@ -31,6 +31,9 @@
         <if test="null != machineGroup and '' != machineGroup">
           and  group_code = #{machineGroup}
         </if>
+        <if test="null != room and '' != room">
+            and  room = #{room}
+        </if>
         order by machine_code asc
     </select>
 
@@ -61,6 +64,11 @@
         delete from t_hl_base_machine
         where id = #{id}
     </delete>
+
+    <select id="getRoom" resultType="java.lang.String">
+        select distinct(room)
+        from t_hl_base_machine
+    </select>
 
 
 

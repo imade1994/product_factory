@@ -43,4 +43,9 @@ public interface MachineService {
      * 删除机台
      * */
     void deleteMachine(String machineCode);
+
+    /**
+     * 车间下拉
+     * */
+    List<String> getRoom();
 }

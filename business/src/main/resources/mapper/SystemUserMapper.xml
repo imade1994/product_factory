@@ -141,7 +141,7 @@ thsmm.exact as meta_exact,
         insert into t_hl_system_user
         (id,user_name,password,department,create_people,check_date,status)
         values
-        (#{vo.id},#{vo.userName},#{vo.passWord},#{vo.department},#{vo.createPeople},#{vo.checkDate},#{vo.status})
+        (#{vo.id},#{vo.userName},#{vo.passWord},#{vo.department},#{vo.createPeople},now(),#{vo.status})
     </insert>
 
     <delete id="deleteUser" parameterType="java.lang.String">
@@ -169,6 +169,9 @@ thsmm.exact as meta_exact,
         where 1=1
         <if test="null != userName and '' != userName">
             and user_name like concat('%',#{userName},'%')
+        </if>
+        <if test="null != userNameComplete and '' != userNameComplete">
+            and user_name =#{userNameComplete}
         </if>
         <if test="null != department and '' != department">
             and department = #{department}
@@ -214,6 +217,29 @@ thsmm.exact as meta_exact,
 
 
     </select>
+
+    <insert id="addDepartmentRole" parameterType="com.hlxd.microcloud.vo.SystemUserRole">
+        insert into
+        t_hl_system_user_department
+        (user_id,department_id,status)
+        values (#{vo.userId},#{vo.department_id},#{vo.status})
+    </insert>
+
+    <select id="countUserName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*)
+        from t_hl_system_user
+        where user_name = #{userName}
+    </select>
+
+    <delete id="deleteUserByAccount" parameterType="java.lang.String" >
+        delete from t_hl_system_user
+        where id = #{userId}
+    </delete>
+
+    <delete id="deleteUserDepartment" parameterType="java.lang.String">
+        delete from t_hl_system_user_department
+        where user_id = #{userId}
+    </delete>
 
 
 

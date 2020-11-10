@@ -9,6 +9,7 @@
         <result column="equipment_code" property="equipmentCode" />
         <result column="equipment_name" property="equipmentName" />
         <result column="equipment_type" property="equipmentType" />
+        <result column="equipment_type_name" property="equipmentTypeName" />
         <result column="equipment_model" property="equipmentModel" />
         <result column="purchase_date" property="purchaseDate" />
         <result column="work_status" property="workStatus" />
@@ -20,26 +21,28 @@
 
     <select id="getBasicEquipment" parameterType="java.util.HashMap" resultMap="BaseResultMap">
         select
-        *
-        from t_hl_base_equipment
+        thsd.key as equipment_type_name,thbe.*
+        from t_hl_base_equipment thbe
+        left join t_hl_system_dict thsd
+        on thbe.equipment_type = thsd.id
         where 1=1
-        <if test="null != equipmentName and '' != equipmentName ">
-            AND equipment_name like  CONCAT('%',#{equipmentName},'%')
+        <if test="null != equipmentType and '' != equipmentType ">
+            AND thbe.equipment_type =#{equipmentType}
         </if>
         <if test="null != equipmentModel and ''!= equipmentModel">
-           AND equipment_model = #{equipmentModel}
+           AND thbe.equipment_model = #{equipmentModel}
         </if>
         <if test="null != workStatus and ''!= workStatus">
-           AND work_status = #{workStatus}
+           AND thbe.work_status = #{workStatus}
         </if>
         <if test="null != beginDate and '' != beginDate">
-           AND purchase_date  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s')
+           AND thbe.purchase_date  <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="null != endDate and '' != endDate">
-            and purchase_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+            and thbe.purchase_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="null != contractNo and ''!= contractNo">
-            AND contract_no = #{contractNo}
+            AND thbe.contract_no = #{contractNo}
         </if>
     </select>
 

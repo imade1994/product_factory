@@ -42,4 +42,10 @@ public interface BrandMapper {
     void deleteBrand(@Param("id")String id);
 
 
+    /**
+     * 获取牌号信息
+     * */
+    Brand getBrandByCode(@Param("code")String code);
+
+
 }

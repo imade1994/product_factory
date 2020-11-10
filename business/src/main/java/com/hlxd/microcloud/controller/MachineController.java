@@ -4,6 +4,7 @@ import com.hlxd.microcloud.service.MachineService;
 import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.vo.Machine;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -96,6 +97,19 @@ public class MachineController {
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
         return returnMap;
+    }
+
+    /**
+     * 车间下拉菜单
+     * */
+    @RequestMapping("/getRoom")
+    public Map getRoom(){
+        Map returnMap = new HashMap();
+        List<String>  list = machineService.getRoom();
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,list);
+        return returnMap;
+
     }
 
 

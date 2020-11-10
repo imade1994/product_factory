@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.RejectMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.RejectDetails">
+        <result column="key" property="rejectReason"></result>
+        <result column="qrCode" property="qrCode"></result>
+        <result column="reject_time" property="rejectTime"></result>
+        <result column="machine_name" property="machineName"></result>
+        <result column="class_name" property="shiftName"></result>
+    </resultMap>
+
+    <select id="getRejectDetails" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+        select thrd.qrCode,
+        thbm.machine_name,
+        thssd.class_name,
+        thsd.`key`,
+        thrd.reject_time
+        from
+        t_hl_reject_detail thrd
+        left join
+        t_hl_system_current_machine_time as allMachine
+        on thrd.machine_code =  allMachine.machine_code
+        left join t_hl_system_dict thsd
+        on  thrd.reject_type_code  = thsd.`value`
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thrd.machine_code
+        left join t_hl_system_shift_details thssd
+        on thssd.id = thrd.shift_id
+        where  thsd.parent_id = 13
+        and thrd.reject_time <![CDATA[>=]]> allMachine.begin_date and thrd.reject_time <![CDATA[<=]]> allMachine.end_date
+        <if test="queryType == 2 ">
+            and thrd.machine_code = #{machineCode}
+        </if>
+        <if test="typeCode == 1 ">
+            and thrd.type_code = #{typeCode}
+        </if>
+        <if test="typeCode == 2">
+            and thrd.type_code = #{typeCode}
+        </if>
+        <if test=" typeCode != 1 and typeCode != 2">
+            and thbm.group_code = #{typeCode}
+            and thrd.reject_type_code != '22' and thrd.reject_type_code != '23' and thrd.reject_type_code != '25'
+        </if>
+        limit #{fromIndex},#{pageSize}
+
+    </select>
+
+    <select id="RejectCount" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        select count(thrd.qrCode)
+        from
+        t_hl_reject_detail thrd
+        left join
+        t_hl_system_current_machine_time as allMachine
+        on thrd.machine_code =  allMachine.machine_code
+        left join t_hl_system_dict thsd
+        on  thrd.reject_type_code  = thsd.`value`
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thrd.machine_code
+        left join t_hl_system_shift_details thssd
+        on thssd.id = thrd.shift_id
+        where  thsd.parent_id = 13
+        and thrd.reject_time <![CDATA[>=]]> allMachine.begin_date and thrd.reject_time <![CDATA[<=]]> allMachine.end_date
+        <if test="queryType == 2 ">
+            and thrd.machine_code = #{machineCode}
+        </if>
+        <if test="typeCode == 1 ">
+            and thrd.type_code = #{typeCode}
+        </if>
+        <if test="typeCode == 2">
+            and thrd.type_code = #{typeCode}
+        </if>
+        <if test=" typeCode != 1 and typeCode != 2">
+            and thbm.group_code = #{typeCode}
+            and thrd.reject_type_code != '22' and thrd.reject_type_code != '23' and thrd.reject_type_code != '25'
+        </if>
+    </select>
+
+</mapper>

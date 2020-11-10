@@ -44,4 +44,9 @@ public class BrandServiceImpl implements BrandService {
     public void deleteBrand(String id) {
         brandMapper.deleteBrand(id);
     }
+
+    @Override
+    public Brand getBrandByCode(String code) {
+        return brandMapper.getBrandByCode(code);
+    }
 }

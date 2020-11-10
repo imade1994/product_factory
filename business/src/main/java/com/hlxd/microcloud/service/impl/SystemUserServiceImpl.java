@@ -4,6 +4,7 @@ import com.hlxd.microcloud.dao.SystemUserMapper;
 import com.hlxd.microcloud.service.SystemUserService;
 import com.hlxd.microcloud.vo.SystemMenu;
 import com.hlxd.microcloud.vo.SystemUser;
+import com.hlxd.microcloud.vo.SystemUserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,5 +66,25 @@ public class SystemUserServiceImpl implements SystemUserService {
     @Override
     public List<SystemMenu> getUserMenu(Map map) {
         return systemUserMapper.getUserMenu(map);
+    }
+
+    @Override
+    public void addDepartmentRole(SystemUserRole systemUserRole) {
+        systemUserMapper.addDepartmentRole(systemUserRole);
+    }
+
+    @Override
+    public int countUserName(String username) {
+        return systemUserMapper.countUserName(username);
+    }
+
+    @Override
+    public void deleteUserByAccount(String userId) {
+        systemUserMapper.deleteUserByAccount(userId);
+    }
+
+    @Override
+    public void deleteUserDepartment(String userId) {
+        systemUserMapper.deleteUserDepartment(userId);
     }
 }

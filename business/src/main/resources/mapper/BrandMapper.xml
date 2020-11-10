@@ -38,11 +38,11 @@
     <insert id="insertBrand" parameterType="java.util.ArrayList">
         insert into
         t_hl_system_brand
-        (id,brand_name,package_barcode,strip_barcode,item_barcode,cigarettes,packages,strips,brandCode)
+        (id,brand_name,package_barcode,strip_barcode,item_barcode,cigarettes,packages,strips,brand_code)
         values
         <foreach collection="list" index="index" item="item"  separator=",">
             (#{item.id},#{item.brandName},#{item.packageBarcode},#{item.stripBarcode},#{item.itemBarcode},
-            #{item.cigarettes},#{item.packages},#{item.strips},#{brandCode})
+            #{item.cigarettes},#{item.packages},#{item.strips},#{item.brandCode})
         </foreach>
     </insert>
 
@@ -51,6 +51,12 @@
         where id=#{id}
 
     </delete>
+
+    <select id ="getBrandByCode" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select *
+        from t_hl_system_brand
+        where brand_code = #{code}
+    </select>
 
 
 

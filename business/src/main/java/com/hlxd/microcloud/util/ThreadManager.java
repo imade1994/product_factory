@@ -35,7 +35,7 @@ public class ThreadManager {
     public static ThreadPoolProxy getDownloadPool() {
         synchronized (mDownloadLock) {
             if (mDownloadPool == null) {
-                mDownloadPool = new ThreadPoolProxy(30000, 30000, 5L);
+                mDownloadPool = new ThreadPoolProxy(100, 100, 5L);
             }
             return mDownloadPool;
         }
@@ -45,7 +45,7 @@ public class ThreadManager {
     public static ThreadPoolProxy getLongPool() {
         synchronized (mLongLock) {
             if (mLongPool == null) {
-                mLongPool = new ThreadPoolProxy(5, 5, 5L);
+                mLongPool = new ThreadPoolProxy(50, 50, 5L);
             }
             return mLongPool;
         }
@@ -55,7 +55,7 @@ public class ThreadManager {
     public static ThreadPoolProxy getShortPool() {
         synchronized (mShortLock) {
             if (mShortPool == null) {
-                mShortPool = new ThreadPoolProxy(2, 2, 5L);
+                mShortPool = new ThreadPoolProxy(50, 50, 5L);
             }
             return mShortPool;
         }
@@ -116,6 +116,31 @@ public class ThreadManager {
             if (mPool != null && (!mPool.isShutdown() || mPool.isTerminating())) {
                 mPool.getQueue().remove(run);
             }
+        }
+        /**
+         * 判断队列中是否有未完成的线程
+         * */
+        public synchronized  boolean isAllComplete(){
+           if(mPool.getActiveCount()!=0){
+               return false;
+           }else{
+               return true;
+           }
+        }
+
+        /**获取活动的线程*/
+        public synchronized  int getActiveCount(){
+            return mPool.getActiveCount();
+        }
+
+        /**获取线程池活动线程*/
+        public synchronized  long getCompleteTask(){
+            return mPool.getCompletedTaskCount();
+        }
+
+        /**获取线程池全部线程*/
+        public synchronized  int getAllTask(){
+            return mPool.getActiveCount();
         }
 
 

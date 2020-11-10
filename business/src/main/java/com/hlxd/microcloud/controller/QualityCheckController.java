@@ -3,6 +3,7 @@ package com.hlxd.microcloud.controller;
 import com.hlxd.microcloud.service.QualityCheckService;
 import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.util.CommonUtil;
+import com.hlxd.microcloud.util.ThreadManager;
 import com.hlxd.microcloud.vo.ProCode;
 import com.hlxd.microcloud.vo.RandomCheckDetails;
 import com.hlxd.microcloud.vo.RandomCheckRecord;
@@ -14,10 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 /**
  * CREATED BY IDEA
@@ -51,11 +53,36 @@ public class QualityCheckController {
     public Map getCodeDetails(@RequestParam("qrCode")String qrCode,@RequestParam("packageType")String packageType){
         Map param = new HashMap();
         param.put("qrCode",qrCode);
-        param.put("packageType",packageType);
+        switch (packageType){
+            case "2":
+                param.put("packageType",1);
+                break;
+            case "3":
+                param.put("packageType",2);
+                break;
+            default:
+                break;
+        }
         Map returnMap  = new HashMap();
         ProCode proCode = qualityCheckService.getCodeDetail(param);
         returnMap.put(CommomStatic.DATA,proCode);
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        return returnMap;
+    }
+
+
+    @RequestMapping("/getCodeRelation")
+    public Map getCodeRelation(@RequestParam("qrCode")String qrCode) throws ExecutionException, InterruptedException {
+        ProCode proCode = qualityCheckService.getCodeRelation(qrCode);
+        Map param = new HashMap();
+        Map returnMap = new HashMap();
+        if(null == proCode){
+            returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
+            returnMap.put(CommomStatic.MESSAGE,"码暂未全部关联！");
+        }else{
+            returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+            returnMap.put(CommomStatic.DATA,proCode);
+        }
         return returnMap;
     }
 
@@ -98,6 +125,10 @@ public class QualityCheckController {
 
         return  returnMap;
     }
+
+
+
+
 
 
 

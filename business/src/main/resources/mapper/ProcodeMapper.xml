@@ -108,30 +108,44 @@
 
     <select id="getProductionByPeriod" parameterType="java.util.HashMap" resultType="com.hlxd.microcloud.vo.ProductionCount">
 
-        select (select count(DISTINCT(parent_code))
-				from
-				t_hl_system_code where qrCode in (select
-				qrCode
+				select  count(qr_code) as packageCount,count(DISTINCT(package_code)) as stripCount,count(DISTINCT(item_code)) as itemCount
+from
+t_hl_system_code_union
+        where relation_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and relation_date  <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+        and machine_code = #{machineCode}
+
+
+    </select>
+
+    <select id="getItemProductionByPeriod" parameterType="java.util.HashMap" resultType="com.hlxd.microcloud.vo.ProductionCount">
+				select  (
+        select  count(DISTINCT(parent_code))
+				from (
+				(select
+				parent_code as qrCode
 				from
 				t_hl_system_code
-				where relation_date between str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+       where relation_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
 				and machine_code = #{machineCode}
-				and package_type = '2')
-				) as itemCount,
+				and package_type = '1') as a
+        left join t_hl_system_code thsc
+        on thsc.qrCode = a.qrCode
+        )
+				 )as itemCount,
 				(select
 				count(qrCode)
 				from
 				t_hl_system_code
-				where relation_date between str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+				where relation_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
 				and machine_code = #{machineCode}
 				and package_type = '1') as packageCount,
 				(select
-				count(qrCode)
+				count(qrCode)/10
 				from
 				t_hl_system_code
-				where relation_date between str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+				where relation_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
 				and machine_code = #{machineCode}
-				and package_type = '2') as stripCount
+				and package_type = '1') as stripCount
 				from dual
 
 
@@ -139,12 +153,36 @@
 
     <select id="validateCode" resultType="java.lang.Integer" parameterType="java.util.HashMap">
         select
-        count(*)
+        (
+        case
+        when (select package_type from t_hl_system_code where qrCode = #{qrCode}) = 3
+        then (select count(DISTINCT(a.parentCode))
+        from
+        (select
+        DISTINCT(parent_code) as parentCode
         from  t_hl_system_code
-        where relation_date between str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
-		and machine_code = #{machineCode}
-		and (qrCode = #{qrCode} or parent_code = #{qrCode})
-
+        where relation_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+        and  package_type = '1'
+        and  machine_code = #{machineCode}) as a
+        left join
+        t_hl_system_code thsc
+        on a.parentCode = thsc.qrCode
+        where thsc.parent_code = #{qrCode}
+        and thsc.package_type = '2')
+        when (select package_type from t_hl_system_code where qrCode = #{qrCode}) = 2
+        then (select count(*) from t_hl_system_code where relation_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+        and  package_type = '1'
+        and  machine_code = #{machineCode}
+        and  parent_code = #{qrCode})
+        when (select package_type from t_hl_system_code where qrCode = #{qrCode}) = 1
+        then (select count(*) from t_hl_system_code where relation_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
+        and  package_type = '1'
+        and  machine_code = #{machineCode}
+        and  qrCode = #{qrCode})
+        else 0
+        END
+        )
+        from dual
     </select>
 
 </mapper>

@@ -8,7 +8,7 @@ eureka:
     prefer-ip-address: true
   client:
     service-url: 
-      defaultZone: http://admin:root@127.0.0.1:9001/eureka/
+      defaultZone: http://admin:root@localhost:9001/eureka/
     register-with-eureka: false   #当前服务部注册到eureka里面
     fetch-registry: false         #不通过eureka获取注册信息
     
@@ -18,7 +18,4 @@ spring:
 
 security:
   basic:
-    enabled: true    # 启用安全认证处理
-  user:
-    name: admin
-    password: root
+    enabled: false    # 启用安全认证处理

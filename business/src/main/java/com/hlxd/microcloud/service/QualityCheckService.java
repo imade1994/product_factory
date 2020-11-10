@@ -45,4 +45,17 @@ public interface QualityCheckService {
      * */
     void insertRandomCheckDetails(List<RandomCheckDetails> randomCheckDetails);
 
+
+    /**
+     * 获取单条码数据
+     * */
+    ProCode getCodeRelation(String qrCode);
+
+
+    /**
+     * 获取上下级码数据
+     * */
+    List<ProCode> getCodeList(Map map);
+
+
 }

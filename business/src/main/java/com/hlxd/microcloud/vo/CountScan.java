@@ -163,9 +163,28 @@ public class CountScan {
     private String brandName;
 
     /**
+     * 班组名
+     * */
+    private String shiftName;
+
+    /**
      * 生产日期
      * */
     private String productDate;
+
+
+    /**
+     * 二维码
+     * */
+    private String qrCode;
+
+
+    /**
+     * 重复次数
+     * */
+    private int repeatCount;
+
+
 
 
 

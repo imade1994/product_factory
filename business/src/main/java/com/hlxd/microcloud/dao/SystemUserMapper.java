@@ -2,6 +2,7 @@ package com.hlxd.microcloud.dao;
 
 import com.hlxd.microcloud.vo.SystemMenu;
 import com.hlxd.microcloud.vo.SystemUser;
+import com.hlxd.microcloud.vo.SystemUserRole;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -65,6 +66,30 @@ public interface SystemUserMapper {
      * 获取用户授权菜单列表
      * */
     List<SystemMenu> getUserMenu(Map map);
+
+
+
+    /**
+     * 授予部门权限
+     * */
+    void addDepartmentRole(@Param("vo") SystemUserRole systemUserRole);
+
+
+    /**
+     * 判断用户名是否存在
+     * */
+    int countUserName(@Param("userName")String username);
+
+
+    /**
+     * 根据账号删除用户
+     * */
+    void deleteUserByAccount(@Param("userId")String userId);
+
+    /**
+     * 删除用户部门关系
+     * */
+    void deleteUserDepartment(@Param("userId")String userId);
 
 
 

@@ -2,10 +2,7 @@ package com.hlxd.microcloud.service.impl;
 
 import com.hlxd.microcloud.dao.AnalysisMapper;
 import com.hlxd.microcloud.service.AnalysisService;
-import com.hlxd.microcloud.vo.CountScan;
-import com.hlxd.microcloud.vo.Machine;
-import com.hlxd.microcloud.vo.RejectCount;
-import com.hlxd.microcloud.vo.ScanCount;
+import com.hlxd.microcloud.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +23,11 @@ public class AnalysisServiceImpl implements AnalysisService {
     @Autowired
      AnalysisMapper analysisMapper;
 
+    @Override
+    public List<CodeUnion> getCodeByParentCode(Map map) {
+        return analysisMapper.getCodeByParentCode(map);
+    }
+
 
     @Override
     public List<ScanCount> getCountStatic(Map map) {
@@ -38,7 +40,7 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
 
     @Override
-    public List<ScanCount> getScanCount(Map map) {
+    public List<RealTimeStatistic> getScanCount(Map map) {
         return analysisMapper.getScanCount(map);
     }
 
@@ -111,5 +113,65 @@ public class AnalysisServiceImpl implements AnalysisService {
     @Override
     public List<CountScan> getCodeUseByMachine(Map map) {
         return analysisMapper.getCodeUseByMachine(map);
+    }
+
+    @Override
+    public List<CountScan> getScanRateByDayDetails(Map map) {
+        return analysisMapper.getScanRateByDayDetails(map);
+    }
+
+    @Override
+    public List<CountScan> getScanRateByMachineDetails(Map map) {
+        return analysisMapper.getScanRateByMachineDetails(map);
+    }
+
+    @Override
+    public List<CountScan> getRelateRateByDayDetails(Map map) {
+        return analysisMapper.getRelateRateByDayDetails(map);
+    }
+
+    @Override
+    public List<CountScan> getRelateRateByMachineDetails(Map map) {
+        return analysisMapper.getRelateRateByMachineDetails(map);
+    }
+
+    @Override
+    public List<CountScan> getWorkRateByDayDetails(Map map) {
+        return analysisMapper.getWorkRateByDayDetails(map);
+    }
+
+    @Override
+    public List<CountScan> getWorkRateByMachineDetails(Map map) {
+        return analysisMapper.getWorkRateByMachineDetails(map);
+    }
+
+    @Override
+    public List<RepeatCount> getRepeatCount(Map map) {
+        return analysisMapper.getRepeatCount(map);
+    }
+
+    @Override
+    public List<ProCode> getRepeatList(Map map) {
+        return analysisMapper.getRepeatList(map);
+    }
+
+    @Override
+    public int getRepeatCountTotal(Map map) {
+        return analysisMapper.getRepeatCountTotal(map);
+    }
+
+    @Override
+    public int getRepeatListTotal(Map map) {
+        return analysisMapper.getRepeatListTotal(map);
+    }
+
+    @Override
+    public AllMachineCount getAllMachineCountByGroupCode(String typeCode) {
+        return analysisMapper.getAllMachineCountByGroupCode(typeCode);
+    }
+
+    @Override
+    public List<MachineCount> getAllMachineCount(String typeCode) {
+        return analysisMapper.getAllMachineCount(typeCode);
     }
 }

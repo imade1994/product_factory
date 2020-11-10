@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.TimeBreakMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.TimeBreak">
+        <result column="machineName" property="machineName"></result>
+        <result column="beginDate" property="beginDate"></result>
+        <result column="endDate" property="endDate"></result>
+        <result column="timeBreakSecond" property="timeBreakSecond"></result>
+        <result column="breakReason" property="breakReason"></result>
+    </resultMap>
+
+    <select id="getTimeBreak" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+        select thtb.begin_date as endDate,
+        thtb.end_date as beginDate,
+        thbm.machine_name as machineName,
+        thtb.break_time_count as timeBreakSecond,
+        thsd.`key` as breakReason
+        from
+        t_hl_time_break thtb
+        left join
+        (select a.machine_code,min(a.beginDate) as beginDate,max(a.endDate) as endDate
+        from (select machine_code,STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') as beginDate,
+        (
+        case
+        when STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]>STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then DATE_ADD(STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+        when STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[<]]>STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        end
+        ) as endDate
+        from
+        t_hl_base_machine thbm
+        left join t_hl_system_shift thss
+        on thbm.shift_id = thss.id
+        left join t_hl_system_shift_details thssd
+        on thss.id = thssd.shift_id
+        group by machine_code,thssd.begin_date,
+        thssd.end_date) as a
+        group by a.machine_code) as allMachine
+        on thtb.machine_code = allMachine.machine_code
+        left join t_hl_system_dict thsd
+        on thsd.`value` = thtb.break_type_code
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thtb.machine_code
+        where thsd.parent_id = 44
+        and thtb.begin_date <![CDATA[>=]]> allMachine.beginDate and thtb.begin_date <![CDATA[<=]]> allMachine.endDate
+        <if test=" typeCode != null and typeCode != ''">
+        and thbm.group_code = #{typeCode}
+        </if>
+        <if test="queryType == 2 ">
+            and thtb.machine_code = #{machineCode}
+        </if>
+        limit #{fromIndex},#{pageSize}
+
+    </select>
+
+    <select id="TimeBreakCount" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        select
+        count(*)
+        from
+        t_hl_time_break thtb
+        left join
+        (select a.machine_code,min(a.beginDate) as beginDate,max(a.endDate) as endDate
+        from (select machine_code,STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') as beginDate,
+        (
+        case
+        when STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[>]]>STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then DATE_ADD(STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+        when STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s')<![CDATA[<]]>STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        then STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        end
+        ) as endDate
+        from
+        t_hl_base_machine thbm
+        left join t_hl_system_shift thss
+        on thbm.shift_id = thss.id
+        left join t_hl_system_shift_details thssd
+        on thss.id = thssd.shift_id
+        group by machine_code,thssd.begin_date,
+        thssd.end_date) as a
+        group by a.machine_code) as allMachine
+        on thtb.machine_code = allMachine.machine_code
+        left join t_hl_system_dict thsd
+        on thsd.`value` = thtb.break_type_code
+        left join t_hl_base_machine thbm
+        on thbm.machine_code = thtb.machine_code
+        where thsd.parent_id = 44
+        and thtb.begin_date <![CDATA[>=]]> allMachine.beginDate and thtb.begin_date <![CDATA[<=]]> allMachine.endDate
+        <if test=" typeCode != null and typeCode != ''">
+            and thbm.group_code = #{typeCode}
+        </if>
+        <if test="queryType == 2 ">
+            and thtb.machine_code = #{machineCode}
+        </if>
+    </select>
+
+</mapper>

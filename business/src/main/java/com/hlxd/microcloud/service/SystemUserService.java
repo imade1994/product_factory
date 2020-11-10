@@ -2,6 +2,7 @@ package com.hlxd.microcloud.service;
 
 import com.hlxd.microcloud.vo.SystemMenu;
 import com.hlxd.microcloud.vo.SystemUser;
+import com.hlxd.microcloud.vo.SystemUserRole;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,32 @@ public interface SystemUserService {
      * 获取用户授权菜单列表
      * */
     List<SystemMenu> getUserMenu(Map map);
+
+
+
+    /**
+     * 授予部门权限
+     * */
+    void addDepartmentRole(SystemUserRole systemUserRole);
+
+
+    /**
+     * 判断用户名是否存在
+     * */
+    int countUserName(String username);
+
+
+    /**
+     * 根据账号删除用户
+     * */
+    void deleteUserByAccount(String userId);
+
+
+
+    /**
+     * 删除用户部门关系
+     * */
+    void deleteUserDepartment(String userId);
 
 
 

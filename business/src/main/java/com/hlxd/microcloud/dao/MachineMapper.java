@@ -41,4 +41,9 @@ public interface MachineMapper {
      * 删除机台
      * */
     void deleteMachine(@Param("machineCode")String machineCode);
+
+    /**
+     * 车间下拉
+     * */
+    List<String> getRoom();
 }

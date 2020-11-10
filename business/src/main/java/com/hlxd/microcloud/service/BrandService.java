@@ -42,4 +42,10 @@ public interface BrandService {
      * */
     void deleteBrand(String id);
 
+
+    /**
+     * 获取牌号信息
+     * */
+    Brand getBrandByCode(String code);
+
 }

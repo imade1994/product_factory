@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>hlxdmicrocloud</artifactId>
+        <artifactId>product_factory</artifactId>
         <groupId>com.hlxd</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -65,7 +65,9 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
+
     </build>
 
 

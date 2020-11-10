@@ -81,6 +81,11 @@ public class ProCode implements Serializable {
      * */
     private int shiftId;
 
+    /**
+     * 班组名
+     * */
+    private String shiftName;
+
 
     /***
      * 运输数据

@@ -119,6 +119,12 @@ public class ScanCount implements Serializable {
     private int period;
 
     /**
+     * 班组名
+     *
+     * */
+    private String shiftName;
+
+    /**
      *日期 年月日
      * format YYYY-mm-DD
      * */
@@ -128,6 +134,45 @@ public class ScanCount implements Serializable {
      *记录备注
      * */
     private String remark;
+
+
+    /**
+     * 小包剔除统计
+     * */
+    private String packageRejectCount;
+
+
+    /**
+     * 条包剔除统计
+     * */
+    private String stripRejectCount;
+
+
+
+    /**
+     * 累计抽检次数
+     * */
+    private String randomCheckCount;
+
+
+    /**
+     * 累计抽检失败数
+     * */
+    private String randomCheckFailCount;
+
+
+    /**
+     * 累计停机次数
+     * */
+    private String breakDownCount;
+
+
+    /**
+     * 累计停机时长
+     * */
+    private String breakTimeCount;
+
+
 
 
     /**

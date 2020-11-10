@@ -62,9 +62,4 @@ public class SystemUser implements Serializable {
      * */
     private List<SystemRole> systemRoles;
 
-
-
-
-
-
 }

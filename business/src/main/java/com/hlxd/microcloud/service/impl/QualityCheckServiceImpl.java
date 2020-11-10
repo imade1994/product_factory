@@ -49,4 +49,14 @@ public class QualityCheckServiceImpl implements QualityCheckService {
         qualityCheckMapper.insertRandomCheckDetails(randomCheckDetails);
 
     }
+
+    @Override
+    public ProCode getCodeRelation(String qrCode) {
+        return qualityCheckMapper.getCodeRelation(qrCode);
+    }
+
+    @Override
+    public List<ProCode> getCodeList(Map map) {
+        return qualityCheckMapper.getCodeList(map);
+    }
 }

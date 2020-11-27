@@ -23,7 +23,9 @@ public interface BatchTaskMapper {
 
     List<CodeUnion> getCodeUnion(Map map);
 
-    void BatchInsertCodeUnion(List<CodeUnion> codeUnions);
+    void BatchInsertCodeUnion(@Param("tableName")String tableName,@Param("list") List<CodeUnion> codeUnions);
+
+    List<CodeUnion> getCodeUnionByItemCode(Map map);
 
 
 

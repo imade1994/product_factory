@@ -3,7 +3,9 @@ package com.hlxd.microcloud.dao;
 
 
 import com.hlxd.microcloud.vo.InitMachineTimeVo;
+import com.hlxd.microcloud.vo.InitTableSchedule;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -19,6 +21,27 @@ public interface InitMapper {
 
 
     void updateMachineTime(InitMachineTimeVo initMachineTimeVo);
+
+    List<InitTableSchedule> getInitTableScheduleFromTable();
+
+    InitTableSchedule getInitTableSchedule(@Param("machineCode")String machineCode);
+
+    void insertTableSchedule(InitTableSchedule initTableSchedule);
+
+    void updateTableSchedule(InitTableSchedule initTableSchedule);
+
+    void createNewTable(@Param("tableName") String tableName);
+
+    void createNewUnionTable(@Param("tableName")String tableName);
+
+
+    int checkTableExits(@Param("tableName")String tableName);
+
+
+
+
+
+
 
 
 

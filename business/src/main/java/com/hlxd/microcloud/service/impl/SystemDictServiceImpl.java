@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.sun.tools.doclint.Entity.and;
 
 /**
  * CREATED BY IDEA

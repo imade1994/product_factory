@@ -58,16 +58,42 @@ and relation_date <![CDATA[<=]]> str_to_date('2020-10-23','%Y-%m-%d')
         where package_type = 2
         and relation_date  <![CDATA[<]]> date_add(Str_to_date(DATE_FORMAT(now(),'%Y-%m-%d'),'%Y-%m-%d'),INTERVAL #{end} DAY) and relation_date  <![CDATA[>=]]> date_add(Str_to_date(DATE_FORMAT(now(),'%Y-%m-%d'),'%Y-%m-%d'),INTERVAL #{begin} DAY))
     </select>
+
+
+    <select id="getCodeUnionByItemCode" parameterType="java.util.HashMap" resultMap="TaskMap">
+        select
+        thsc.qrCode as qr_code,
+        thsc_1.qrCode as package_code,
+        thsc_1.parent_code as item_code,
+        thsc.machine_code,
+        thbm.machine_name,
+        thsc_1.machine_code as package_machine_code,
+        thbm_1.machine_name as package_machine_name,
+        thsc.relation_date,
+        thsc_1.relation_date as package_relation_date,
+        thsc.brand_id,
+        thsc.shift_id,
+        thsc_1.shift_id as  package_shift_id
+        from t_hl_system_code thsc
+        left join t_hl_base_machine thbm
+        on thsc.machine_code = thbm.machine_code
+        left join t_hl_system_code thsc_1
+        on thsc.parent_code = thsc_1.qrCode
+        left join t_hl_base_machine thbm_1
+        on thsc_1.machine_code = thbm_1.machine_code
+        where thsc.package_type = 1
+        and thsc_1.parent_code = #{itemCode}
+    </select>
     
-    <insert id="BatchInsertCodeUnion" parameterType="java.util.ArrayList">
-insert into t_hl_system_code_union
+    <insert id="BatchInsertCodeUnion" parameterType="java.util.ArrayList" statementType="STATEMENT">
+insert into ${tableName}
 (qr_code,package_code,item_code,machine_code,machine_name,package_machine_code,package_machine_name,relation_date,package_relation_date,brand_id,shift_id,package_shift_id)
 values
         <foreach collection="list" item="item" separator=",">
-            (#{item.qrCode},#{item.packageCode},#{item.itemCode},
-            #{item.machineCode},#{item.machineName},#{item.packageMachineCode},
-            #{item.packageMachineName},#{item.relationDate},#{item.packageRelationDate},
-            #{item.brandId},#{item.shiftId},#{item.packageShiftId})
+            ('${item.qrCode}','${item.packageCode}','${item.itemCode}',
+            '${item.machineCode}','${item.machineName}','${item.packageMachineCode}',
+            '${item.packageMachineName}','${item.relationDate}','${item.packageRelationDate}',
+            '${item.brandId}','${item.shiftId}','${item.packageShiftId}')
         </foreach>
 
     </insert>

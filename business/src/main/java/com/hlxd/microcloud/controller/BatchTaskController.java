@@ -108,7 +108,7 @@ public class BatchTaskController {
                             stmt.executeBatch();
                             connection.commit();
                             list.add(finalI);*/
-                            batchTaskService.BatchInsertCodeUnion(finalSubList);
+                            batchTaskService.BatchInsertCodeUnion("t_hl_system_code_union",finalSubList);
                             return finalI;
                         }catch (Exception e){
                             e.printStackTrace();

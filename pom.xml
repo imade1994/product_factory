@@ -20,6 +20,9 @@
     <properties>
         <jdk.version>1.8</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <file_encoding>UTF-8</file_encoding>
+        <boot-version>2.2.11.RELEASE</boot-version>
     </properties>
 
     <dependencyManagement>
@@ -45,7 +48,7 @@
             <dependency>	<!-- SpringCloud离不开SpringBoot，所以必须要配置此依赖包 -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>1.5.4.RELEASE</version>
+                <version>${boot-version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

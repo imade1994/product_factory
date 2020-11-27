@@ -21,5 +21,8 @@ public interface BatchTaskService {
 
     List<CodeUnion> getCodeUnion(Map map);
 
-    void BatchInsertCodeUnion(List<CodeUnion> codeUnions);
+    void BatchInsertCodeUnion(String tableName,List<CodeUnion> codeUnions);
+
+
+    List<CodeUnion> getCodeUnionByItemCode(Map map);
 }

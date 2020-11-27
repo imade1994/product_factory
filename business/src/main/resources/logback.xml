@@ -32,6 +32,7 @@
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
 		</rollingPolicy>
 	</appender>
 
@@ -40,8 +41,6 @@
 		<appender-ref ref="ACCESS" />
 	</logger>
 	<logger name="druid.sql.Statement" level="DEBUG" />
-	<logger name="com.hlxd.microcloud.dao" level="TRACE" />
-
 	<root level="INFO">
 		<appender-ref ref="DETAIL" />
 		<appender-ref ref="CONSOLE" />

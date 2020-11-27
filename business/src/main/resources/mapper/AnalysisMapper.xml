@@ -143,7 +143,7 @@
         select
 thbm.machine_name,
 thbm.machine_code,
-case when (select count(*) from t_hl_realtime_work where thbm.machine_code = machine_code)>0 and TIMESTAMPDIFF(MINUTE,(select last_time from t_hl_realtime_work where produce_date = DATE_FORMAT(today.begin_date,'%Y-%m-%d') and shift_id = today.shift_id and machine_code =  thbm.machine_code order by last_time desc limit 1),now()) > 2
+(case when (select count(*) from t_hl_realtime_work where thbm.machine_code = machine_code)>0 and TIMESTAMPDIFF(MINUTE,(select last_time from t_hl_realtime_work where produce_date = DATE_FORMAT(today.begin_date,'%Y-%m-%d') and shift_id = today.shift_id and machine_code =  thbm.machine_code order by last_time desc limit 1),now()) > 2
 then 0
 else (select status from t_hl_realtime_work where produce_date = DATE_FORMAT(today.begin_date,'%Y-%m-%d') and shift_id = today.shift_id and machine_code =  thbm.machine_code order by last_time desc limit 1)
   end ) as sys_status

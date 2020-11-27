@@ -10,6 +10,12 @@
         <result column="begin_date" property="beginDate" />
         <result column="end_date" property="endDate" />
     </resultMap>
+    <resultMap id="tableInitMap" type="com.hlxd.microcloud.vo.InitTableSchedule">
+        <result column="machine_code" property="machineCode" />
+        <result column="begin_date" property="beginDate" />
+        <result column="end_date" property="endDate" />
+        <result column="date_string" property="dateString" />
+    </resultMap>
 
 
     <select id="getInitMachineTime" resultMap="baseInitMap" >
@@ -52,5 +58,92 @@
         *
         from t_hl_system_current_machine_time
     </select>
+
+    <select id="getInitTableScheduleFromTable" resultMap="tableInitMap">
+        select * from t_hl_system_table_schedule
+    </select>
+    <select id="getInitTableSchedule" resultMap="tableInitMap">
+        select
+        thbm.machine_code,
+        min(STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s')) as begin_date,
+        max(
+        (
+        case
+        when STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[>]]>  STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')        then DATE_ADD(STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+        when STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.begin_date),'%Y-%m-%d %H:%i:%s') <![CDATA[<]]>  STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')        then STR_TO_DATE(concat(DATE_FORMAT(now(),'%Y-%m-%d'),' ',thssd.end_date),'%Y-%m-%d %H:%i:%s')
+        end )
+        ) as end_date,
+        DATE_FORMAT(now(),'%Y%m%d') as date_string
+        from
+        t_hl_base_machine thbm
+        left join
+        t_hl_system_shift thss
+        on thbm.shift_id = thss.id
+        left join t_hl_system_shift_details thssd
+        on thssd.shift_id = thss.id
+        where thss.status =1
+        and thbm.machine_code= #{machineCode}
+        group by thbm.machine_code
+    </select>
+    <update id="updateTableSchedule" parameterType="com.hlxd.microcloud.vo.InitTableSchedule">
+        update t_hl_system_table_schedule
+        set begin_date = #{beginDate},end_date = #{endDate}
+        where machine_code = #{machineCode}
+    </update>
+    <insert id="insertTableSchedule" parameterType="com.hlxd.microcloud.vo.InitTableSchedule">
+        insert into t_hl_system_table_schedule
+        (machine_code,begin_date,end_date,date_string) values (#{machineCode},#{beginDate},#{endDate},#{dateString})
+
+    </insert>
+
+    <insert id="createNewTable" parameterType="java.lang.String" statementType="STATEMENT">
+CREATE TABLE ${tableName}  (
+  `id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `qrCode` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `parent_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `relation_date` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  `brand_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `machine_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `package_type` bigint(20) NULL DEFAULT NULL,
+  `remark` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `batch_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `work_batch_no` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `shift_id` bigint(20) NULL DEFAULT NULL,
+  `origin_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `speed` int(4) NULL DEFAULT NULL,
+  `LoadTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `index_qr_pr`(`qrCode`, `parent_code`, `machine_code`) USING BTREE COMMENT '码机台',
+  INDEX `index_time`(`qrCode`, `parent_code`, `package_type`, `machine_code`, `relation_date`) USING BTREE COMMENT '码时间',
+  INDEX `index_special`(`parent_code`, `relation_date`, `package_type`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+    </insert>
+
+    <select id="checkTableExits" parameterType="java.lang.String" resultType="java.lang.Integer">
+SELECT
+  count(*)
+FROM
+  information_schema.tables
+	where table_name = #{tableName}
+    </select>
+
+    <insert id="createNewUnionTable" parameterType="java.lang.String" statementType="STATEMENT">
+        CREATE TABLE ${tableName}  (
+  `qr_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '包码',
+  `package_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '条码',
+  `item_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '件码',
+  `machine_code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '包装机编号',
+  `machine_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '包装机名称',
+  `package_machine_code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '装封箱机编码',
+  `package_machine_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '装封箱机名称',
+  `relation_date` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '包装机关联日期',
+  `package_relation_date` timestamp(0) NULL DEFAULT NULL COMMENT '装封箱机关联日期',
+  `brand_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '牌号',
+  `shift_id` int(20) NULL DEFAULT NULL COMMENT '包装机班组ID',
+  `package_shift_id` int(20) NULL DEFAULT NULL COMMENT '装封箱机班组ID',
+  PRIMARY KEY (`qr_code`, `package_code`, `item_code`, `relation_date`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+    </insert>
+
 
 </mapper>

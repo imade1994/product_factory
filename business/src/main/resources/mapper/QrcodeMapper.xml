@@ -79,4 +79,9 @@
         where t_cc.qr_code = #{qrCode}
     </select>
 
+
+
+
+
+
 </mapper>

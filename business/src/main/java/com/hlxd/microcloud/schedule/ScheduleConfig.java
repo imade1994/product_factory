@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -43,7 +44,7 @@ public class ScheduleConfig {
             .writeTimeout(100,TimeUnit.SECONDS);
 
     /** influx 连接工厂 */
-    public static final InfluxDB influxDb = InfluxDBFactory.connect("http://127.0.0.1:8086",client);
+    public static final InfluxDB influxDb = InfluxDBFactory.connect("http://192.168.2.8:8086",client);
 
     public static final String dataBase = "hlxd";
 
@@ -62,6 +63,8 @@ public class ScheduleConfig {
     @Autowired
     InitService initService;
 
+
+
     @PostConstruct
     public void init(){
         scheduleConfig = this;
@@ -70,7 +73,7 @@ public class ScheduleConfig {
         //unionCode();
     }
 
-    @Scheduled(cron = "0 0 1 * * ?")
+    //@Scheduled(cron = "0 0 1 * * ?")
     public  void unionCode(){
         Map param = new HashMap();
         param.put("end",0);
@@ -90,7 +93,7 @@ public class ScheduleConfig {
                 public Boolean call()  {
                     try{
 
-                        batchTaskService.BatchInsertCodeUnion(finalSubList);
+                        batchTaskService.BatchInsertCodeUnion("t_hl_system_code_union",finalSubList);
                     }catch (Exception e){
                         return false;
                     }
@@ -103,7 +106,7 @@ public class ScheduleConfig {
 
     }
 
-    @Scheduled(cron = "0 0/1 * * * ? ")
+    //@Scheduled(cron = "0 0/1 * * * ? ")
     public void updateMachineTime(){
         List<InitMachineTimeVo> machineTimeList1 =  initService.getInitMachineTime();
         List<InitMachineTimeVo> machineTimeList2 =  initService.getInitMachineTimeFromTable();
@@ -121,13 +124,39 @@ public class ScheduleConfig {
 
 
         }
-        log.info("**********************当前未发生换班**********************************");
+        //log.info("**********************当前未发生换班**********************************");
     }
     public boolean compactDetails(InitMachineTimeVo vo1,InitMachineTimeVo vo2){
         if(vo1.getBeginDate().equals(vo2.getBeginDate())&&vo1.getEndDate().equals(vo2.getEndDate())){
             return true;
         }else{
             return false;
+        }
+    }
+    //@Scheduled(cron = "0 0/1 * * * ? ")
+    public void initTable(){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScheduleDate);
+        SimpleDateFormat simpleDateFormatTable = new SimpleDateFormat(TableTime);
+        List<InitTableSchedule> tableSchedules = initService.getInitTableScheduleFromTable();
+        if(null != tableSchedules&& tableSchedules.size()>0){
+            for(InitTableSchedule initTableSchedule:tableSchedules){
+                try{
+                    Date beginDate = simpleDateFormat.parse(initTableSchedule.getBeginDate());
+                    Date endDate   = simpleDateFormat.parse(initTableSchedule.getEndDate());
+                    Date nowDate   = new Date();
+                    if(nowDate.before(beginDate)||  nowDate.after(endDate)){
+                        log.info("******************************当前时间不在时间段内，触发更新");
+                        InitTableSchedule tableSchedule = initService.getInitTableSchedule(initTableSchedule.getMachineCode());
+                        initService.insertTableSchedule(tableSchedule);
+                        String tableName = TableNamePrefix+simpleDateFormatTable.format(new Date())+"_"+initTableSchedule.getMachineCode();
+                        initService.createNewTable(tableName);
+                    }else{
+                        log.info("无需处理***************************************");
+                    }
+                }catch (Exception e){
+                    log.info("*********************************日期转换异常！"+e.getMessage());
+                }
+            }
         }
     }
 
@@ -223,15 +252,20 @@ public class ScheduleConfig {
         return true;
     }
 
-    @PostConstruct
+    //@PostConstruct
     public static boolean initUpload(){
         String str  = CommonUtil.getFormateString();
         uploadStatistic(str);
         return true;
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    //@Scheduled(cron = "0 0 0 * * ?")
     public void initStatisticByDay(){
+        
+
+
+
+
     }
 
 

@@ -2,6 +2,7 @@ package com.hlxd.microcloud.dao;
 
 import com.hlxd.microcloud.vo.Qrcode;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * CREATED BY IDEA
@@ -16,4 +17,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface QrcodeMapper {
 
     Qrcode getQrcode(String qrCode);
+
+
 }

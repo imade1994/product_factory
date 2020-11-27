@@ -30,13 +30,22 @@ public final class CommonUtil {
 
   public static final String time = "yyyy-MM-dd";
 
+  public static final String TableTime = "yyyyMMdd";
+
   public static final String timeFormate = "yyyy-MM-dd HH:mm:ss.S";
+
+  public static final String ScheduleDate = "yyyy-MM-dd HH:mm:ss";
 
   public static final String UTCString = "yyyy-MM-dd'T'HH:mm:ss.SS'Z'";
 
   public static final String UTCString2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
   public static final String UTCString1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
+  public static final String TableNamePrefix = "t_hl_system_code_";
+
+  public static final String UnionTableNamePrefix = "t_hl_system_code_union";
+
 
   public static final Map queryMap = new HashMap();
 
@@ -99,9 +108,29 @@ public final class CommonUtil {
       SimpleDateFormat sdfSTR = new SimpleDateFormat(UTCString);
       date = sdfUTC.parse(UTCStr);
       String str = sdfSTR.format(date);
-
       return str;
   }
+
+  public static String tableScheduleTime(){
+      SimpleDateFormat simpleDateFormat = new SimpleDateFormat(TableTime);
+      return simpleDateFormat.format(new Date());
+  }
+
+    public static String tableScheduleTime(String date) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(TableTime);
+        SimpleDateFormat simpleDateFormat_1 = new SimpleDateFormat(ScheduleDate);
+        return simpleDateFormat.format(simpleDateFormat_1.parse(date));
+    }
+
+    public static void main(String[] args) {
+      String str = "2020-11-26 12:12:12";
+        try {
+            System.out.println(tableScheduleTime(str));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
   /**
    * 时间对比工具类
    * @Param  t1 开始时间 t2 结束时间
@@ -946,14 +975,6 @@ public final class CommonUtil {
         return husband;
     }
 
-  public static void main(String[] args){
-
-
-      String str = "t_hl_code_batch_202005140001";
-
-      System.out.println(validateParams(str));
-
-  }
 
   public static String getCode(String prifix,String endfix){
       return prifix+1+UUID.randomUUID().toString().replaceAll("-","")+endfix;

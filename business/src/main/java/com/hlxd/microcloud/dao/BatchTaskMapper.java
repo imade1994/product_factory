@@ -28,5 +28,8 @@ public interface BatchTaskMapper {
     List<CodeUnion> getCodeUnionByItemCode(Map map);
 
 
+    void deleteCodeFromSystemCode(@Param("itemCode") String itemCode);
+
+
 
 }

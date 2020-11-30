@@ -7,7 +7,10 @@ import java.text.ParseException;
 import java.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.hlxd.microcloud.schedule.AsyncService;
+import com.hlxd.microcloud.schedule.RedisConsumer;
+import com.hlxd.microcloud.service.BatchTaskService;
 import com.hlxd.microcloud.service.InitService;
+import com.hlxd.microcloud.vo.CodeUnion;
 import com.hlxd.microcloud.vo.KafkaVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -33,11 +36,13 @@ public class KafkaConsumerUtil implements Runnable {
     private final KafkaConsumer<String, String> consumer;
     private ConsumerRecords<String, String> msgList;
     private final RedisTemplate redisTemplate;
+    private   InitService initService;
+    private   BatchTaskService batchTaskService;
     private AsyncService asyncService;
-    private InitService initService;
 
 
-    public KafkaConsumerUtil(RedisTemplate<String, Object> redisTemplate, AsyncService asyncService, InitService initService) {
+
+    public KafkaConsumerUtil(RedisConsumer redisConsumer) {
         Properties props = new Properties();
         Map configMap = new HashMap();
         //configMap.put("0",AbstractKafkaStatic.partition);
@@ -51,9 +56,10 @@ public class KafkaConsumerUtil implements Runnable {
         props.putAll(configMap);
         this.consumer = new KafkaConsumer<String, String>(props);
         this.consumer.subscribe(Arrays.asList(AbstractKafkaStatic.topic));
-        this.redisTemplate = redisTemplate;
-        this.asyncService = asyncService;
-        this.initService = initService;
+        this.redisTemplate = redisConsumer.redisTemplate;
+        this.initService = redisConsumer.initService;
+        this.batchTaskService = redisConsumer.batchTaskService;
+        this.asyncService = redisConsumer.asyncService;
     }
 
     @Override
@@ -123,6 +129,7 @@ public class KafkaConsumerUtil implements Runnable {
         String machineCode = "";
         String produceDate = "";
         String packageType = "";
+        String relationDate= "";
         String type  = kafkaVo.getType();
         if(type.equals("INSERT")){
             List<Map<String,String>> keyMaps = kafkaVo.getData();
@@ -137,6 +144,7 @@ public class KafkaConsumerUtil implements Runnable {
                             break;
                         case "relation_date":
                             produceDate = " relationDate="+keyMap.get(s);
+                            relationDate = keyMap.get(s);
                             break;
                         case "package_type":
                             packageType = keyMap.get(s);
@@ -145,10 +153,12 @@ public class KafkaConsumerUtil implements Runnable {
                             break;
                     }
                 }
-                if(packageType.equals("1")||packageType.equals("2")||packageType.equals("3")){
+                if(packageType.equals("1")||packageType.equals("2")){
                     map.put(qrCode,machineCode+produceDate);
                 }else if(packageType.equals("3")){
-                    asyncService.batchInsertByCanal(qrCode,produceDate);
+                    log.info("*********************************查询到3的码"+qrCode+"*****************************************");
+                    map.put(qrCode,machineCode+produceDate);
+                    asyncService.batchInsertByCanal(qrCode,relationDate);
                 }
             }
         }
@@ -188,8 +198,9 @@ public class KafkaConsumerUtil implements Runnable {
                     log.info("*****************当前数据关联时间为"+relationDate);
                     String tableName = TableNamePrefix+tableScheduleTime(relationDate)+"_"+machineCode;
                     int count = initService.checkTableExits(tableName);
-                    log.info("*************表"+tableName+"不存在，手动创建！**********************************");
+
                     if(!(count>0)){
+                        log.info("*************表"+tableName+"不存在，手动创建！**********************************");
                         initService.createNewTable(tableName);
                     }
                     sql = "insert into "+kafkaVo.getDataBase()+"."+tableName;
@@ -203,6 +214,7 @@ public class KafkaConsumerUtil implements Runnable {
         return sql;
 
     }
+
    /* public static void main(String args[]) {
         KafkaConsumerUtil test1 = new KafkaConsumerUtil("qrcode_t_hl_illegal_code");
         Thread thread1 = new Thread(test1);

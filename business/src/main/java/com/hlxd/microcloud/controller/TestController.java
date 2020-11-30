@@ -1,5 +1,6 @@
 package com.hlxd.microcloud.controller;
 
+import com.hlxd.microcloud.schedule.AsyncService;
 import com.hlxd.microcloud.service.BatchTaskService;
 import com.hlxd.microcloud.vo.CodeUnion;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +24,12 @@ import java.util.Map;
 @RequestMapping("/test")
 public class TestController {
     @Autowired
-    private BatchTaskService batchTaskService;
+    private AsyncService asyncService;
 
     @RequestMapping("init")
     public void initTables(){
         Map map = new HashMap();
         map.put("itemCode","Fail0311030582020-09-18 17:46:23");
-        List<CodeUnion> codeUnions = batchTaskService.getCodeUnionByItemCode(map);
-        batchTaskService.BatchInsertCodeUnion("t_hl_system_code_union",codeUnions);
+        asyncService.batchInsertByCanal("Fail0311030582020-09-18 17:46:23","2020-09-18 17:46:23");
     }
 }

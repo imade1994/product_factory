@@ -1,11 +1,14 @@
 package com.hlxd.microcloud.schedule;
 
+import com.hlxd.microcloud.service.BatchTaskService;
 import com.hlxd.microcloud.service.InitService;
 import com.hlxd.microcloud.util.KafkaConsumerUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 /**
  * CREATED BY IDEA
@@ -21,31 +24,35 @@ import org.springframework.stereotype.Component;
 public class RedisConsumer {
 
     @Autowired
-    private  RedisTemplate<String, Object> redisTemplate;
+    public  RedisTemplate<String, Object> redisTemplate;
 
-    public static RedisConsumer redisConsumer;
-
-    @Autowired
-    private AsyncService asyncService;
+    public  RedisConsumer redisConsumer;
 
     @Autowired
-    private InitService initService;
+    public BatchTaskService batchTaskService;
+
+    @Autowired
+    public InitService initService;
+
+    @Autowired
+    public AsyncService asyncService;
 
 
-    //@PostConstruct
+    @PostConstruct
     public void init(){
         redisConsumer = this;
         redisConsumer.redisTemplate = this.redisTemplate;
-        redisConsumer.asyncService = this.asyncService;
+        redisConsumer.batchTaskService = this.batchTaskService;
         redisConsumer.initService = this.initService;
+        redisConsumer.asyncService = this.asyncService;
         initDataToRedis();
     }
 
 
     public void initDataToRedis(){
-        KafkaConsumerUtil test1 = new KafkaConsumerUtil(redisTemplate,asyncService,initService);
-        Thread thread1 = new Thread(test1);
-        thread1.start();
+        KafkaConsumerUtil consumer = new KafkaConsumerUtil(redisConsumer);
+        Thread thread = new Thread(consumer);
+        thread.start();
     }
 
 

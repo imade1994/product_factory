@@ -25,4 +25,6 @@ public interface BatchTaskService {
 
 
     List<CodeUnion> getCodeUnionByItemCode(Map map);
+
+    void deleteCodeFromSystemCode(String itemCode);
 }

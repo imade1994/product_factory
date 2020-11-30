@@ -106,7 +106,7 @@ public class ScheduleConfig {
 
     }
 
-    //@Scheduled(cron = "0 0/1 * * * ? ")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     public void updateMachineTime(){
         List<InitMachineTimeVo> machineTimeList1 =  initService.getInitMachineTime();
         List<InitMachineTimeVo> machineTimeList2 =  initService.getInitMachineTimeFromTable();
@@ -133,7 +133,7 @@ public class ScheduleConfig {
             return false;
         }
     }
-    //@Scheduled(cron = "0 0/1 * * * ? ")
+   @Scheduled(cron = "0 0/1 * * * ? ")
     public void initTable(){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScheduleDate);
         SimpleDateFormat simpleDateFormatTable = new SimpleDateFormat(TableTime);

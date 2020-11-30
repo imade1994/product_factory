@@ -27,7 +27,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @MapperScan("com.hlxd.microcloud.dao")
 @EnableScheduling
-@EnableAsync
 public class BusinessApplication {
   public static void main(String[] args) {
       SpringApplication.run(BusinessApplication.class,args);

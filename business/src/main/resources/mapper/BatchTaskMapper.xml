@@ -98,6 +98,23 @@ values
 
     </insert>
 
+    <delete id="deleteCodeFromSystemCode" parameterType="java.lang.String">
+        DELETE
+A
+from
+t_hl_system_code  A
+where  EXISTS
+(
+select * from
+(select
+   DISTINCT(qrcode),machine_code
+        from t_hl_system_code thsc
+        where thsc.package_type = 2
+        and thsc.parent_code = #{itemCode} )c
+where A.parent_code = c.qrcode and A.machine_code = c.machine_code
+)
+    </delete>
+
 
 
 </mapper>

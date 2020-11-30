@@ -47,4 +47,9 @@ public class BatchTaskServiceImpl implements BatchTaskService {
         return batchTaskMapper.getCodeUnionByItemCode(map);
     }
 
+    @Override
+    public void deleteCodeFromSystemCode(String itemCode) {
+        batchTaskMapper.deleteCodeFromSystemCode(itemCode);
+    }
+
 }

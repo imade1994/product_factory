@@ -47,6 +47,15 @@ public final class CommonUtil {
   public static final String UnionTableNamePrefix = "t_hl_system_code_union";
 
 
+  /**
+   * 异常信息常量
+   * */
+
+  public static final String LOG_ERROR_PREFIX = "ERROR_INFO";
+  public static final String LOG_INFO_PREFIX = "LOG_INFO";
+
+
+
   public static final Map queryMap = new HashMap();
 
 

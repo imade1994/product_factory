@@ -11,6 +11,8 @@ import com.hlxd.microcloud.schedule.RedisConsumer;
 import com.hlxd.microcloud.service.BatchTaskService;
 import com.hlxd.microcloud.service.InitService;
 import com.hlxd.microcloud.vo.CodeUnion;
+import com.hlxd.microcloud.vo.InitTable;
+import com.hlxd.microcloud.vo.InitTableSchedule;
 import com.hlxd.microcloud.vo.KafkaVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -85,7 +87,7 @@ public class KafkaConsumerUtil implements Runnable {
                         JSONObject jsonObject = JSONObject.parseObject(record.value());
                         KafkaVo kafkaVo = JSONObject.toJavaObject(jsonObject,KafkaVo.class);
                         map = getCode(kafkaVo);
-                        String sql = getSql(kafkaVo);
+                        String sql =getSql(kafkaVo);
                        if(null != sql && sql.length()>5){
                            try {
                                int rows =statement.executeUpdate(sql);
@@ -127,6 +129,7 @@ public class KafkaConsumerUtil implements Runnable {
         Map map= new HashMap();
         String qrCode = "";
         String machineCode = "";
+        String machineCode_1="";
         String produceDate = "";
         String packageType = "";
         String relationDate= "";
@@ -141,6 +144,7 @@ public class KafkaConsumerUtil implements Runnable {
                             break;
                         case "machine_code":
                             machineCode= " machineCode="+keyMap.get(s);
+                            machineCode_1 = keyMap.get(s);
                             break;
                         case "relation_date":
                             produceDate = " relationDate="+keyMap.get(s);
@@ -158,7 +162,7 @@ public class KafkaConsumerUtil implements Runnable {
                 }else if(packageType.equals("3")){
                     log.info("*********************************查询到3的码"+qrCode+"*****************************************");
                     map.put(qrCode,machineCode+produceDate);
-                    asyncService.batchInsertByCanal(qrCode,relationDate);
+                    asyncService.batchInsertByCanal(qrCode,relationDate,machineCode_1);
                 }
             }
         }
@@ -168,6 +172,7 @@ public class KafkaConsumerUtil implements Runnable {
     public String getSql(KafkaVo kafkaVo) throws ParseException {
         String type  = kafkaVo.getType();
         String sql = "";
+        String tableName = null;
         switch (type){
             case "INSERT":
                 if(kafkaVo.getTable().equals("t_hl_system_code")){
@@ -196,13 +201,33 @@ public class KafkaConsumerUtil implements Runnable {
                         value = value.substring(0,value.length()-1)+") ,";
                     }
                     log.info("*****************当前数据关联时间为"+relationDate);
-                    String tableName = TableNamePrefix+tableScheduleTime(relationDate)+"_"+machineCode;
-                    int count = initService.checkTableExits(tableName);
-
-                    if(!(count>0)){
-                        log.info("*************表"+tableName+"不存在，手动创建！**********************************");
-                        initService.createNewTable(tableName);
+                    /**
+                     * 获取当前条码对应班组的对应时间字符串
+                     * */
+                    tableName = initService.getTableScheduleString(machineCode,relationDate);
+                    //
+                    if(null == tableName|| tableName.equals("")){
+                        log.error(LOG_ERROR_PREFIX+"*************表生成记录不存在，调用创建！**********************************");
+                        InitTableSchedule tableSchedule = initService.getInitTableSchedule(machineCode);
+                        //initService.updateTableSchedule(tableSchedule);
+                        tableName = TableNamePrefix+tableSchedule.getDateString()+tableSchedule.getMachineCode();
+                        int count = initService.checkTableExits(tableName);
+                        if(!(count>0)){
+                            log.error(LOG_ERROR_PREFIX+"*************表不存在，调用创建！**********************************");
+                            initService.createNewTable(tableName);
+                        }
+                        /**
+                         * 往表格生成表里面插入一条记录
+                         * */
+                        InitTable initTable = new InitTable();
+                        initTable.setTableName(tableName);
+                        initTable.setScheduleBeginDate(tableSchedule.getBeginDate());
+                        initTable.setScheduleEndDate(tableSchedule.getEndDate());
+                        initTable.setProduceDate(tableSchedule.getDateString());
+                        initTable.setProduceMachineCode(tableSchedule.getMachineCode());
+                        initService.insertRecordTableInit(initTable);
                     }
+
                     sql = "insert into "+kafkaVo.getDataBase()+"."+tableName;
                     sql = sql + key.substring(0,key.length()-1)+") values "+value.substring(0,value.length()-1);
                     log.info("转化后的sql为**************************"+sql+"*******************************************");
@@ -211,6 +236,8 @@ public class KafkaConsumerUtil implements Runnable {
             default:
                 break;
         }
+       /* returnMap.put("sql",sql);
+        returnMap.put("tableName",tableName);*/
         return sql;
 
     }

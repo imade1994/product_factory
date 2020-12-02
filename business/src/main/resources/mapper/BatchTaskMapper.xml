@@ -18,6 +18,16 @@
         <result column="package_shift_id"      property="packageShiftId" />
     </resultMap>
 
+    <resultMap id="errorMap" type="com.hlxd.microcloud.vo.ScheduleErrorCode">
+        <result column="qrcode"               property="qrCode" />
+        <result column="schedule_date"        property="scheduleDate" />
+        <result column="id"                   property="id" />
+        <result column="relation_date"        property="relationDate" />
+        <result column="machine_code"         property="machineCode" />
+        <result column="table_name"           property="tableName" />
+        <result column="execute_state"        property="executeState" />
+    </resultMap>
+
 
 
     <select id="getPackageCodeUnion" resultType="java.lang.String" >
@@ -114,6 +124,35 @@ select * from
 where A.parent_code = c.qrcode and A.machine_code = c.machine_code
 )
     </delete>
+
+    <insert id="insertErrorCode" parameterType="com.hlxd.microcloud.vo.ScheduleErrorCode">
+        insert into t_hl_system_code_error
+        (qrcode,schedule_date,table_name,machine_code,relation_date,execute_state)values (#{qrCode},now(),#{tableName},#{machineCode},#{relationDate},#{executeState})
+    </insert>
+
+    <select id="getErrorCode" resultMap="errorMap" parameterType="java.lang.Integer">
+        select
+				id,
+				qrcode,
+				schedule_date,
+				relation_date,
+				machine_code,
+				table_name
+				from
+				t_hl_system_code_error
+				where execute_state = #{executeState}
+    </select>
+    <delete id="deleteSchedule" parameterType="java.lang.Integer">
+        delete
+        from t_hl_system_code_error
+        where id = #{id}
+    </delete>
+
+    <update id="updateSchedule" parameterType="java.lang.Integer">
+        update t_hl_system_code_error
+        set execute_state = #{executeState}
+        where id = #{id}
+    </update>
 
 
 

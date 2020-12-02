@@ -12,6 +12,7 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,7 +62,13 @@ public class ScheduleConfig {
     BatchTaskService batchTaskService;
 
     @Autowired
+    public RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
     InitService initService;
+
+    @Autowired
+    AsyncService asyncService;
 
 
 
@@ -73,36 +80,84 @@ public class ScheduleConfig {
         //unionCode();
     }
 
-    //@Scheduled(cron = "0 0 1 * * ?")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     public  void unionCode(){
-        Map param = new HashMap();
-        param.put("end",0);
-        param.put("begin",-1);
-        List<CodeUnion> codeUnionList = batchTaskService.getCodeUnion(param);
-        int forCount = codeUnionList.size()%1000 == 0 ?codeUnionList.size()/1000:(codeUnionList.size()/1000)+1;
-        for(int i=0;i<forCount;i++){
-            List<CodeUnion> subList = new ArrayList<>();
-            if (((i+1)*1000 ) < codeUnionList.size()){
-                subList = codeUnionList.subList(i*1000,(i+1)*1000);
-            }else{
-                subList = codeUnionList.subList(i*1000,codeUnionList.size());
-            }
-            List<CodeUnion> finalSubList = subList;
-            Callable<Boolean> queryCall = new Callable<Boolean>() {
-                @Override
-                public Boolean call()  {
-                    try{
-
-                        batchTaskService.BatchInsertCodeUnion("t_hl_system_code_union",finalSubList);
-                    }catch (Exception e){
-                        return false;
+        /**
+         * 查询当前是否有线程在操作数据库
+         * */
+        String lock = (String) redisTemplate.opsForValue().get("t_hl_system_code_error_lock");
+        log.info(LOG_INFO_PREFIX+"******************************定时任务主动查询关联触发当前锁值为"+lock);
+        List<FutureTask<Boolean>> futureTasks = new ArrayList<>();
+        if(null == lock){
+            /**
+             * 保证同时只有一个线程操作数据合并
+             * */
+            redisTemplate.opsForValue().set("t_hl_system_code_error_lock","1");
+            List<ScheduleErrorCode> scheduleErrorCodes = batchTaskService.getErrorCode(0);
+            for(ScheduleErrorCode scheduleErrorCode:scheduleErrorCodes){
+                Callable<Boolean> queryCall = new Callable<Boolean>() {
+                    @Override
+                    public Boolean call()  {
+                        try{
+                            Map map = new HashMap();
+                            map.put("itemCode",scheduleErrorCode.getQrCode());
+                            /**
+                             * 获取组装好的3码关联关系实体
+                             * */
+                            List<CodeUnion> codeUnions = batchTaskService.getCodeUnionByItemCode(map);
+                            if(null != codeUnions&&codeUnions.size()>0){
+                                batchTaskService.BatchInsertCodeUnion(scheduleErrorCode.getTableName(),codeUnions);
+                                /**
+                                 * 更新异常主库ID
+                                 * 状态码 1:为执行完成可以执行删除
+                                 * */
+                                batchTaskService.updateSchedule(scheduleErrorCode.getId(),1);
+                                /**
+                                 * 从主库移除数据
+                                 *
+                                batchTaskService.deleteCodeFromSystemCode(scheduleErrorCode.getQrCode());
+                                *//**
+                                 * 从执行异常库删除数据
+                                 * *//*
+                                batchTaskService.deleteSchedule(scheduleErrorCode.getId());*/
+                            }
+                        }catch (Exception e){
+                            log.error(LOG_ERROR_PREFIX+"****************定时任务出现异常二维码为"+scheduleErrorCode.getQrCode()+"***************异常信息为"+e.getMessage());
+                            return true;
+                        }
+                        return true;
                     }
-                    return true;
+                };
+                FutureTask<Boolean> CodeUnion = new FutureTask<>(queryCall);
+                futureTasks.add(CodeUnion);
+                ThreadManager.getLongPool().execute(CodeUnion);
+            }
+            Boolean flag = true;
+            /**
+             * 轮询多线程任务结果
+             * 执行完成会返回 true;
+             * */
+            for(FutureTask<Boolean> futureTask:futureTasks){
+                try {
+                    if(!futureTask.get()){
+                        flag = false;
+                    }
+                } catch (InterruptedException e) {
+                    log.error(LOG_ERROR_PREFIX+"****************获取多线程结果出现异常***************异常信息为"+e.getMessage());
+                } catch (ExecutionException e) {
+                    log.error(LOG_ERROR_PREFIX+"****************获取多线程结果出现异常***************异常信息为"+e.getMessage());
+                    e.printStackTrace();
                 }
-            };
-            FutureTask<Boolean> CodeUnion = new FutureTask<>(queryCall);
-            ThreadManager.getLongPool().execute(CodeUnion);
+            }
+            if(flag){
+                /**
+                 * 从redis中移除锁
+                 * */
+                redisTemplate.delete("t_hl_system_code_error_lock");
+            }
         }
+
+
 
     }
 
@@ -115,7 +170,7 @@ public class ScheduleConfig {
                 if(initMachineTimeVo.getMachineCode().equals(initMachineTimeVo1.getMachineCode())){
                     boolean flag = compactDetails(initMachineTimeVo,initMachineTimeVo1);
                     if(!flag){
-                        log.info("*********************换班，更换班组为+"+initMachineTimeVo.getClassName()+"更换前为+"+initMachineTimeVo1.getClassName());
+                        log.info(LOG_INFO_PREFIX+"*********************换班，更换班组为+"+initMachineTimeVo.getClassName()+"更换前为+"+initMachineTimeVo1.getClassName());
                         initService.updateMachineTime(initMachineTimeVo);
                     }
                 }
@@ -136,7 +191,6 @@ public class ScheduleConfig {
    @Scheduled(cron = "0 0/1 * * * ? ")
     public void initTable(){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScheduleDate);
-        SimpleDateFormat simpleDateFormatTable = new SimpleDateFormat(TableTime);
         List<InitTableSchedule> tableSchedules = initService.getInitTableScheduleFromTable();
         if(null != tableSchedules&& tableSchedules.size()>0){
             for(InitTableSchedule initTableSchedule:tableSchedules){
@@ -145,19 +199,47 @@ public class ScheduleConfig {
                     Date endDate   = simpleDateFormat.parse(initTableSchedule.getEndDate());
                     Date nowDate   = new Date();
                     if(nowDate.before(beginDate)||  nowDate.after(endDate)){
-                        log.info("******************************当前时间不在时间段内，触发更新");
+                        log.info(LOG_INFO_PREFIX+"******************************当前时间不在时间段内，触发更新");
                         InitTableSchedule tableSchedule = initService.getInitTableSchedule(initTableSchedule.getMachineCode());
-                        initService.insertTableSchedule(tableSchedule);
-                        String tableName = TableNamePrefix+simpleDateFormatTable.format(new Date())+"_"+initTableSchedule.getMachineCode();
+                        initService.updateTableSchedule(tableSchedule);
+                        String tableName = TableNamePrefix+tableSchedule.getDateString()+tableSchedule.getMachineCode();
                         initService.createNewTable(tableName);
+                        /**
+                         * 往表格生成表里面插入一条记录
+                         * */
+                        InitTable initTable = new InitTable();
+                        initTable.setTableName(tableName);
+                        initTable.setProduceDate(tableSchedule.getDateString());
+                        initTable.setProduceMachineCode(tableSchedule.getMachineCode());
+                        initTable.setScheduleBeginDate(tableSchedule.getBeginDate());
+                        initTable.setScheduleEndDate(tableSchedule.getEndDate());
+                        initService.insertRecordTableInit(initTable);
                     }else{
-                        log.info("无需处理***************************************");
+                        //log.info("无需处理***************************************");
                     }
                 }catch (Exception e){
-                    log.info("*********************************日期转换异常！"+e.getMessage());
+                    log.info(LOG_ERROR_PREFIX+"*********************************日期转换异常！"+e.getMessage());
                 }
             }
         }
+    }
+
+    @Scheduled(cron = "0 0 2 * * ?")
+    //@Scheduled(cron = "0 0/1 * * * ? ")
+    public void deleteCodeFromBase(){
+        log.info(LOG_INFO_PREFIX+"******************************删除任务触发");
+        List<ScheduleErrorCode> scheduleErrorCodes = batchTaskService.getErrorCode(1);
+        for(ScheduleErrorCode scheduleErrorCode:scheduleErrorCodes){
+            /**
+             * 从主库移除数据
+             **/
+             batchTaskService.deleteCodeFromSystemCode(scheduleErrorCode.getQrCode());
+             /**
+             * 从执行异常库删除数据
+             * */
+             batchTaskService.deleteSchedule(scheduleErrorCode.getId());
+        }
+
     }
 
 

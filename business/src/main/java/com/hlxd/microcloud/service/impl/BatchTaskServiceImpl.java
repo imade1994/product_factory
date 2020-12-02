@@ -3,6 +3,7 @@ package com.hlxd.microcloud.service.impl;
 import com.hlxd.microcloud.dao.BatchTaskMapper;
 import com.hlxd.microcloud.service.BatchTaskService;
 import com.hlxd.microcloud.vo.CodeUnion;
+import com.hlxd.microcloud.vo.ScheduleErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,26 @@ public class BatchTaskServiceImpl implements BatchTaskService {
     @Override
     public void deleteCodeFromSystemCode(String itemCode) {
         batchTaskMapper.deleteCodeFromSystemCode(itemCode);
+    }
+
+    @Override
+    public void insertErrorCode(ScheduleErrorCode scheduleErrorCode) {
+        batchTaskMapper.insertErrorCode(scheduleErrorCode);
+    }
+
+    @Override
+    public List<ScheduleErrorCode> getErrorCode(int executeState) {
+        return batchTaskMapper.getErrorCode(executeState);
+    }
+
+    @Override
+    public void deleteSchedule(int id) {
+        batchTaskMapper.deleteSchedule(id);
+    }
+
+    @Override
+    public void updateSchedule(int id,int executeState) {
+        batchTaskMapper.updateSchedule(id,executeState);
     }
 
 }

@@ -30,6 +30,6 @@ public class TestController {
     public void initTables(){
         Map map = new HashMap();
         map.put("itemCode","Fail0311030582020-09-18 17:46:23");
-        asyncService.batchInsertByCanal("Fail0311030582020-09-18 17:46:23","2020-09-18 17:46:23");
+        //asyncService.batchInsertByCanal("Fail0311030582020-09-18 17:46:23","2020-09-18 17:46:23");
     }
 }

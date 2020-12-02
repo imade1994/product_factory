@@ -1,6 +1,7 @@
 package com.hlxd.microcloud.dao;
 
 import com.hlxd.microcloud.vo.CodeUnion;
+import com.hlxd.microcloud.vo.ScheduleErrorCode;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -29,6 +30,16 @@ public interface BatchTaskMapper {
 
 
     void deleteCodeFromSystemCode(@Param("itemCode") String itemCode);
+
+
+    void insertErrorCode(ScheduleErrorCode scheduleErrorCode);
+
+    List<ScheduleErrorCode> getErrorCode(@Param("executeState")int executeState );
+
+
+    void deleteSchedule(@Param("id")int id);
+
+    void updateSchedule(@Param("id")int id,@Param("executeState")int executeState);
 
 
 

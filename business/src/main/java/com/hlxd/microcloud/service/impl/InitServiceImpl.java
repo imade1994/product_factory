@@ -4,6 +4,7 @@ package com.hlxd.microcloud.service.impl;
 import com.hlxd.microcloud.dao.InitMapper;
 import com.hlxd.microcloud.service.InitService;
 import com.hlxd.microcloud.vo.InitMachineTimeVo;
+import com.hlxd.microcloud.vo.InitTable;
 import com.hlxd.microcloud.vo.InitTableSchedule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,5 +68,15 @@ public class InitServiceImpl implements InitService {
     @Override
     public int checkTableExits(String tableName) {
         return initMapper.checkTableExits(tableName);
+    }
+
+    @Override
+    public String getTableScheduleString(String machineCode, String currentDate) {
+        return initMapper.getTableScheduleString(machineCode,currentDate);
+    }
+
+    @Override
+    public void insertRecordTableInit(InitTable initTable) {
+        initMapper.insertRecordTableInit(initTable);
     }
 }

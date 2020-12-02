@@ -1,6 +1,7 @@
 package com.hlxd.microcloud.service;
 
 import com.hlxd.microcloud.vo.CodeUnion;
+import com.hlxd.microcloud.vo.ScheduleErrorCode;
 
 import java.util.List;
 import java.util.Map;
@@ -27,4 +28,16 @@ public interface BatchTaskService {
     List<CodeUnion> getCodeUnionByItemCode(Map map);
 
     void deleteCodeFromSystemCode(String itemCode);
+
+
+    void insertErrorCode(ScheduleErrorCode scheduleErrorCode);
+
+
+    List<ScheduleErrorCode> getErrorCode(int executeState);
+
+
+    void deleteSchedule(int id);
+
+
+    void updateSchedule(int id,int executeState);
 }

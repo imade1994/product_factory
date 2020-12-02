@@ -2,7 +2,9 @@ package com.hlxd.microcloud.service;
 
 
 import com.hlxd.microcloud.vo.InitMachineTimeVo;
+import com.hlxd.microcloud.vo.InitTable;
 import com.hlxd.microcloud.vo.InitTableSchedule;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -30,6 +32,11 @@ public interface InitService {
     void createNewUnionTable(String tableName);
 
     int checkTableExits(String tableName);
+
+    String getTableScheduleString(String machineCode,String currentDate);
+
+
+    void insertRecordTableInit(InitTable initTable);
 
 
 

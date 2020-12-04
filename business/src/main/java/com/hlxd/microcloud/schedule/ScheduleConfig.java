@@ -80,7 +80,7 @@ public class ScheduleConfig {
         //unionCode();
     }
 
-    @Scheduled(cron = "0 0/1 * * * ? ")
+    //@Scheduled(cron = "0 0/1 * * * ? ")
     public  void unionCode(){
         /**
          * 查询当前是否有线程在操作数据库
@@ -161,7 +161,7 @@ public class ScheduleConfig {
 
     }
 
-    @Scheduled(cron = "0 0/1 * * * ? ")
+    //@Scheduled(cron = "0 0/1 * * * ? ")
     public void updateMachineTime(){
         List<InitMachineTimeVo> machineTimeList1 =  initService.getInitMachineTime();
         List<InitMachineTimeVo> machineTimeList2 =  initService.getInitMachineTimeFromTable();
@@ -188,7 +188,7 @@ public class ScheduleConfig {
             return false;
         }
     }
-   @Scheduled(cron = "0 0/1 * * * ? ")
+   //@Scheduled(cron = "0 0/1 * * * ? ")
     public void initTable(){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScheduleDate);
         List<InitTableSchedule> tableSchedules = initService.getInitTableScheduleFromTable();
@@ -224,7 +224,7 @@ public class ScheduleConfig {
         }
     }
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    //@Scheduled(cron = "0 0 2 * * ?")
     //@Scheduled(cron = "0 0/1 * * * ? ")
     public void deleteCodeFromBase(){
         log.info(LOG_INFO_PREFIX+"******************************删除任务触发");

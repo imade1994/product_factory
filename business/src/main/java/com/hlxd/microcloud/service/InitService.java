@@ -1,12 +1,11 @@
 package com.hlxd.microcloud.service;
 
 
-import com.hlxd.microcloud.vo.InitMachineTimeVo;
-import com.hlxd.microcloud.vo.InitTable;
-import com.hlxd.microcloud.vo.InitTableSchedule;
+import com.hlxd.microcloud.vo.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface InitService {
 
@@ -37,6 +36,15 @@ public interface InitService {
 
 
     void insertRecordTableInit(InitTable initTable);
+
+
+    ProCode getProCode(String tableName,String qrCode);
+
+
+    ProCode getProCodes(Map map);
+
+
+    List<TableSplit> getTableSplit(Map map);
 
 
 

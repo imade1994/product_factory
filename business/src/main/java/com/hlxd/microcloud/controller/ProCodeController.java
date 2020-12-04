@@ -1,9 +1,12 @@
 package com.hlxd.microcloud.controller;
 
+import com.hlxd.microcloud.service.InitService;
 import com.hlxd.microcloud.service.ProCodeService;
 import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.vo.ProCode;
 import com.hlxd.microcloud.vo.ProductionCount;
+import com.hlxd.microcloud.vo.TableSplit;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,10 +32,14 @@ import static com.hlxd.microcloud.util.CommonUtil.*;
  */
 @RestController
 @RequestMapping("/api/pro")
+@Slf4j
 public class ProCodeController {
 
     @Autowired
     private ProCodeService proCodeService;
+
+    @Autowired
+    private InitService initService;
 
     /**
      *编码查询
@@ -132,6 +139,37 @@ public class ProCodeController {
     @RequestMapping("/getProduction")
     public Map getProductionByPeriod(@RequestParam("machineCode")String machineCode,@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate){
         Map paramMap = new HashMap();
+        List<String> dateStrs  =  new ArrayList<>();
+        try {
+            dateStrs   = getDayFromDate(beginDate,endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        paramMap.put("machineCode",machineCode);
+        paramMap.put("dates",dateStrs);
+        List<TableSplit> tableSplits = initService.getTableSplit(paramMap);
+        List<String> tableNames = new ArrayList<>();
+        for(TableSplit tableSplit:tableSplits){
+            try {
+                boolean flag = compareDate(tableSplit.getEndDate(),endDate);
+                if(flag){
+                    tableNames.add(tableSplit.getTableName());
+                    break;
+                }else{
+                    tableNames.add(tableSplit.getTableName());
+                }
+            }catch (Exception e){
+                log.error(LOG_ERROR_PREFIX+"*************日期转换异常！数据库查询日期"+tableSplit.getEndDate()+"**********************************查询时间"+endDate);
+            }
+        }
+
+
+
+
+
+
+
+
         Map returnMap = new HashMap();
         paramMap.put("machineCode",machineCode);
         paramMap.put("beginDate",beginDate);

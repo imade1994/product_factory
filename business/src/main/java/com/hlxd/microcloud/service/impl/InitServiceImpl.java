@@ -3,13 +3,12 @@ package com.hlxd.microcloud.service.impl;
 
 import com.hlxd.microcloud.dao.InitMapper;
 import com.hlxd.microcloud.service.InitService;
-import com.hlxd.microcloud.vo.InitMachineTimeVo;
-import com.hlxd.microcloud.vo.InitTable;
-import com.hlxd.microcloud.vo.InitTableSchedule;
+import com.hlxd.microcloud.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -78,5 +77,20 @@ public class InitServiceImpl implements InitService {
     @Override
     public void insertRecordTableInit(InitTable initTable) {
         initMapper.insertRecordTableInit(initTable);
+    }
+
+    @Override
+    public ProCode getProCode(String tableName,String qrCode) {
+        return initMapper.getProCode(tableName,qrCode);
+    }
+
+    @Override
+    public ProCode getProCodes(Map map) {
+        return initMapper.getProCodes(map);
+    }
+
+    @Override
+    public List<TableSplit> getTableSplit(Map map) {
+        return initMapper.getTableSplit(map);
     }
 }

@@ -54,14 +54,20 @@ public class AsyncService {
             List<CodeUnion> codeUnions = batchTaskService.getCodeUnionByItemCode(param);
             if (null != codeUnions&&codeUnions.size()>0){
                 batchTaskService.BatchInsertCodeUnion(tableName,codeUnions);
-                ScheduleErrorCode scheduleErrorCode = new ScheduleErrorCode();
-                scheduleErrorCode.setMachineCode(machineCode);
-                scheduleErrorCode.setQrCode(itemCode);
-                scheduleErrorCode.setRelationDate(produceDate);
-                scheduleErrorCode.setTableName(tableName);
-                scheduleErrorCode.setExecuteState(1);
-                batchTaskService.insertErrorCode(scheduleErrorCode);
-                //batchTaskService.deleteCodeFromSystemCode(itemCode);
+               /* */
+                try{
+                    batchTaskService.deleteCodeFromSystemCode(itemCode);
+                }catch (Exception e){
+                    log.info(LOG_ERROR_PREFIX+"件码****************************"+itemCode+"****************************删除异常!");
+                    ScheduleErrorCode scheduleErrorCode = new ScheduleErrorCode();
+                    scheduleErrorCode.setMachineCode(machineCode);
+                    scheduleErrorCode.setQrCode(itemCode);
+                    scheduleErrorCode.setRelationDate(produceDate);
+                    scheduleErrorCode.setTableName(tableName);
+                    scheduleErrorCode.setExecuteState(1);
+                    batchTaskService.insertErrorCode(scheduleErrorCode);
+                }
+
             }else{
                 ScheduleErrorCode scheduleErrorCode = new ScheduleErrorCode();
                 scheduleErrorCode.setMachineCode(machineCode);

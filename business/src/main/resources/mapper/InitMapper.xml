@@ -16,6 +16,69 @@
         <result column="end_date" property="endDate" />
         <result column="date_string" property="dateString" />
     </resultMap>
+    <resultMap id="tableSplitMap" type="com.hlxd.microcloud.vo.TableSplit">
+        <result column="table_name" property="machineCode" />
+        <result column="produce_date" property="produceDate" />
+        <result column="produce_machine_code" property="machineCode" />
+        <result column="schedule_begin_date" property="beginDate" />
+        <result column="schedule_end_date" property="endDate" />
+    </resultMap>
+    <resultMap id="ProCodeMap" type="com.hlxd.microcloud.vo.ProCode">
+        <result column="qrCode" property="qrCode" />
+        <result column="parent_code" property="parentCode" />
+        <result column="relation_date" property="relationDate" />
+        <result column="brand_name" property="productName" />
+        <result column="machine_code" property="machineCode" />
+        <result column="machine_name" property="machineName" />
+        <result column="package_type" property="packageType" />
+        <result column="batch_no" property="batchNo" />
+        <result column="remarks" property="remark" />
+        <result column="work_batch_no" property="workBatchNo" />
+        <result column="shift_id" property="shiftId" />
+    </resultMap>
+
+    <resultMap id="QrCodeDetailsMap" type="com.hlxd.microcloud.vo.ProCode">
+        <result column="qr_code" property="qrCode" />
+        <result column="parent_code" property="parentCode" />
+        <result column="relation_date" property="relationDate" />
+        <result column="brand_name" property="productName" />
+        <result column="brand_id" property="brandId" />
+        <result column="machine_code" property="machineCode" />
+        <result column="machine_name" property="machineName" />
+        <result column="package_type" property="packageType" />
+        <result column="batch_no" property="batchNo" />
+        <result column="remarks" property="remark" />
+        <result column="work_batch_no" property="workBatchNo" />
+        <result column="shift_id" property="shiftId" />
+        <collection property="proCodes" ofType="com.hlxd.microcloud.vo.ProCode">
+            <result column="c_qrCode" property="qrCode" />
+            <result column="c_parent_code" property="parentCode" />
+            <result column="c_relation_date" property="relationDate" />
+            <result column="c_brand_name" property="productName" />
+            <result column="c_brand_name" property="brandId" />
+            <result column="c_machine_code" property="machineCode" />
+            <result column="c_machine_name" property="machineName" />
+            <result column="c_package_type" property="packageType" />
+            <result column="c_batch_no" property="batchNo" />
+            <result column="c_remarks" property="remark" />
+            <result column="c_work_batch_no" property="workBatchNo" />
+            <result column="c_shift_id" property="shiftId" />
+            <collection property="proCodes" ofType="com.hlxd.microcloud.vo.ProCode">
+                <result column="cc_c_qrCode" property="qrCode" />
+                <result column="cc_c_parent_code" property="parentCode" />
+                <result column="cc_c_relation_date" property="relationDate" />
+                <result column="cc_c_brand_name" property="productName" />
+                <result column="cc_c_brand_name" property="brandId" />
+                <result column="cc_c_machine_code" property="machineCode" />
+                <result column="cc_c_machine_name" property="machineName" />
+                <result column="cc_c_package_type" property="packageType" />
+                <result column="cc_c_batch_no" property="batchNo" />
+                <result column="cc_c_remarks" property="remark" />
+                <result column="cc_c_work_batch_no" property="workBatchNo" />
+                <result column="cc_c_shift_id" property="shiftId" />
+            </collection>
+        </collection>
+    </resultMap>
 
 
     <select id="getInitMachineTime" resultMap="baseInitMap" >
@@ -158,6 +221,76 @@ FROM
         (table_name,produce_date,produce_machine_code,create_date,schedule_begin_date,schedule_end_date)
         values (#{tableName},#{produceDate},#{produceMachineCode},now(),#{scheduleBeginDate},#{scheduleEndDate})
     </insert>
+
+    <select id="getProCode" parameterType="java.util.HashMap" resultMap="ProCodeMap" statementType="STATEMENT">
+      select
+				thsc.qrCode,
+				thsc.parent_code,
+				thsc.relation_date,
+				thsc.brand_id,
+				thbm.machine_code,
+				thbm.machine_name,
+				thsb.brand_name,
+				thsc.package_type,
+				thsc.remark,
+				thsc.batch_no,
+				thsc.work_batch_no,
+				thsc.shift_id
+				from ${tableName} thsc
+				left join t_hl_system_brand thsb
+				on thsc.brand_id = thsb.id
+				left join t_hl_base_machine thbm
+				on thsc.machine_code = thbm.machine_code
+        where thsc.qrCode = '${qrCode}'
+
+
+
+    </select>
+
+    <select id="getProCodes" parameterType="java.util.HashMap" resultMap="QrCodeDetailsMap">
+        select
+        item_code as qr_code,
+        package_machine_name as machine_name,
+        3 as package_type,
+        thsb.brand_name,
+        package_code as c_qrCode,
+        item_code as c_parent_code,
+		machine_name as c_machine_name,
+        relation_date as c_relation_date,
+        2 as c_package_type,
+        thsb.brand_name as c_brand_name,
+		qr_code as cc_c_qrCode,
+        package_code as cc_c_parent_code,
+		machine_name as cc_c_machine_name,
+        relation_date as cc_c_relation_date,
+        1 as cc_c_package_type,
+        thsb.brand_name as cc_c_brand_name
+				from ${tableName} thscu
+				left join t_hl_system_brand thsb
+				on thscu.brand_id = thsb.brand_code
+				where thscu.qr_code = '${qrCode}' or thscu.package_code = '${qrCode}' or thscu.item_code = '${qrCode}'
+    </select>
+
+    <select id="getTableSplit" parameterType="java.util.HashMap" resultMap="tableSplitMap">
+        select
+        table_name,
+        produce_date,
+        produce_machine_code,
+        schedule_begin_date,
+        schedule_end_date
+        from
+        t_hl_system_table_split
+        where
+        produce_machine_code = #{machineCode}
+        and
+        produce_date in (
+        <foreach collection="dates" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+
+        order by produce_date asc
+    </select>
 
 
 </mapper>

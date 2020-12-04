@@ -2,13 +2,12 @@ package com.hlxd.microcloud.dao;
 
 
 
-import com.hlxd.microcloud.vo.InitMachineTimeVo;
-import com.hlxd.microcloud.vo.InitTable;
-import com.hlxd.microcloud.vo.InitTableSchedule;
+import com.hlxd.microcloud.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface InitMapper {
@@ -43,6 +42,15 @@ public interface InitMapper {
 
 
     void insertRecordTableInit(InitTable initTable);
+
+
+    ProCode getProCode(@Param("tableName")String tableName,@Param("qrCode")String qrCode);
+
+
+    ProCode getProCodes(Map map);
+
+
+    List<TableSplit> getTableSplit(Map map);
 
 
 

@@ -1,25 +1,29 @@
 package com.hlxd.microcloud.controller;
 
+import com.hlxd.microcloud.service.InitService;
 import com.hlxd.microcloud.service.QualityCheckService;
 import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.util.CommonUtil;
 import com.hlxd.microcloud.util.ThreadManager;
-import com.hlxd.microcloud.vo.ProCode;
-import com.hlxd.microcloud.vo.RandomCheckDetails;
-import com.hlxd.microcloud.vo.RandomCheckRecord;
+import com.hlxd.microcloud.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletRequest;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+
+import static com.hlxd.microcloud.util.CommonUtil.UnionTableNamePrefix;
+import static com.hlxd.microcloud.util.CommonUtil.tableScheduleTime;
 
 /**
  * CREATED BY IDEA
@@ -37,6 +41,12 @@ public class QualityCheckController {
 
     @Autowired
     private QualityCheckService qualityCheckService;
+
+    @Autowired
+    public RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private InitService initService;
 
 
     @RequestMapping("/getCheckRecord")
@@ -72,8 +82,60 @@ public class QualityCheckController {
 
 
     @RequestMapping("/getCodeRelation")
-    public Map getCodeRelation(@RequestParam("qrCode")String qrCode) throws ExecutionException, InterruptedException {
-        ProCode proCode = qualityCheckService.getCodeRelation(qrCode);
+    public Map getCodeRelation(@RequestParam("qrCode")String qrCode) throws  ParseException {
+        String results = (String) redisTemplate.opsForValue().get(qrCode);
+        Map returnMap = new HashMap();
+        ProCode proCodes = null;
+        /**
+         * result 返回格式应为 machineCode=4584584825,relationDate=2020-11-26 12:12:12,packageType=1
+         * 对result进行分割 获取对应的值
+         * */
+        Map<String,String> param = CommonUtil.splitResults(results);
+        if(null != param && param.size()>0&& !(param.isEmpty()) ){
+            String packageType = param.get("packageType");
+            String machineCode = param.get("machineCode");
+            String relationDate = param.get("relationDate");
+            switch (packageType){
+                case "1":
+                    /**
+                     * 通过查询当日数据库查询得包码的对应条码
+                     * 再从redis中获取条码的关联时间
+                     * */
+                    String tableName = initService.getTableScheduleString(machineCode,relationDate);
+                    ProCode proCode = initService.getProCode(tableName,qrCode);
+                    if(null != proCode){
+                        String results_1 = (String) redisTemplate.opsForValue().get(proCode.getParentCode());
+                        if(null != results_1){
+                            proCodes = getProCodes(results_1,qrCode);
+                            returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+                            returnMap.put(CommomStatic.DATA,proCodes);
+                        }else{
+                            returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+                            returnMap.put(CommomStatic.DATA,proCode);
+                        }
+                    }
+                    break;
+                case "2":
+                    /**
+                     * 包装规格 2 跟 3 查询方式一致
+                     * */
+                    proCodes = getProCodes(results,qrCode);
+                    returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+                    returnMap.put(CommomStatic.DATA,proCodes);
+                    break;
+                case "3":
+                    proCodes = getProCodes(results,qrCode);
+                    returnMap.put(CommomStatic.DATA,proCodes);
+                    returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+                    break;
+                default:
+                    break;
+            }
+        }else{
+            returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
+            returnMap.put(CommomStatic.MESSAGE,"数据异常，请联系管理员！");
+        }
+/*      ProCode proCode = qualityCheckService.getCodeRelation(qrCode);
         Map param = new HashMap();
         Map returnMap = new HashMap();
         if(null == proCode){
@@ -82,8 +144,22 @@ public class QualityCheckController {
         }else{
             returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
             returnMap.put(CommomStatic.DATA,proCode);
-        }
+        }*/
         return returnMap;
+    }
+
+    /**
+     * 抽出公用代码段
+     *
+     * */
+     ProCode getProCodes(String results,String qrCode) throws ParseException {
+        Map<String,String> tmp = CommonUtil.splitResults(results);
+        String tableName_1 = UnionTableNamePrefix+tableScheduleTime(tmp.get("relationDate"));
+        tmp.clear();
+        tmp.put("tableName",tableName_1);
+        tmp.put("qrCode",qrCode);
+        ProCode proCodes = initService.getProCodes(tmp);
+        return proCodes;
     }
 
 

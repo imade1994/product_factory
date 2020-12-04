@@ -117,12 +117,12 @@ where  EXISTS
 (
 select * from
 (select
-   DISTINCT(qrcode),machine_code
+   DISTINCT(qrcode) as qrcode
         from t_hl_system_code thsc
         where thsc.package_type = 2
         and thsc.parent_code = #{itemCode} )c
-where A.parent_code = c.qrcode and A.machine_code = c.machine_code
-)
+where A.parent_code = c.qrcode
+) or parent_code = #{itemCode} or qrCode = #{itemCode}
     </delete>
 
     <insert id="insertErrorCode" parameterType="com.hlxd.microcloud.vo.ScheduleErrorCode">

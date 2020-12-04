@@ -158,10 +158,10 @@ public class KafkaConsumerUtil implements Runnable {
                     }
                 }
                 if(packageType.equals("1")||packageType.equals("2")){
-                    map.put(qrCode,machineCode+produceDate);
+                    map.put(qrCode,machineCode+","+produceDate+",packageType="+packageType);
                 }else if(packageType.equals("3")){
                     log.info("*********************************查询到3的码"+qrCode+"*****************************************");
-                    map.put(qrCode,machineCode+produceDate);
+                    map.put(qrCode,machineCode+","+produceDate+",packageType="+packageType);
                     asyncService.batchInsertByCanal(qrCode,relationDate,machineCode_1);
                 }
             }

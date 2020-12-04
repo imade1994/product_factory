@@ -67,6 +67,8 @@ public final class CommonUtil {
 
   public static final String key2 = "endDate";
 
+  public static final long timeSeconds= 1000*60*60*24;
+
 
   public static final String key4 = "period";
 
@@ -131,15 +133,72 @@ public final class CommonUtil {
         return simpleDateFormat.format(simpleDateFormat_1.parse(date));
     }
 
-    public static void main(String[] args) {
-      String str = "2020-11-26 12:12:12";
-        try {
-            System.out.println(tableScheduleTime(str));
-        } catch (ParseException e) {
-            e.printStackTrace();
+    public static boolean compareDate(String date1,String date2) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScheduleDate);
+        Date date_1   = simpleDateFormat.parse(date1);
+        Date date_2   = simpleDateFormat.parse(date2);
+        if(date_1.after(date_2)){
+            return true;
+        }else{
+            return false;
         }
+    }
+    public static String getDateString(Date date,int i){
+      Date newDate = new Date(date.getTime()+i*timeSeconds);
+      SimpleDateFormat simpleDateFormat = new SimpleDateFormat(TableTime);
+      return simpleDateFormat.format(newDate);
+    }
+
+    public static List<String> getDayFromDate(String beginDate,String endDate) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScheduleDate);
+        Date begin   = simpleDateFormat.parse(beginDate);
+        Date end   = simpleDateFormat.parse(endDate);
+        int count = (int) ((end.getTime()-begin.getTime())/timeSeconds);
+        List<String> list = new ArrayList<>();
+        for(int i=-1;i<=count+1;i++){
+            if(begin.getTime()+i*timeSeconds<=end.getTime()+timeSeconds){
+                String str = getDateString(begin,i);
+                list.add(str);
+            }
+        }
+        return list;
+    }
+
+    public static void main(String[] args) {
+      String str = "machineCode=4584584825,relationDate=2020-11-26 12:12:12,packageType=1";
+      String[] s = str.split(",");
+      String machineCode = s[0].split("machineCode=")[1].trim();
+      String relationDate = s[1].split("relationDate=")[1].trim();
+      String packageType = s[2].split("packageType=")[1].trim();
+      System.out.println(s);
 
     }
+
+    /***
+     * 分割来自redis返回值
+     * */
+    public static Map<String,String> splitResults(String results){
+        Map returnMap = new HashMap();
+        try{
+            String[] s = results.split(",");
+            String machineCode = s[0].split("machineCode=")[1].trim();
+            String relationDate = s[1].split("relationDate=")[1].trim();
+            String packageType = s[2].split("packageType=")[1].trim();
+            returnMap.put("machineCode",machineCode);
+            returnMap.put("relationDate",relationDate);
+            returnMap.put("packageType",packageType);
+        }catch (Exception e){
+            log.info(LOG_ERROR_PREFIX+"redis返回结果集分割异常****************************"+results+"****************************"+e.getMessage());
+        }
+        return returnMap;
+    }
+
+
+
+
+
+
+
   /**
    * 时间对比工具类
    * @Param  t1 开始时间 t2 结束时间

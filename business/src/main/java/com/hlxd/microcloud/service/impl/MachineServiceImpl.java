@@ -49,5 +49,10 @@ public class MachineServiceImpl implements MachineService {
         return machineMapper.getRoom();
     }
 
+    @Override
+    public Machine getMachine(String machineCode) {
+        return machineMapper.getMachine(machineCode);
+    }
+
 
 }

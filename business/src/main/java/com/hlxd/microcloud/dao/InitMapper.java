@@ -52,17 +52,9 @@ public interface InitMapper {
 
     List<TableSplit> getTableSplit(Map map);
 
+    ProductionCount getCountFromUnion(Map map);
 
 
-
-
-
-
-
-
-
-
-
-
+    int countCode(Map map);
 
 }

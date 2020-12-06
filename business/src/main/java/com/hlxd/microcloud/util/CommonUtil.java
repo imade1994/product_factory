@@ -132,16 +132,29 @@ public final class CommonUtil {
         SimpleDateFormat simpleDateFormat_1 = new SimpleDateFormat(ScheduleDate);
         return simpleDateFormat.format(simpleDateFormat_1.parse(date));
     }
+    public static boolean compareBefore(Date date1,Date date2){
+      return date1.getTime()<=date2.getTime();
+    }
+    public static boolean compareAfter(Date date1,Date date2){
+        return date1.getTime() >=date2.getTime();
+    }
 
-    public static boolean compareDate(String date1,String date2) throws ParseException {
+    public static int compareDate(Date beginDate_new,Date endDate_new,String date1,String date2) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScheduleDate);
-        Date date_1   = simpleDateFormat.parse(date1);
-        Date date_2   = simpleDateFormat.parse(date2);
-        if(date_1.after(date_2)){
-            return true;
+        Date data_beginDate   = simpleDateFormat.parse(date1);
+        Date data_endDate   = simpleDateFormat.parse(date2);
+        if(compareBefore(beginDate_new,data_beginDate) && compareBefore(endDate_new,data_endDate)){
+            return 1;
+        }else if(compareBefore(beginDate_new,data_beginDate)&& compareAfter(endDate_new,data_endDate)){
+            return 2;
+        }else if(compareBefore(beginDate_new,data_beginDate) && compareBefore( beginDate_new,data_endDate) && compareAfter(endDate_new,data_endDate)){
+            return 3;
+        }else if(compareBefore(beginDate_new,data_beginDate)&& compareAfter(endDate_new,data_beginDate) && compareAfter(endDate_new,data_endDate)){
+            return 4;
         }else{
-            return false;
+            return 0;
         }
+
     }
     public static String getDateString(Date date,int i){
       Date newDate = new Date(date.getTime()+i*timeSeconds);

@@ -48,4 +48,6 @@ public interface MachineService {
      * 车间下拉
      * */
     List<String> getRoom();
+
+    Machine getMachine(String machineCode);
 }

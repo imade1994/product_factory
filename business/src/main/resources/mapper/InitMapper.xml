@@ -17,7 +17,7 @@
         <result column="date_string" property="dateString" />
     </resultMap>
     <resultMap id="tableSplitMap" type="com.hlxd.microcloud.vo.TableSplit">
-        <result column="table_name" property="machineCode" />
+        <result column="table_name" property="tableName" />
         <result column="produce_date" property="produceDate" />
         <result column="produce_machine_code" property="machineCode" />
         <result column="schedule_begin_date" property="beginDate" />
@@ -204,7 +204,9 @@ FROM
   `brand_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '牌号',
   `shift_id` int(20) NULL DEFAULT NULL COMMENT '包装机班组ID',
   `package_shift_id` int(20) NULL DEFAULT NULL COMMENT '装封箱机班组ID',
-  PRIMARY KEY (`qr_code`, `package_code`, `item_code`, `relation_date`) USING BTREE
+   PRIMARY KEY (`qr_code`, `package_code`, `item_code`, `relation_date`) USING BTREE,
+  INDEX `index_query`(`machine_code`, `relation_date`) USING BTREE COMMENT 'countQuery',
+  INDEX `code_query`(`qr_code`, `package_code`, `item_code`) USING BTREE COMMENT 'codeQuery'
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
     </insert>
 
@@ -290,6 +292,47 @@ FROM
         )
 
         order by produce_date asc
+    </select>
+
+    <select id="getCountFromUnion" parameterType="java.util.HashMap" resultType="com.hlxd.microcloud.vo.ProductionCount" statementType="STATEMENT">
+         select
+            count(distinct(qr_code)) as packageCount,
+            count(distinct (package_code)) as stripCount,
+            count(distinct (item_code)) as itemCount
+            from ${tableName}
+            where
+            machine_code = '${machineCode}'
+            <if test="type == 1">
+                and relation_date <![CDATA[>=]]> str_to_date('${beginDate}','%Y-%m-%d %H:%i:%s')   and relation_date <![CDATA[<=]]> str_to_date('${endDate}','%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="type == 2">
+            </if>
+            <if test="type == 3">
+                and relation_date <![CDATA[>=]]>  str_to_date('${beginDate}','%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="type ==4">
+                and relation_date <![CDATA[<=]]> str_to_date('${endDate}','%Y-%m-%d %H:%i:%s')
+            </if>
+
+
+    </select>
+
+    <select id="countCode" parameterType="java.util.HashMap" resultType="java.lang.Integer" statementType="STATEMENT">
+        select count(*)
+        from ${tableName}
+        where
+        machine_code='${machineCode}'
+        and relation_date <![CDATA[>=]]> str_to_date('${beginDate}','%Y-%m-%d %H:%i:%s')
+        and relation_date <![CDATA[<=]]> str_to_date('${endDate}','%Y-%m-%d %H:%i:%s')
+        <if test="packageType ==1">
+            and qrCode = '${qrCode}'
+        </if>
+        <if test="packageType == 2">
+
+        </if>
+
+
+
     </select>
 
 

@@ -1,10 +1,13 @@
 package com.hlxd.microcloud.controller;
 
 import com.hlxd.microcloud.service.AnalysisService;
+import com.hlxd.microcloud.service.MachineService;
 import com.hlxd.microcloud.util.CommomStatic;
+import com.hlxd.microcloud.util.CommonUtil;
 import com.hlxd.microcloud.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +35,13 @@ public class AnalysisController {
 
     @Autowired
     AnalysisService analysisService;
+
+    @Autowired
+    public  RedisTemplate<String, Object> redisTemplate;
+
+
+    @Autowired
+    MachineService machineService;
 
 
 
@@ -62,14 +72,13 @@ public class AnalysisController {
     @RequestMapping("/validateQrCode")
     public Map getValidateQrCode(@RequestParam("qrCode")String qrCode){
         Map returnMap = new HashMap();
-        Map param = new HashMap();
-        param.put("qrCode",qrCode);
-        List<CodeUnion> codeUnions = analysisService.getCodeByParentCode(param);
-        if(null != codeUnions && codeUnions.size()>0){
+        String results = (String) redisTemplate.opsForValue().get(qrCode);
+        Map<String,String> paramMap = CommonUtil.splitResults(results);
+        if(null != paramMap && !paramMap.isEmpty()){
             Map temMap = new HashMap();
-            CodeUnion codeUnion = codeUnions.get(0);
-            temMap.put("machineName",null == codeUnion.getMachineName()?"":codeUnion.getMachineName());
-            temMap.put("machineCode",codeUnion.getMachineCode());
+            Machine machine = machineService.getMachine(paramMap.get("machineCode"));
+            temMap.put("machineName",machine.getMachineName());
+            temMap.put("machineCode",paramMap.get("machineCode"));
             returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
             returnMap.put(CommomStatic.DATA,temMap);
         }else{

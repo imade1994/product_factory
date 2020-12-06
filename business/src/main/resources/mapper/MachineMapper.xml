@@ -70,6 +70,14 @@
         from t_hl_base_machine
     </select>
 
+    <select id="getMachine" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select machine_name,
+        machine_code
+        from t_hl_base_machine
+        where machine_code = #{machineCode}
+
+    </select>
+
 
 
 </mapper>

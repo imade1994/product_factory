@@ -46,4 +46,6 @@ public interface MachineMapper {
      * 车间下拉
      * */
     List<String> getRoom();
+
+    Machine getMachine(@Param("machineCode")String machineCode);
 }

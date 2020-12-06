@@ -93,4 +93,14 @@ public class InitServiceImpl implements InitService {
     public List<TableSplit> getTableSplit(Map map) {
         return initMapper.getTableSplit(map);
     }
+
+    @Override
+    public ProductionCount getCountFromUnion(Map map) {
+        return initMapper.getCountFromUnion(map);
+    }
+
+    @Override
+    public int countCode(Map map) {
+        return initMapper.countCode(map);
+    }
 }

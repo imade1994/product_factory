@@ -20,20 +20,20 @@ public class ProductionCount implements Serializable {
     /**
      * 件产量
      * */
-    private BigInteger itemCount;
+    private int itemCount;
 
 
 
     /**
      * 包产量
      * */
-    private BigInteger packageCount;
+    private int packageCount;
 
 
     /**
      * 条产量
      * */
-    private BigInteger stripCount;
+    private int stripCount;
 
 
 }

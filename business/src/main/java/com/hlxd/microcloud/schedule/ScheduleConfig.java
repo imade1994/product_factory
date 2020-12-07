@@ -242,6 +242,25 @@ public class ScheduleConfig {
 
     }
 
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void countIllegalCode(){
+        Map map = new HashMap();
+        List<TableSplit> tableSplits = initService.getCurrentTableSplit();
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
 
    /* @Scheduled(cron = "0 0 0 * * ?")
     @RequestMapping("/upload")

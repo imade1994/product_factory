@@ -100,6 +100,16 @@ public class InitServiceImpl implements InitService {
     }
 
     @Override
+    public List<TableSplit> getCurrentTableSplit() {
+        return initMapper.getCurrentTableSplit();
+    }
+
+    @Override
+    public void countIllegalCode(String tableName) {
+        initMapper.countIllegalCode(tableName);
+    }
+
+    @Override
     public int countCode(Map map) {
         return initMapper.countCode(map);
     }

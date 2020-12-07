@@ -139,6 +139,14 @@ public final class CommonUtil {
         return date1.getTime() >=date2.getTime();
     }
 
+    public static boolean compareBetween(String date,String beginDate,String endDate) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScheduleDate);
+        Date newDate = simpleDateFormat.parse(date);
+        Date begin   = simpleDateFormat.parse(beginDate);
+        Date end     = simpleDateFormat.parse(endDate);
+        return newDate.getTime()>=begin.getTime()&&newDate.getTime()<=end.getTime();
+    }
+
     public static int compareDate(Date beginDate_new,Date endDate_new,String date1,String date2) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScheduleDate);
         Date data_beginDate   = simpleDateFormat.parse(date1);
@@ -191,6 +199,7 @@ public final class CommonUtil {
      * 分割来自redis返回值
      * */
     public static Map<String,String> splitResults(String results){
+        log.info(LOG_INFO_PREFIX+"****************************传入redis的返回为"+results+"*************************************");
         Map returnMap = new HashMap();
         try{
             String[] s = results.split(",");

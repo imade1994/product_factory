@@ -151,38 +151,20 @@ t_hl_system_code_union
 
     </select>
 
-    <select id="validateCode" resultType="java.lang.Integer" parameterType="java.util.HashMap">
-        select
-        (
-        case
-        when (select package_type from t_hl_system_code where qrCode = #{qrCode}) = 3
-        then (select count(DISTINCT(a.parentCode))
-        from
-        (select
-        DISTINCT(parent_code) as parentCode
-        from  t_hl_system_code
-        where relation_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
-        and  package_type = '1'
-        and  machine_code = #{machineCode}) as a
-        left join
-        t_hl_system_code thsc
-        on a.parentCode = thsc.qrCode
-        where thsc.parent_code = #{qrCode}
-        and thsc.package_type = '2')
-        when (select package_type from t_hl_system_code where qrCode = #{qrCode}) = 2
-        then (select count(*) from t_hl_system_code where relation_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
-        and  package_type = '1'
-        and  machine_code = #{machineCode}
-        and  parent_code = #{qrCode})
-        when (select package_type from t_hl_system_code where qrCode = #{qrCode}) = 1
-        then (select count(*) from t_hl_system_code where relation_date <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d %H:%i:%s')
-        and  package_type = '1'
-        and  machine_code = #{machineCode}
-        and  qrCode = #{qrCode})
-        else 0
-        END
-        )
-        from dual
+    <select id="validateCode" resultType="java.lang.Integer" parameterType="java.util.HashMap" statementType="STATEMENT">
+        select count(*)
+        from ${tableName}
+        <where>
+            <if test="null != packageType and packageType == 2">
+                package_code = '${qrCode}' and machine_code = '${machineCode}' and relation_date<![CDATA[<=]]> STR_TO_DATE('${endDate}','%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[>=]]> STR_TO_DATE('${beginDate}','%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="null != packageType and packageType == 3">
+                item_code = '${qrCode}' and machine_code = '${machineCode}' and relation_date<![CDATA[<=]]> STR_TO_DATE('${endDate}','%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[>=]]> STR_TO_DATE('${beginDate}','%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="null !=queryType and queryType == 'database' ">
+                parent_code = '${qrCode}' and machine_code = '${machineCode}' and relation_date<![CDATA[<=]]> STR_TO_DATE('${endDate}','%Y-%m-%d %H:%i:%s') and relation_date <![CDATA[>=]]> STR_TO_DATE('${beginDate}','%Y-%m-%d %H:%i:%s')
+            </if>
+        </where>
     </select>
 
 </mapper>

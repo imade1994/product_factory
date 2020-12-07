@@ -294,6 +294,19 @@ FROM
         order by produce_date asc
     </select>
 
+    <select id="getCurrentTableSplit"  resultMap="tableSplitMap">
+        select
+        table_name,
+        produce_date,
+        produce_machine_code,
+        schedule_begin_date,
+        schedule_end_date
+        from
+        t_hl_system_table_split
+        where
+        produce_date = date_format(date_add(now(),interval -1  day),'%Y%m%d')
+    </select>
+
     <select id="getCountFromUnion" parameterType="java.util.HashMap" resultType="com.hlxd.microcloud.vo.ProductionCount" statementType="STATEMENT">
          select
             count(distinct(qr_code)) as packageCount,

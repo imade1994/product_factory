@@ -49,6 +49,10 @@ public interface InitService {
 
     ProductionCount getCountFromUnion(Map map);
 
+    List<TableSplit> getCurrentTableSplit();
+
+    void countIllegalCode(String tableName);
+
     int countCode(Map map);
 
 

@@ -263,54 +263,64 @@ public class ProCodeController {
      *
      * */
     @RequestMapping("/validateCode")
-    public Map validateCode(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate,@RequestParam("machineCode")String machineCode,@RequestParam("qrCode")String qrCode){
-        /*String result = (String) redisTemplate.opsForValue().get(qrCode);
+    public Map validateCode(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate,@RequestParam("machineCode")String machineCode,@RequestParam("qrCode")String qrCode) throws ParseException {
+        String result = (String) redisTemplate.opsForValue().get(qrCode);
+        Map returnMap = new HashMap();
         Map<String,String> param = CommonUtil.splitResults(result);
+        Map paramMap = new HashMap();
+        paramMap.put("machineCode",machineCode);
+        paramMap.put("beginDate",beginDate);
+        paramMap.put("endDate",endDate);
+        paramMap.put("qrCode",qrCode);
+        String tableName = "";
+        int count = 0;
         if(null != param && !param.isEmpty()){
             String relationDate_redis = param.get("relationDate");
             String packageType_redis = param.get("packageType");
             String machineCode_redis = param.get("machineCode");
             switch (packageType_redis){
                 case "1":
-                    *//**
-                     * 获取到码详细信息
-                     * *//*
-                    String tableName = initService.getTableScheduleString(machineCode_redis,relationDate_redis);
-                    ProCode proCode = initService.getProCode(tableName,qrCode);
-                    if(null != proCode){
-
+                    /**
+                     * 从redis中取得码对应关联时间和机台，跟参数直接对比
+                     *
+                     * */
+                    if(machineCode.equals(machineCode_redis)&&compareBetween(relationDate_redis,beginDate,endDate)){
+                        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+                        returnMap.put(CommomStatic.DATA,1);
                     }
                     break;
                 case "2":
-                    *//**
-                     * 包装规格 2 跟 3 查询方式一致
-                     * *//*
-                    proCodes = getProCodes(results,qrCode);
+                    /**
+                     * 从redis中取得的为条，件码关联时间 可以直接去union表去查询信息
+                     * 若redis中不存在此条数据，则存在两种情况
+                     * 1：包条已关联，暂时未到装封箱机
+                     * 2：码确实不存在
+                     */
+                    tableName = UnionTableNamePrefix+tableScheduleTime(relationDate_redis);
+                    paramMap.put("packageType",2);
+                    paramMap.put("tableName",tableName);
+                    count = proCodeService.validateCode(paramMap);
                     returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
-                    returnMap.put(CommomStatic.DATA,proCodes);
+                    returnMap.put(CommomStatic.DATA,count);
                     break;
                 case "3":
-                    proCodes = getProCodes(results,qrCode);
-                    returnMap.put(CommomStatic.DATA,proCodes);
+                    tableName = UnionTableNamePrefix+tableScheduleTime(relationDate_redis);
+                    paramMap.put("packageType",3);
+                    paramMap.put("tableName",tableName);
+                    count = proCodeService.validateCode(paramMap);
                     returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+                    returnMap.put(CommomStatic.DATA,count);
                     break;
                 default:
                     break;
             }
-
-
-        }*/
-
-
-        Map paramMap = new HashMap();
-        Map returnMap = new HashMap();
-        paramMap.put("machineCode",machineCode);
-        paramMap.put("beginDate",beginDate);
-        paramMap.put("endDate",endDate);
-        paramMap.put("qrCode",qrCode);
-        int count = proCodeService.validateCode(paramMap);
-        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
-        returnMap.put(CommomStatic.DATA,count);
+        }else{
+            paramMap.put("queryType","database");
+            paramMap.put("tableName","t_hl_system_code");
+            count = proCodeService.validateCode(paramMap);
+            returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+            returnMap.put(CommomStatic.DATA,count);
+        }
         return returnMap;
     }
 

@@ -52,7 +52,12 @@ public interface InitMapper {
 
     List<TableSplit> getTableSplit(Map map);
 
+    List<TableSplit> getCurrentTableSplit();
+
     ProductionCount getCountFromUnion(Map map);
+
+
+    void countIllegalCode(@Param("tableName")String tableName);
 
 
     int countCode(Map map);

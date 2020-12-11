@@ -56,5 +56,8 @@ public interface InitService {
     int countCode(Map map);
 
 
+    void rejectCount();
+
+
 
 }

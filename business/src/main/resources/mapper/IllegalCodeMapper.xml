@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.IllegalCodeMapper">
+
+
+    <insert id="getRepeatCode" parameterType="java.lang.String" >
+        insert  into t_hl_illegal_code
+(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+select
+a.*
+from
+(
+select
+qrCode,
+${packageType} as package_type,
+1 as illegal_type,
+count(*),
+DATE_FORMAT(now(),'%Y-%m-%d'),
+now()
+from ${tableName}
+where package_type = ${packageType}
+group by qrCode
+having count(*)>1)as a
+    </insert>
+
+
+    <insert id="wrongRelationPackage" parameterType="java.lang.String" >
+        insert  into t_hl_illegal_code
+(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+select
+a.*
+from
+(
+select
+parent_code,
+2 as package_type,
+2 as illegal_type,
+count(*),
+DATE_FORMAT(now(),'%Y-%m-%d'),
+now()
+from
+${tableName}
+where package_type = 1
+group by parent_code
+having count(*) != 10
+
+)as a
+    </insert>
+
+    <insert id="wrongRelationStrip" parameterType="java.lang.String" >
+        insert  into t_hl_illegal_code
+(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+select
+a.*
+from
+(
+select
+parent_code,
+3 as package_type,
+3 as illegal_type,
+count(*),
+DATE_FORMAT(now(),'%Y-%m-%d'),
+now()
+from
+${tableName}
+where package_type = 2
+group by parent_code
+having count(*) != 50
+
+)as a
+    </insert>
+
+    <insert id="containDiscardCodeStrip" parameterType="java.lang.String" >
+        insert  into t_hl_illegal_code
+(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+select
+a.*
+from
+(
+select
+parent_code,
+2 as package_type,
+4 as illegal_type,
+count(*),
+DATE_FORMAT(now(),'%Y-%m-%d'),
+now()
+from
+${tableName} thsc
+inner join
+t_hl_discard_code thdc
+on thdc.qrCode = thsc.qrCode
+where
+thsc.package_type = 1
+group by parent_code
+
+)as a
+    </insert>
+
+
+    <insert id="containDiscardCodeItem" parameterType="java.lang.String" >
+        insert  into t_hl_illegal_code
+(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+select
+a.*
+from
+(
+select
+parent_code,
+3 as package_type,
+5 as illegal_type,
+count(*),
+DATE_FORMAT(now(),'%Y-%m-%d'),
+now()
+from
+${tableName} thsc
+inner join
+t_hl_discard_code thdc
+on thdc.qrCode = thsc.qrCode
+where
+thsc.package_type = 2
+group by parent_code
+)as a
+    </insert>
+
+
+    <insert id="markedRejectItem" parameterType="java.lang.String" >
+        insert  into t_hl_illegal_code
+(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+select
+a.*
+from
+(
+select
+parent_code,
+3 as package_type,
+6 as illegal_type,
+count(*),
+DATE_FORMAT(now(),'%Y-%m-%d'),
+now()
+from
+${tableName} thsc
+inner join
+t_hl_reject_detail thrd
+on thrd.qrCode = thsc.parent_code
+where
+thsc.package_type = 2
+group by parent_code
+)as a
+    </insert>
+
+
+
+</mapper>

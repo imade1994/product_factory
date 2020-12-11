@@ -113,4 +113,9 @@ public class InitServiceImpl implements InitService {
     public int countCode(Map map) {
         return initMapper.countCode(map);
     }
+
+    @Override
+    public void rejectCount() {
+        initMapper.rejectCount();
+    }
 }

@@ -215,7 +215,7 @@ FROM
         select table_name
         from t_hl_system_table_split
         where produce_machine_code = #{machineCode}
-        and str_to_date(#{currentDate},'%Y-%m-%d %H:%i:%s') between schedule_begin_date and schedule_end_date
+        and schedule_begin_date <![CDATA[<]]>str_to_date(#{currentDate},'%Y-%m-%d %H:%i:%s')   and  str_to_date(#{currentDate},'%Y-%m-%d %H:%i:%s') <![CDATA[<=]]> schedule_end_date
     </select>
 
     <insert id="insertRecordTableInit" parameterType="com.hlxd.microcloud.vo.InitTable">
@@ -293,18 +293,22 @@ FROM
 
         order by produce_date asc
     </select>
-
+<!--/*thsts.produce_date = date_format(date_add(now(),interval -1  day),'%Y%m%d')*/-->
     <select id="getCurrentTableSplit"  resultMap="tableSplitMap">
         select
-        table_name,
-        produce_date,
-        produce_machine_code,
-        schedule_begin_date,
-        schedule_end_date
+        thsts.table_name,
+        thsts.produce_date,
+        thsts.produce_machine_code,
+        thsts.schedule_begin_date,
+        thsts.schedule_end_date,
+		thbm.group_code as tableType
         from
-        t_hl_system_table_split
+        t_hl_system_table_split thsts
+        left join  t_hl_base_machine thbm
+        on thbm.machine_code = thsts.produce_machine_code
         where
-        produce_date = date_format(date_add(now(),interval -1  day),'%Y%m%d')
+        date_add(now(),interval -1  day) <![CDATA[<=]]> thsts.create_date and date_add(now(),interval 0  day) <![CDATA[>=]]> thsts.create_date
+
     </select>
 
     <select id="getCountFromUnion" parameterType="java.util.HashMap" resultType="com.hlxd.microcloud.vo.ProductionCount" statementType="STATEMENT">
@@ -347,6 +351,34 @@ FROM
 
 
     </select>
+    <insert id="rejectCount" >
+insert into t_hl_reject_count
+(machine_code,shift_id,type_code,reject_type_code,reject_date,reject_count,scan_date)
+select
+a.*
+from (
+        select
+        machine_code,
+        shift_id,
+        type_code,
+		reject_type_code,
+		reject_date,
+        count(*) as reject_count,
+		now() as scan_date
+        from
+        t_hl_reject_detail
+        where reject_date <![CDATA[>=]]>  DATE_ADD(str_to_date(DATE_FORMAT(now(),'%Y-%m-%d'),'%Y-%m-%d'),INTERVAL -1 DAY) and reject_date <![CDATA[<]]> DATE_ADD(str_to_date(DATE_FORMAT(now(),'%Y-%m-%d'),'%Y-%m-%d'),INTERVAL 0 DAY)
+        group by machine_code,
+        shift_id,
+        reject_date,
+        reject_type_code,
+        type_code
+) as a
+
+
+
+
+    </insert>
 
 
 </mapper>

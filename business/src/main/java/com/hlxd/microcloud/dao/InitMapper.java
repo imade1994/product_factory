@@ -62,4 +62,7 @@ public interface InitMapper {
 
     int countCode(Map map);
 
+
+    void rejectCount();
+
 }

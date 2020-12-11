@@ -1,6 +1,7 @@
 package com.hlxd.microcloud.schedule;
 
 import com.hlxd.microcloud.service.BatchTaskService;
+import com.hlxd.microcloud.service.IllegalCodeService;
 import com.hlxd.microcloud.service.InitService;
 import com.hlxd.microcloud.vo.CodeUnion;
 import com.hlxd.microcloud.vo.ScheduleErrorCode;
@@ -37,10 +38,14 @@ public class AsyncService {
     private BatchTaskService batchTaskService;
 
 
+    @Autowired
+    private IllegalCodeService illegalCodeService;
+
+
 
     @Async("AsyncConfigure")
     public void batchInsertByCanal(String itemCode,String produceDate,String machineCode){
-        //log.info("**************************进入异步携带参数itemCode"+itemCode+"生产日期"+produceDate+"**********************************");
+        log.info("**************************进入异步携带参数itemCode"+itemCode+"生产日期"+produceDate+"**********************************");
         Map param = new HashMap();
         param.put("itemCode",itemCode);
         try {
@@ -83,4 +88,44 @@ public class AsyncService {
         }
 
     }
+
+
+    @Async("AsyncConfigure")
+    public void asyncIllegalCodeTask(String tableName,int tableType){
+        switch (tableType){
+            case 2:
+                log.info(LOG_INFO_PREFIX+"定时任务*****************多次关联****************************"+tableName);
+                illegalCodeService.getRepeatCode(tableName,1);
+                /**
+                 * 包含废码的条
+                 * */
+                log.info(LOG_INFO_PREFIX+"定时任务*****************包含废码的条****************************"+tableName);
+                illegalCodeService.containDiscardCodeStrip(tableName);
+                /**
+                 * 关联错误的条
+                 * */
+                log.info(LOG_INFO_PREFIX+"定时任务*****************关联错误的条****************************"+tableName);
+                illegalCodeService.wrongRelationPackage(tableName);
+                break;
+            case 3:
+                log.info(LOG_INFO_PREFIX+"定时任务*****************多次关联****************************"+tableName);
+                illegalCodeService.getRepeatCode(tableName,2);
+                /**
+                 * 包含废码的件
+                 * */
+                log.info(LOG_INFO_PREFIX+"定时任务*****************包含废码的件****************************"+tableName);
+                illegalCodeService.containDiscardCodeItem(tableName);
+                /**
+                 * 关联错误的件
+                 * */
+                log.info(LOG_INFO_PREFIX+"定时任务*****************关联错误的件****************************"+tableName);
+                illegalCodeService.wrongRelationStrip(tableName);
+                /**
+                 * 包含剔除条码的件
+                 * */
+                log.info(LOG_INFO_PREFIX+"定时任务*****************包含剔除码的件****************************"+tableName);
+                illegalCodeService.markedRejectItem(tableName);
+        }
+    }
+
 }

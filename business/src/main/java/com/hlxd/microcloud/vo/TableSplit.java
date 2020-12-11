@@ -26,5 +26,7 @@ public class TableSplit implements Serializable {
 
     private String endDate;
 
+    private int tableType;
+
 
 }

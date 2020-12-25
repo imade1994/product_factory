@@ -199,18 +199,20 @@ public final class CommonUtil {
      * 分割来自redis返回值
      * */
     public static Map<String,String> splitResults(String results){
-        log.info(LOG_INFO_PREFIX+"****************************传入redis的返回为"+results+"*************************************");
+        //log.info(LOG_INFO_PREFIX+"****************************传入redis的返回为"+results+"*************************************");
         Map returnMap = new HashMap();
-        try{
-            String[] s = results.split(",");
-            String machineCode = s[0].split("machineCode=")[1].trim();
-            String relationDate = s[1].split("relationDate=")[1].trim();
-            String packageType = s[2].split("packageType=")[1].trim();
-            returnMap.put("machineCode",machineCode);
-            returnMap.put("relationDate",relationDate);
-            returnMap.put("packageType",packageType);
-        }catch (Exception e){
-            log.info(LOG_ERROR_PREFIX+"redis返回结果集分割异常****************************"+results+"****************************"+e.getMessage());
+        if(null != results && results.length()>0 && results.split(",").length == 3 ){
+            try{
+                String[] s = results.split(",");
+                String machineCode = s[0].split("machineCode=")[1].trim();
+                String relationDate = s[1].split("relationDate=")[1].trim();
+                String packageType = s[2].split("packageType=")[1].trim();
+                returnMap.put("machineCode",machineCode);
+                returnMap.put("relationDate",relationDate);
+                returnMap.put("packageType",packageType);
+            }catch (Exception e){
+                log.info(LOG_ERROR_PREFIX+"redis返回结果集分割异常****************************"+results+"****************************"+e.getMessage());
+            }
         }
         return returnMap;
     }

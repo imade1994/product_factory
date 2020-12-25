@@ -5,8 +5,12 @@ import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.util.CommonUtil;
 import com.hlxd.microcloud.vo.CancelRelation;
 import com.hlxd.microcloud.vo.DiscardCode;
+import com.hlxd.microcloud.vo.DiscardCount;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletRequest;
@@ -32,7 +36,9 @@ public class DiscardCodeController {
     DiscardService discardService;
 
 
-
+    /**
+     * 获取废码详情
+     * */
     @RequestMapping("/getDiscardList")
     public Map getDiscardList(ServletRequest request){
         Map returnMap = new HashMap();
@@ -41,7 +47,9 @@ public class DiscardCodeController {
         returnMap.put(CommomStatic.DATA,discardCodeList);
         return returnMap;
     }
-
+    /**
+     * 获取解除关联码的列表
+     * */
     @RequestMapping("/getCancelList")
     public Map getCancelList(ServletRequest request){
         Map returnMap = new HashMap();
@@ -50,6 +58,48 @@ public class DiscardCodeController {
         returnMap.put(CommomStatic.DATA,cancelRelations);
         return returnMap;
     }
+
+    /**
+     * 获取废码回传记录
+     * */
+    @RequestMapping("/getDisCardCountList")
+    public Map getUploadRecord(){
+        Map returnMap = new HashMap();
+        List<DiscardCount> discardCounts = discardService.getDisCardCountList(new HashMap());
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,discardCounts);
+        return returnMap;
+    }
+
+    /***
+     * 手动上传
+     * */
+    @RequestMapping("/manualUpload")
+    public Map manualUpload(@RequestParam("currentDate")String currentDate){
+        Map map = new HashMap();
+        Map returnMap = new HashMap();
+        map.put("currentDate",currentDate);
+        try{
+            //返回废码合集
+            // discardCodes = discardService.getDiscardCodeList(map);
+            map.put("uploadState",1);
+            //更新上传记录
+            discardService.updateDiscardCodeUpload(map);
+            /**
+             * 后续编码上传处理
+             * */
+        }catch (Exception e){
+            ///出现异常回滚事务
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
+            returnMap.put(CommomStatic.MESSAGE,"执行异常"+e.getMessage());
+            return returnMap;
+        }
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.MESSAGE,"手动上传成功！");
+        return returnMap;
+    }
+
 
 
 

@@ -16,6 +16,15 @@
         <result column="machine_Name" property="machineName" />
     </resultMap>
 
+    <!-- 废码统计返回结果集 -->
+    <resultMap id="DiscardMap" type="com.hlxd.microcloud.vo.DiscardCount">
+        <result column="countDate" property="countDate" />
+        <result column="packageCount" property="packageCount" />
+        <result column="stripCount" property="stripCount" />
+        <result column="uploadState" property="uploadState" />
+        <result column="updateDate" property="updateDate" />
+    </resultMap>
+
     <resultMap id="BaseCancelResultMap" type="com.hlxd.microcloud.vo.CancelRelation">
         <id column="id" property="id" />
         <result column="qrCode" property="qrCode" />
@@ -38,8 +47,6 @@
 
     <select id="getDiscardCodeList" parameterType="java.util.HashMap" resultMap="BaseResultMap">
         select
-
-
         thdc.id,
         thdc.discard_type_code,
         thdc.discard_date,
@@ -47,15 +54,25 @@
         thdc.qrCode,
         thdc.discard_time,
         thdc.package_type,
-        thbm.machine_code
+        thbm.machine_code,
         thssd.class_name
         from t_hl_discard_code thdc
         left join t_hl_system_shift_details thssd
         on thssd.id = thdc.shift_id
         left join t_hl_base_machine thbm
         on thbm.id = thdc.machine_code
-        where thdc.package_type = #{packageType}
-        and machine_code = #{machineCode}
+        <trim prefix="where" prefixOverrides="AND | OR">
+            <if test="null != packageType">
+                AND thdc.package_type = #{packageType}
+            </if>
+            <if test="null != machineCode">
+                AND machine_code = #{machineCode}
+            </if>
+            <if test="null != currentDate">
+                AND discard_date = #{currentDate}
+            </if>
+        </trim>
+
     </select>
 
 
@@ -90,5 +107,53 @@
 				where thcr.relation_type = #{relationType}
 				and thcr.machine_code = #{machineCode}
     </select>
+
+    <select id="getDisCardCount" parameterType="java.util.HashMap"  resultMap="DiscardMap">
+    select
+discard_date as currentDate,
+(select count(qrCode) from t_hl_discard_code where package_type =1 ) as packageCount,
+(select count(qrCode) from t_hl_discard_code where package_type =2 ) as stripCount
+from t_hl_discard_code
+where discard_date = #{currentDate}
+group by currentDate
+    </select>
+
+    <select id="getDisCardCountList" parameterType="java.util.HashMap"  resultMap="DiscardMap">
+          select
+          currentDate,
+          packageCount,
+          stripCount,
+          uploadStats,
+          uploadDate
+          from t_hl_discard_upload
+        <trim prefix="where" prefixOverrides="AND | OR">
+            <if test="null != queryDate and '' != queryDate">
+                AND currentDate = #{queryDate}
+            </if>
+            <if test="null != machineCode">
+                AND machine_code = #{machineCode}
+            </if>
+            <if test="null != currentDate">
+                AND discard_date = #{currentDate}
+            </if>
+        </trim>
+
+    </select>
+
+    <update id="updateDiscardCodeUpload" parameterType="java.util.HashMap">
+        update t_hl_discard_upload
+        <trim prefix="set" suffixOverrides=",">
+            <if test=" uploadState !=null">uploadState = #{uploadState},</if>
+        </trim>
+        where countDate = #{currentDate}
+    </update>
+
+    <insert id="insertDiscardCodeRecord" parameterType="com.hlxd.microcloud.vo.DiscardCode">
+        insert into
+        t_hl_discard_upload
+        (currentDate,packageCount,StripCount,uploadState,updateDate)
+        values
+        (#{currentDate},#{packageCount},#{StripCount},#{uploadState},now())
+    </insert>
 
 </mapper>

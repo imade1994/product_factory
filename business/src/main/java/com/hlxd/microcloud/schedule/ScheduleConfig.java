@@ -2,7 +2,9 @@ package com.hlxd.microcloud.schedule;
 
 import com.hlxd.microcloud.service.AnalysisService;
 import com.hlxd.microcloud.service.BatchTaskService;
+import com.hlxd.microcloud.service.DiscardService;
 import com.hlxd.microcloud.service.InitService;
+import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.util.CommonUtil;
 import com.hlxd.microcloud.util.ThreadManager;
 import com.hlxd.microcloud.vo.*;
@@ -36,7 +38,7 @@ import static com.hlxd.microcloud.util.CommonUtil.*;
  * @PROJECT product_factory
  */
 @Component
-@RestController
+//@RestController("/api/manual")
 @Slf4j
 public class ScheduleConfig {
 
@@ -70,13 +72,17 @@ public class ScheduleConfig {
     @Autowired
     AsyncService asyncService;
 
+    @Autowired
+    DiscardService discardService;
+
 
 
     @PostConstruct
     public void init(){
         scheduleConfig = this;
-        scheduleConfig.analysisService = this.analysisService;
+        scheduleConfig.analysisService  = this.analysisService;
         scheduleConfig.batchTaskService = this.batchTaskService;
+        scheduleConfig.discardService   = this.discardService;
         //unionCode();
     }
 
@@ -253,6 +259,50 @@ public class ScheduleConfig {
     @Scheduled(cron = "0 0 2 * * ?")
     public void rejectCodeCount(){
         initService.rejectCount();
+    }
+
+
+
+    /**
+     * 废码统计上传
+     * **/
+    @Scheduled(cron = "0 0 2 * * ?")
+    //@RequestMapping("/disCardCodeUpload")
+    public Map disCardCodeUpload(){
+        List<DiscardCode> discardCodes = new ArrayList<>();
+        Map map = new HashMap();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-mm-dd");
+        String currentDate =simpleDateFormat.format(new Date());
+        map.put("currentDate",currentDate);
+        List<DiscardCount> discardCounts = discardService.getDisCardCount(map);
+        //返回废码合集后续处理待定
+        // discardCodes = discardService.getDiscardCodeList(map);
+        if(null != discardCounts && discardCounts.size()>0){
+            DiscardCount discardCount = discardCounts.get(0);
+            //上传成功标识符，默认上传成功
+            discardCount.setUploadState(1);
+            //插入上传记录
+            discardService.insertDiscardCodeRecord(discardCount);
+        }
+        map.clear();
+        map.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        map.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
+        return map;
+    }
+
+    /**
+     * 编码上传
+     * */
+    @Scheduled(cron = "0 30 2 * * ?")
+    public void uploadSuccessCode(){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-mm-dd");
+        String currentDate =simpleDateFormat.format(new Date());
+
+
+
+
+
+
     }
 
 

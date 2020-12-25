@@ -19,6 +19,12 @@
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
+            <!--日志文件保留天数-->
+            <maxHistory>7</maxHistory>
+            <!--每个文件最多100MB，保留15天的历史记录，但最多20GB-->
+            <totalSizeCap>20GB</totalSizeCap>
+            <!--重启清理日志文件-->
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
         </rollingPolicy>
 	</appender>
 	<appender name="ACCESS"
@@ -32,7 +38,12 @@
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>30</maxHistory>
+            <!--日志文件保留天数-->
+            <maxHistory>7</maxHistory>
+            <!--每个文件最多100MB，保留15天的历史记录，但最多20GB-->
+            <totalSizeCap>20GB</totalSizeCap>
+            <!--重启清理日志文件-->
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
 		</rollingPolicy>
 	</appender>
 

@@ -111,7 +111,21 @@ public class QualityCheckController {
                             returnMap.put(CommomStatic.DATA,proCodes);
                         }else{
                             returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
-                            returnMap.put(CommomStatic.DATA,proCode);
+                            List<ProCode> packageList = new ArrayList<>();
+                            List<ProCode> itemList    = new ArrayList<>();
+                            ProCode itemProCode = new ProCode();
+                            ProCode packageProCode = new ProCode();
+                            packageList.add(proCode);
+                            packageProCode.setProCodes(packageList);
+                            packageProCode.setQrCode(proCode.getParentCode());
+                            packageProCode.setRelationDate(proCode.getRelationDate());
+                            packageProCode.setMachineName(proCode.getMachineName());
+                            itemList.add(packageProCode);
+                            itemProCode.setMachineName("暂未关联");
+                            itemProCode.setRelationDate("暂未关联");
+                            itemProCode.setQrCode("未关联");
+                            itemProCode.setProCodes(itemList);
+                            returnMap.put(CommomStatic.DATA,itemProCode);
                         }
                     }
                     break;

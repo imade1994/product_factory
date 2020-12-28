@@ -29,6 +29,8 @@ public class DiscardCount implements Serializable {
 
     private String updateDate;
 
+    private int uploadModel;
+
 
 
 

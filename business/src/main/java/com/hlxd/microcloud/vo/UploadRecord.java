@@ -62,4 +62,12 @@ public class UploadRecord implements Serializable {
      * 任务状态
      * */
     private int status;
+
+    /**
+     * 当日产量
+     * */
+    private String currentProduce;
+
+
+
 }

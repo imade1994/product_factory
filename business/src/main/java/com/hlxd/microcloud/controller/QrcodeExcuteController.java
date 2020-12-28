@@ -39,4 +39,10 @@ public class QrcodeExcuteController {
         }
         return returnMap;
     }
+
+
+
+
+
+
 }

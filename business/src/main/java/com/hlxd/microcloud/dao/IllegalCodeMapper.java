@@ -1,7 +1,11 @@
 package com.hlxd.microcloud.dao;
 
+import com.hlxd.microcloud.vo.IllegalCode;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * CREATED BY IDEA
@@ -61,6 +65,26 @@ public interface IllegalCodeMapper {
      *
      * */
     void markedRejectItem(@Param("tableName")String tableName);
+
+
+    /**
+     * 获取异常吗分类统计数据
+     * @param 以时间，机台，包装类型分类
+     * */
+    List<IllegalCode> getIllegalCodeCount(Map map);
+
+
+    /**
+     * 获取异常码详细码数据
+     * @param produceDate
+     * @param machineCode
+     * @param packageType
+     * @param illegalType
+     * @param fromIndex
+     * @param endIndex
+     * */
+    List<IllegalCode> getIllegalCode(Map map);
+
 
 
 

@@ -1,5 +1,10 @@
 package com.hlxd.microcloud.service;
 
+import com.hlxd.microcloud.vo.IllegalCode;
+
+import java.util.List;
+import java.util.Map;
+
 /**
  * CREATED BY IDEA
  *
@@ -57,4 +62,25 @@ public interface IllegalCodeService {
      *
      * */
     void markedRejectItem(String tableName);
+
+
+
+    /**
+     * 获取异常吗分类统计数据
+     * @param 以时间，机台，包装类型分类
+     * */
+    List<IllegalCode> getIllegalCodeCount(Map map);
+
+
+    /**
+     * 获取异常码详细码数据
+     * @param produceDate
+     * @param machineCode
+     * @param packageType
+     * @param illegalType
+     * @param fromIndex
+     * @param endIndex
+     * */
+    List<IllegalCode> getIllegalCode(Map map);
+
 }

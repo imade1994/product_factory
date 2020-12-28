@@ -1,9 +1,6 @@
 package com.hlxd.microcloud.schedule;
 
-import com.hlxd.microcloud.service.AnalysisService;
-import com.hlxd.microcloud.service.BatchTaskService;
-import com.hlxd.microcloud.service.DiscardService;
-import com.hlxd.microcloud.service.InitService;
+import com.hlxd.microcloud.service.*;
 import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.util.CommonUtil;
 import com.hlxd.microcloud.util.ThreadManager;
@@ -75,18 +72,22 @@ public class ScheduleConfig {
     @Autowired
     DiscardService discardService;
 
+    @Autowired
+    UploadRecordService uploadRecordService;
+
 
 
     @PostConstruct
     public void init(){
         scheduleConfig = this;
-        scheduleConfig.analysisService  = this.analysisService;
-        scheduleConfig.batchTaskService = this.batchTaskService;
-        scheduleConfig.discardService   = this.discardService;
+        scheduleConfig.analysisService     = this.analysisService;
+        scheduleConfig.batchTaskService    = this.batchTaskService;
+        scheduleConfig.discardService      = this.discardService;
+        scheduleConfig.uploadRecordService = this.uploadRecordService;
         //unionCode();
     }
 
-    @Scheduled(cron = "0 0/1 * * * ? ")
+    //@Scheduled(cron = "0 0/1 * * * ? ")
     public  void unionCode(){
         /**
          * 查询当前是否有线程在操作数据库
@@ -167,7 +168,7 @@ public class ScheduleConfig {
 
     }
 
-    @Scheduled(cron = "0 0/1 * * * ? ")
+    //@Scheduled(cron = "0 0/1 * * * ? ")
     public void updateMachineTime(){
         List<InitMachineTimeVo> machineTimeList1 =  initService.getInitMachineTime();
         List<InitMachineTimeVo> machineTimeList2 =  initService.getInitMachineTimeFromTable();
@@ -194,7 +195,7 @@ public class ScheduleConfig {
             return false;
         }
     }
-   @Scheduled(cron = "0 0/1 * * * ? ")
+    //@Scheduled(cron = "0 0/1 * * * ? ")
     public void initTable(){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScheduleDate);
         List<InitTableSchedule> tableSchedules = initService.getInitTableScheduleFromTable();
@@ -230,7 +231,7 @@ public class ScheduleConfig {
         }
     }
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    //@Scheduled(cron = "0 0 2 * * ?")
     //@Scheduled(cron = "0 0/1 * * * ? ")
     public void deleteCodeFromBase(){
         log.info(LOG_INFO_PREFIX+"******************************删除任务触发");
@@ -248,7 +249,7 @@ public class ScheduleConfig {
 
     }
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    //@Scheduled(cron = "0 0 2 * * ?")
     public void countIllegalCode(){
         List<TableSplit> tableSplits = initService.getCurrentTableSplit();
         for(TableSplit tableSplit:tableSplits){
@@ -256,7 +257,7 @@ public class ScheduleConfig {
         }
     }
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    //@Scheduled(cron = "0 0 2 * * ?")
     public void rejectCodeCount(){
         initService.rejectCount();
     }
@@ -266,10 +267,9 @@ public class ScheduleConfig {
     /**
      * 废码统计上传
      * **/
-    @Scheduled(cron = "0 0 2 * * ?")
+    //@Scheduled(cron = "0 0 2 * * ?")
     //@RequestMapping("/disCardCodeUpload")
-    public Map disCardCodeUpload(){
-        List<DiscardCode> discardCodes = new ArrayList<>();
+    public void disCardCodeUpload(){
         Map map = new HashMap();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-mm-dd");
         String currentDate =simpleDateFormat.format(new Date());
@@ -284,25 +284,44 @@ public class ScheduleConfig {
             //插入上传记录
             discardService.insertDiscardCodeRecord(discardCount);
         }
-        map.clear();
-        map.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
-        map.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
-        return map;
     }
 
     /**
      * 编码上传
      * */
-    @Scheduled(cron = "0 30 2 * * ?")
-    public void uploadSuccessCode(){
+    //@Scheduled(cron = "0 40 2 * * ?")
+    public void uploadSuccessCode() throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-mm-dd");
-        String currentDate =simpleDateFormat.format(new Date());
-
-
-
-
-
-
+        SimpleDateFormat simpleDateFormat_1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Long stamp     = new Date().getTime()-24*60*1000L;//减一天的时间
+        Date countDate =new Date(stamp);
+        String currentDate =simpleDateFormat.format(countDate);
+        Map paramMap = new HashMap();
+        paramMap.put("currentDate",currentDate);
+        UploadRecord uploadRecord = uploadRecordService.getUploadRecordCount(paramMap);//获取当天实时表产量信息，获取当日产量（件）
+        if(null != uploadRecord){
+            uploadRecord.setProduceDate(currentDate);//数据产生日期
+            //uploadRecord.setCurrentProduce(String.valueOf(uploadRecord.getTwigItem()/50));//件码数量
+            //查询当日有效编码数量，查询3码关联表，根据生产日期 获取3码关联表的表名
+            String tableName = UnionTableNamePrefix+tableScheduleTime(simpleDateFormat_1.format(countDate));
+            paramMap.clear();
+            paramMap.put("tableName",tableName);
+            try{
+                UploadRecord actual = uploadRecordService.getUploadRecordActualCount(paramMap);
+                uploadRecord.setStatistic(actual.getPackTwig()+actual.getTwigItem());//总数据量，此处为同步返回的同步成功数据量，暂时设定为同样的值
+                uploadRecord.setPackTwig(actual.getPackTwig());
+                uploadRecord.setTwigItem(actual.getTwigItem());
+            }catch (Exception e){
+                log.error("************************表**************"+tableName+"查询统计数据执行异常，信息为"+e.getMessage());
+            }
+            uploadRecord.setUploadModel(1);
+            uploadRecord.setStatus(0);
+            //暂时未接入国家数据同步，默认完成
+            //插入执行任务
+            uploadRecordService.insertUploadRecord(uploadRecord);
+        }else{
+            log.error("************************时间**************"+currentDate+"暂无数据");
+        }
     }
 
 

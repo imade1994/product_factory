@@ -2,9 +2,13 @@ package com.hlxd.microcloud.service.impl;
 
 import com.hlxd.microcloud.dao.IllegalCodeMapper;
 import com.hlxd.microcloud.service.IllegalCodeService;
+import com.hlxd.microcloud.vo.IllegalCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * CREATED BY IDEA
@@ -53,5 +57,15 @@ public class IllegalCodeServiceImpl implements IllegalCodeService {
     @Override
     public void markedRejectItem(String tableName) {
         illegalCodeMapper.markedRejectItem(tableName);
+    }
+
+    @Override
+    public List<IllegalCode> getIllegalCodeCount(Map map) {
+        return illegalCodeMapper.getIllegalCodeCount(map);
+    }
+
+    @Override
+    public List<IllegalCode> getIllegalCode(Map map) {
+        return illegalCodeMapper.getIllegalCode(map);
     }
 }

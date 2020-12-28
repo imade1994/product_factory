@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.UploadRecordMapper">
+
+
+    <resultMap id="BaseMap" type="com.hlxd.microcloud.vo.UploadRecord">
+        <result column="id"                 property="id" />
+        <result column="pack_twig"          property="packTwig" />
+        <result column="twig_item"          property="twigItem" />
+        <result column="statistic"          property="statistic"/>
+        <result column="upload_model"       property="uploadModel" />
+        <result column="complete_date"      property="completeDate" />
+        <result column="manual_people"      property="manualPeople" />
+        <result column="status"             property="status" />
+        <result column="produce_date"       property="produceDate" />
+        <result column="current_produce"    property="currentProduce" />
+    </resultMap>
+
+
+
+    <select id="getUploadRecord"  parameterType="java.util.HashMap" resultMap="BaseMap">
+       select
+       id,
+       pack_twig,
+       twig_item,
+       statistic,
+       upload_model,
+       complete_date,
+       manual_people,
+       status,
+       produce_date,
+       current_produce
+       from t_hl_upload_record
+       <trim prefix="where" prefixOverrides="AND|OR">
+           <if test="null != beginDate and ''!= beginDate">
+               AND str_to_date(produce_date,'%Y-%m-%d') <![CDATA[>=]]> STR_TO_DATE(#{beginDate},'%Y-%m-%d')
+           </if>
+           <if test="null != endDate and ''!= endDate">
+               AND str_to_date(produce_date,'%Y-%m-%d') <![CDATA[<=]]> STR_TO_DATE(#{endDate},'%Y-%m-%d')
+           </if>
+           <if test="null != uploadModel and '' != uploadModel">
+               AND upload_model = #{uploadModel}
+           </if>
+           <if test="null != id and '' != id">
+               AND id= #{id}
+           </if>
+           <if test="null != currentDate and '' != currentDate">
+               AND produce_date = #{currentDate}
+           </if>
+           <if test="null != status and '' != status">
+               AND status = #{status}
+           </if>
+       </trim>
+    </select>
+
+
+    <select id="updateUploadRecord" parameterType="java.util.HashMap">
+       update
+       t_hl_upload_record
+       <trim prefix="set" prefixOverrides=",">
+           <if test="null != uploadModel and ''!= uploadModel">
+              ,upload_model = #{uploadModel}
+           </if>
+           <if test="null != status and '' != status ">
+             ,status = #{status}
+           </if>
+       </trim>
+       where id = #{id}
+    </select>
+
+
+    <select id="insertUploadRecord" parameterType="com.hlxd.microcloud.vo.UploadRecord" >
+        insert into
+        t_hl_upload_record
+        (id,
+       pack_twig,
+       twig_item,
+       statistic,
+       upload_model,
+       complete_date,
+       manual_people,
+       status,
+       produce_date,
+       current_produce)
+       values(#{packTwig},#{twigItem},#{statistic},#{uploadModel},now(),#{produceDate},'admin',#{status},
+       #{currentProduce}
+       )
+    </select>
+
+
+
+    <select id="getUploadRecordCount" parameterType="java.util.HashMap" resultMap="BaseMap">
+        select
+				COALESCE(sum(case
+				when type_code = 3
+				then realtime_relate
+				else null
+				end
+				),0)as currentProduce
+				from
+				t_hl_realtime_work
+				where produce_date = #{currentDate}
+    </select>
+
+    <select id="getUploadRecordActualCount" parameterType="java.util.HashMap" resultMap="BaseMap" statementType="STATEMENT">
+        select
+				COUNT(qr_code) as pack_twig,
+				count(DISTINCT(package_code)) as twig_item
+				from ${tableName}
+    </select>
+
+</mapper>

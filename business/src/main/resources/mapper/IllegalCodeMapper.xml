@@ -2,6 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hlxd.microcloud.dao.IllegalCodeMapper">
 
+    <resultMap id="baseMap" type="com.hlxd.microcloud.vo.IllegalCode">
+        <result column="qrCode" property="qrCode"></result>
+        <result column="package_type" property="packageType"></result>
+        <result column="illegal_type" property="illegalType"></result>
+        <result column="illegal_counts" property="illegalCounts"></result>
+        <result column="scan_date" property="scanDate"></result>
+        <result column="scan_time" property="scanTime"></result>
+        <result column="code_counts" property="codeCount"></result>
+    </resultMap>
+
 
     <insert id="getRepeatCode" parameterType="java.lang.String" >
         insert  into t_hl_illegal_code
@@ -147,6 +157,24 @@ thsc.package_type = 2
 group by parent_code
 )as a
     </insert>
+
+    <select id="getIllegalCodeCount" parameterType="java.util.HashMap" resultMap="baseMap">
+        select
+        count(qrCode),
+        <if test="null != packageType and '' != packageType">
+            package_type,
+        </if>
+        <if test="null != scanDate and '' != scanDate ">
+            scan_date,
+        </if>
+        <if test="null != illegalType and '' != illegalType">
+            illegal_type,
+        </if>
+        from t_hl_illegal_code
+
+    </select>
+
+
 
 
 

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,9 +64,10 @@ public class DiscardCodeController {
      * 获取废码回传记录
      * */
     @RequestMapping("/getDisCardCountList")
-    public Map getUploadRecord(){
+    public Map getUploadRecord(HttpServletRequest request){
         Map returnMap = new HashMap();
-        List<DiscardCount> discardCounts = discardService.getDisCardCountList(new HashMap());
+        Map paramMap  = CommonUtil.transformMap(request.getParameterMap());
+        List<DiscardCount> discardCounts = discardService.getDisCardCountList(paramMap);
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         returnMap.put(CommomStatic.DATA,discardCounts);
         return returnMap;

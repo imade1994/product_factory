@@ -29,4 +29,6 @@ public class IllegalCode implements Serializable {
 
     private String scanTime;
 
+    private String codeCount;
+
 }

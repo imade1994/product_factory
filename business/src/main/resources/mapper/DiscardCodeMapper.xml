@@ -23,6 +23,7 @@
         <result column="stripCount" property="stripCount" />
         <result column="uploadState" property="uploadState" />
         <result column="updateDate" property="updateDate" />
+        <result column="upload_model" property="uploadModel" />
     </resultMap>
 
     <resultMap id="BaseCancelResultMap" type="com.hlxd.microcloud.vo.CancelRelation">
@@ -120,21 +121,25 @@ group by currentDate
 
     <select id="getDisCardCountList" parameterType="java.util.HashMap"  resultMap="DiscardMap">
           select
-          currentDate,
+          countDate,
           packageCount,
           stripCount,
-          uploadStats,
-          uploadDate
+          uploadState,
+          updateDate,
+          upload_model
           from t_hl_discard_upload
         <trim prefix="where" prefixOverrides="AND | OR">
-            <if test="null != queryDate and '' != queryDate">
-                AND currentDate = #{queryDate}
+            <if test="null != beginDate and '' != beginDate">
+                AND str_to_date(countDate,'%Y-%m-%d') <![CDATA[>=]]> str_to_date(#{beginDate},'%Y-%m-%d')
             </if>
-            <if test="null != machineCode">
-                AND machine_code = #{machineCode}
+            <if test="null != endDate and '' != endDate">
+                AND str_to_date(countDate,'%Y-%m-%d') <![CDATA[<=]]> str_to_date(#{endDate},'%Y-%m-%d')
             </if>
-            <if test="null != currentDate">
-                AND discard_date = #{currentDate}
+            <if test="null != uploadState and '' != uploadState">
+                AND uploadState = #{uploadState}
+            </if>
+            <if test="null != uploadModel and '' != uploadModel">
+                AND upload_model=#{uploadModel}
             </if>
         </trim>
 
@@ -143,7 +148,7 @@ group by currentDate
     <update id="updateDiscardCodeUpload" parameterType="java.util.HashMap">
         update t_hl_discard_upload
         <trim prefix="set" suffixOverrides=",">
-            <if test=" uploadState !=null">uploadState = #{uploadState},</if>
+            <if test=" uploadState !=null and '' != uploadState">uploadState = #{uploadState},</if>
         </trim>
         where countDate = #{currentDate}
     </update>
@@ -151,9 +156,9 @@ group by currentDate
     <insert id="insertDiscardCodeRecord" parameterType="com.hlxd.microcloud.vo.DiscardCode">
         insert into
         t_hl_discard_upload
-        (currentDate,packageCount,StripCount,uploadState,updateDate)
+        (countDate,packageCount,StripCount,uploadState,updateDate)
         values
-        (#{currentDate},#{packageCount},#{StripCount},#{uploadState},now())
+        (#{countDate},#{packageCount},#{StripCount},#{uploadState},now())
     </insert>
 
 </mapper>

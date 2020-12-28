@@ -43,11 +43,26 @@ public class IllegalCodeController {
         return returnMap;
     }
 
+    /**
+     * 获取异常码详细码数据
+     * @param beginDate
+     * @param endDate
+     * @param produceDate
+     * @param machineCode 暂未关联
+     * @param packageType
+     * @param illegalType
+     * @param size
+     * @param index
+     * */
     @RequestMapping("/getIllegalCode")
     public Map getIllegalCode(HttpServletRequest request){
         Map paramMap  = new HashMap();
         Map returnMap = new HashMap();
         paramMap = CommonUtil.transformMap(request.getParameterMap());
+        int index = Integer.valueOf((String)paramMap.get("index"));
+        int size  = Integer.valueOf((String)paramMap.get("size"));
+        paramMap.put("fromIndex",(index-1)*size);
+        paramMap.replace("size",size);
         List<IllegalCode> illegalCodes = illegalCodeService.getIllegalCode(paramMap);
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         returnMap.put(CommomStatic.DATA,illegalCodes);

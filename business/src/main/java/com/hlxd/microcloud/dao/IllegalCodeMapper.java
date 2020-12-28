@@ -77,7 +77,7 @@ public interface IllegalCodeMapper {
     /**
      * 获取异常码详细码数据
      * @param produceDate
-     * @param machineCode
+     * @param machineCode 暂未关联
      * @param packageType
      * @param illegalType
      * @param fromIndex

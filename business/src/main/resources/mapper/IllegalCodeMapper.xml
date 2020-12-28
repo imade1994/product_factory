@@ -160,7 +160,6 @@ group by parent_code
 
     <select id="getIllegalCodeCount" parameterType="java.util.HashMap" resultMap="baseMap">
         select
-        count(qrCode),
         <if test="null != packageType and '' != packageType">
             package_type,
         </if>
@@ -170,7 +169,59 @@ group by parent_code
         <if test="null != illegalType and '' != illegalType">
             illegal_type,
         </if>
+        count(qrCode) as code_counts
         from t_hl_illegal_code
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <if test="null != packageType and '' != packageType">
+                AND package_type = #{packageType}
+            </if>
+            <if test="null != scanDate and '' != scanDate ">
+                AND scan_date = #{scanDate}
+            </if>
+            <if test="null != illegalType and '' != illegalType">
+                AND illegal_type = #{illegalType}
+            </if>
+        </trim>
+        <trim prefix="group by" prefixOverrides=",">
+            <if test="null != packageType and '' != packageType">
+                 ,package_type
+            </if>
+            <if test="null != scanDate and '' != scanDate ">
+                ,scan_date
+            </if>
+            <if test="null != illegalType and '' != illegalType">
+                ,illegal_type
+            </if>
+        </trim>
+
+    </select>
+    <select id="getIllegalCode" parameterType="java.util.HashMap" resultMap="baseMap">
+        select
+        qrCode,
+        package_type,
+        illegal_type,
+        illegal_counts,
+        scan_date,
+        scan_time
+        from t_hl_illegal_code
+        <trim prefix="where" prefixOverrides="AND|OR" >
+            <if test="null != beginDate and '' != beginDate">
+              AND STR_TO_DATE(scan_date,'%Y-%m-%d') <![CDATA[>=]]> STR_TO_DATE(#{beginDate},'%Y-%m-%d')
+            </if>
+            <if test="null != endDate and '' != endDate">
+                AND STR_TO_DATE(scan_date,'%Y-%m-%d') <![CDATA[<=]]> STR_TO_DATE(#{endDate},'%Y-%m-%d')
+            </if>
+            <if test="null != produceDate and '' != produceDate">
+                AND scan_date = #{produceDate}
+            </if>
+            <if test="null != packageType and '' != packageType">
+                AND package_type = #{packageType}
+            </if>
+            <if test="null != illegalType and '' != illegalType">
+                AND illegal_type = #{illegalType}
+            </if>
+        </trim>
+        limit #{fromIndex},#{size}
 
     </select>
 

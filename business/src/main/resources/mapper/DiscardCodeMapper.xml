@@ -67,10 +67,10 @@
                 AND thdc.package_type = #{packageType}
             </if>
             <if test="null != machineCode">
-                AND machine_code = #{machineCode}
+                AND thdc.machine_code = #{machineCode}
             </if>
             <if test="null != currentDate">
-                AND discard_date = #{currentDate}
+                AND thdc.discard_date = #{currentDate}
             </if>
         </trim>
 

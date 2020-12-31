@@ -45,7 +45,7 @@ public class RedisConsumer {
         redisConsumer.batchTaskService = this.batchTaskService;
         redisConsumer.initService = this.initService;
         redisConsumer.asyncService = this.asyncService;
-        //initDataToRedis();
+        initDataToRedis();
     }
 
 

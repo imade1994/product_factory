@@ -87,7 +87,7 @@ public class ScheduleConfig {
         //unionCode();
     }
 
-    //@Scheduled(cron = "0 0/1 * * * ? ")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     public  void unionCode(){
         /**
          * 查询当前是否有线程在操作数据库
@@ -168,7 +168,7 @@ public class ScheduleConfig {
 
     }
 
-    //@Scheduled(cron = "0 0/1 * * * ? ")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     public void updateMachineTime(){
         List<InitMachineTimeVo> machineTimeList1 =  initService.getInitMachineTime();
         List<InitMachineTimeVo> machineTimeList2 =  initService.getInitMachineTimeFromTable();
@@ -195,7 +195,7 @@ public class ScheduleConfig {
             return false;
         }
     }
-    //@Scheduled(cron = "0 0/1 * * * ? ")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     public void initTable(){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ScheduleDate);
         List<InitTableSchedule> tableSchedules = initService.getInitTableScheduleFromTable();
@@ -231,7 +231,7 @@ public class ScheduleConfig {
         }
     }
 
-    //@Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 2 * * ?")
     //@Scheduled(cron = "0 0/1 * * * ? ")
     public void deleteCodeFromBase(){
         log.info(LOG_INFO_PREFIX+"******************************删除任务触发");
@@ -249,7 +249,7 @@ public class ScheduleConfig {
 
     }
 
-    //@Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 2 * * ?")
     public void countIllegalCode(){
         List<TableSplit> tableSplits = initService.getCurrentTableSplit();
         for(TableSplit tableSplit:tableSplits){
@@ -257,7 +257,7 @@ public class ScheduleConfig {
         }
     }
 
-    //@Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 2 * * ?")
     public void rejectCodeCount(){
         initService.rejectCount();
     }
@@ -267,7 +267,7 @@ public class ScheduleConfig {
     /**
      * 废码统计上传
      * **/
-    //@Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 2 * * ?")
     //@RequestMapping("/disCardCodeUpload")
     public void disCardCodeUpload(){
         Map map = new HashMap();
@@ -289,7 +289,7 @@ public class ScheduleConfig {
     /**
      * 编码上传
      * */
-    //@Scheduled(cron = "0 40 2 * * ?")
+    @Scheduled(cron = "0 40 2 * * ?")
     public void uploadSuccessCode() throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-mm-dd");
         SimpleDateFormat simpleDateFormat_1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

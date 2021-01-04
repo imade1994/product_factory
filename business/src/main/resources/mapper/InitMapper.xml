@@ -244,6 +244,8 @@ FROM
 				left join t_hl_base_machine thbm
 				on thsc.machine_code = thbm.machine_code
         where thsc.qrCode = '${qrCode}'
+        order by relation_date desc
+        limit 1
 
 
 

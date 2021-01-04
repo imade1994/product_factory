@@ -85,6 +85,7 @@ public class DiscardCodeController {
             //返回废码合集
             // discardCodes = discardService.getDiscardCodeList(map);
             map.put("uploadState",1);
+            map.put("uploadModel",2);//手动模式
             //更新上传记录
             discardService.updateDiscardCodeUpload(map);
             /**

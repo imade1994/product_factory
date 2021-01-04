@@ -271,7 +271,7 @@ public class ScheduleConfig {
     //@RequestMapping("/disCardCodeUpload")
     public void disCardCodeUpload(){
         Map map = new HashMap();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-mm-dd");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String currentDate =simpleDateFormat.format(new Date());
         map.put("currentDate",currentDate);
         List<DiscardCount> discardCounts = discardService.getDisCardCount(map);
@@ -283,17 +283,28 @@ public class ScheduleConfig {
             discardCount.setUploadState(1);
             //插入上传记录
             discardService.insertDiscardCodeRecord(discardCount);
+        }else{
+            DiscardCount discardCount = new DiscardCount();
+            discardCount.setStripCount(0);
+            discardCount.setPackageCount(0);
+            discardCount.setUploadModel(1);
+            discardCount.setCountDate(currentDate);
+            discardCount.setUploadState(1);
+            discardService.insertDiscardCodeRecord(discardCount);
         }
     }
 
     /**
      * 编码上传
      * */
-    @Scheduled(cron = "0 40 2 * * ?")
+    @Scheduled(cron = "0 0 2 * * ?")
+    //@PostConstruct
     public void uploadSuccessCode() throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-mm-dd");
+        log.info("***********************编码上传定时任务***************************");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat simpleDateFormat_1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Long stamp     = new Date().getTime()-24*60*1000L;//减一天的时间
+//        Long stamp     = new Date().getTime()-24*60*1000L;//减一天的时间
+        Long stamp     = new Date().getTime()-(2*24*60*60*1000);//减一天的时间
         Date countDate =new Date(stamp);
         String currentDate =simpleDateFormat.format(countDate);
         Map paramMap = new HashMap();

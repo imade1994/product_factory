@@ -15,8 +15,9 @@
 
     <insert id="getRepeatCode" parameterType="java.lang.String" >
         insert  into t_hl_illegal_code
-(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+(id,qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
 select
+uuid(),
 a.*
 from
 (
@@ -36,8 +37,9 @@ having count(*)>1)as a
 
     <insert id="wrongRelationPackage" parameterType="java.lang.String" >
         insert  into t_hl_illegal_code
-(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+(id,qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
 select
+uuid(),
 a.*
 from
 (
@@ -59,8 +61,9 @@ having count(*) != 10
 
     <insert id="wrongRelationStrip" parameterType="java.lang.String" >
         insert  into t_hl_illegal_code
-(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+(id,qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
 select
+uuid(),
 a.*
 from
 (
@@ -82,8 +85,9 @@ having count(*) != 50
 
     <insert id="containDiscardCodeStrip" parameterType="java.lang.String" >
         insert  into t_hl_illegal_code
-(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+(id,qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
 select
+uuid(),
 a.*
 from
 (
@@ -109,8 +113,9 @@ group by parent_code
 
     <insert id="containDiscardCodeItem" parameterType="java.lang.String" >
         insert  into t_hl_illegal_code
-(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+(id,qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
 select
+uuid(),
 a.*
 from
 (
@@ -135,8 +140,9 @@ group by parent_code
 
     <insert id="markedRejectItem" parameterType="java.lang.String" >
         insert  into t_hl_illegal_code
-(qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
+(id,qrCode,package_type,illegal_type,illegal_counts,scan_date,scan_time)
 select
+uuid(),
 a.*
 from
 (
@@ -160,11 +166,9 @@ group by parent_code
 
     <select id="getIllegalCodeCount" parameterType="java.util.HashMap" resultMap="baseMap">
         select
+        scan_date,
         <if test="null != packageType and '' != packageType">
             package_type,
-        </if>
-        <if test="null != scanDate and '' != scanDate ">
-            scan_date,
         </if>
         <if test="null != illegalType and '' != illegalType">
             illegal_type,
@@ -186,7 +190,7 @@ group by parent_code
             <if test="null != packageType and '' != packageType">
                  ,package_type
             </if>
-            <if test="null != scanDate and '' != scanDate ">
+            <if test="1 == 1">
                 ,scan_date
             </if>
             <if test="null != illegalType and '' != illegalType">

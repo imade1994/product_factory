@@ -149,6 +149,7 @@ group by currentDate
         update t_hl_discard_upload
         <trim prefix="set" suffixOverrides=",">
             <if test=" uploadState !=null and '' != uploadState">uploadState = #{uploadState},</if>
+            <if test=" uploadModel !=null and '' != uploadModel">upload_model = #{uploadModel},</if>
         </trim>
         where countDate = #{currentDate}
     </update>

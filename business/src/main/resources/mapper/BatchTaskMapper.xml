@@ -154,6 +154,16 @@ where A.parent_code = c.qrcode
         where id = #{id}
     </update>
 
+    <delete id="deleteItemBeforeInsert" parameterType="java.lang.String" statementType="STATEMENT">
+        delete
+        from  ${tableName}
+        where item_code = '${itemCode}'
+
+
+
+
+    </delete>
+
 
 
 </mapper>

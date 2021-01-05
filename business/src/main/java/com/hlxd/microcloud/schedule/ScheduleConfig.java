@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static com.hlxd.microcloud.util.CommomStatic.REDIS_UNION_CODE_LOCK;
 import static com.hlxd.microcloud.util.CommonUtil.*;
 
 /**
@@ -92,20 +93,21 @@ public class ScheduleConfig {
         /**
          * 查询当前是否有线程在操作数据库
          * */
-        String lock = (String) redisTemplate.opsForValue().get("t_hl_system_code_error_lock");
-        log.info(LOG_INFO_PREFIX+"******************************定时任务主动查询关联触发当前锁值为"+lock);
-        List<FutureTask<Boolean>> futureTasks = new ArrayList<>();
-        if(null == lock){
+        //String lock = (String) redisTemplate.opsForValue().get("t_hl_system_code_error_lock");
+        //log.info(LOG_INFO_PREFIX+"******************************定时任务主动查询关联触发当前锁值为"+lock);
+        List<FutureTask<String>> futureTasks = new ArrayList<>();
+        List<ScheduleErrorCode> scheduleErrorCodes = batchTaskService.getErrorCode(0);
+        for(ScheduleErrorCode scheduleErrorCode:scheduleErrorCodes){
             /**
-             * 保证同时只有一个线程操作数据合并
+             * 保证同时只有一个线程操作一条数据合并
              * */
-            redisTemplate.opsForValue().set("t_hl_system_code_error_lock","1");
-            List<ScheduleErrorCode> scheduleErrorCodes = batchTaskService.getErrorCode(0);
-            for(ScheduleErrorCode scheduleErrorCode:scheduleErrorCodes){
-                Callable<Boolean> queryCall = new Callable<Boolean>() {
+            String lock = (String) redisTemplate.opsForValue().get(REDIS_UNION_CODE_LOCK+scheduleErrorCode.getQrCode());
+            if(null == lock){
+                Callable<String> queryCall = new Callable<String>() {
                     @Override
-                    public Boolean call()  {
+                    public String call()  {
                         try{
+                            redisTemplate.opsForValue().set(REDIS_UNION_CODE_LOCK+scheduleErrorCode.getQrCode(),1);
                             Map map = new HashMap();
                             map.put("itemCode",scheduleErrorCode.getQrCode());
                             /**
@@ -113,6 +115,10 @@ public class ScheduleConfig {
                              * */
                             List<CodeUnion> codeUnions = batchTaskService.getCodeUnionByItemCode(map);
                             if(null != codeUnions&&codeUnions.size()>0){
+                                /**
+                                 * 先执行删除再同步插入
+                                 * */
+                                batchTaskService.deleteItemBeforeInsert(scheduleErrorCode.getTableName(),scheduleErrorCode.getQrCode());
                                 batchTaskService.BatchInsertCodeUnion(scheduleErrorCode.getTableName(),codeUnions);
                                 /**
                                  * 更新异常主库ID
@@ -122,50 +128,43 @@ public class ScheduleConfig {
                                 /**
                                  * 从主库移除数据
                                  *
-                                batchTaskService.deleteCodeFromSystemCode(scheduleErrorCode.getQrCode());
-                                *//**
+                                 batchTaskService.deleteCodeFromSystemCode(scheduleErrorCode.getQrCode());
+                                 *//**
                                  * 从执行异常库删除数据
                                  * *//*
                                 batchTaskService.deleteSchedule(scheduleErrorCode.getId());*/
                             }
                         }catch (Exception e){
                             log.error(LOG_ERROR_PREFIX+"****************定时任务出现异常二维码为"+scheduleErrorCode.getQrCode()+"***************异常信息为"+e.getMessage());
-                            return true;
+                            return "";
                         }
-                        return true;
+                        return scheduleErrorCode.getQrCode();
                     }
                 };
-                FutureTask<Boolean> CodeUnion = new FutureTask<>(queryCall);
+                FutureTask<String> CodeUnion = new FutureTask<>(queryCall);
                 futureTasks.add(CodeUnion);
                 ThreadManager.getLongPool().execute(CodeUnion);
             }
-            Boolean flag = true;
-            /**
-             * 轮询多线程任务结果
-             * 执行完成会返回 true;
-             * */
-            for(FutureTask<Boolean> futureTask:futureTasks){
-                try {
-                    if(!futureTask.get()){
-                        flag = false;
-                    }
-                } catch (InterruptedException e) {
-                    log.error(LOG_ERROR_PREFIX+"****************获取多线程结果出现异常***************异常信息为"+e.getMessage());
-                } catch (ExecutionException e) {
-                    log.error(LOG_ERROR_PREFIX+"****************获取多线程结果出现异常***************异常信息为"+e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-            if(flag){
+        }
+        /**
+         * 轮询多线程任务结果
+         * 执行完成会返回 true;
+         * */
+        for(FutureTask<String> futureTask:futureTasks){
+            try {
+                String code = futureTask.get();
                 /**
-                 * 从redis中移除锁
+                 * 删除redis锁
+                 * 释放资源
                  * */
-                redisTemplate.delete("t_hl_system_code_error_lock");
+                redisTemplate.delete(REDIS_UNION_CODE_LOCK+code);
+            } catch (InterruptedException e) {
+                log.error(LOG_ERROR_PREFIX+"****************获取多线程结果出现异常***************异常信息为"+e.getMessage());
+            } catch (ExecutionException e) {
+                log.error(LOG_ERROR_PREFIX+"****************获取多线程结果出现异常***************异常信息为"+e.getMessage());
+                e.printStackTrace();
             }
         }
-
-
-
     }
 
     @Scheduled(cron = "0 0/1 * * * ? ")
@@ -267,7 +266,7 @@ public class ScheduleConfig {
     /**
      * 废码统计上传
      * **/
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 10 2 * * ?")
     //@RequestMapping("/disCardCodeUpload")
     public void disCardCodeUpload(){
         Map map = new HashMap();
@@ -297,7 +296,7 @@ public class ScheduleConfig {
     /**
      * 编码上传
      * */
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 12 2 * * ?")
     //@PostConstruct
     public void uploadSuccessCode() throws ParseException {
         log.info("***********************编码上传定时任务***************************");

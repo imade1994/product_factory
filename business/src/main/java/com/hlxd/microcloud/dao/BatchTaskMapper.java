@@ -42,5 +42,8 @@ public interface BatchTaskMapper {
     void updateSchedule(@Param("id")int id,@Param("executeState")int executeState);
 
 
+    void deleteItemBeforeInsert(@Param("tableName")String tableName,@Param("itemCode")String itemCode);
+
+
 
 }

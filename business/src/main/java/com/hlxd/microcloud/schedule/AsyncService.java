@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.hlxd.microcloud.util.CommomStatic.REDIS_UNION_CODE_LOCK;
 import static com.hlxd.microcloud.util.CommonUtil.*;
 
 /**
@@ -41,6 +42,9 @@ public class AsyncService {
     @Autowired
     private IllegalCodeService illegalCodeService;
 
+    @Autowired
+    public RedisTemplate<String, Object> redisTemplate;
+
 
 
     @Async("AsyncConfigure")
@@ -48,45 +52,56 @@ public class AsyncService {
         log.info("**************************进入异步携带参数itemCode"+itemCode+"生产日期"+produceDate+"**********************************");
         Map param = new HashMap();
         param.put("itemCode",itemCode);
-        try {
-            String tableName = UnionTableNamePrefix+tableScheduleTime(produceDate);
-            //log.info("*************关联详情表"+tableName+"**********************************");
-            int count = initService.checkTableExits(tableName);
-            if(!(count>0)){
-                //log.info("*************表"+tableName+"不存在，手动创建！**********************************");
-                initService.createNewUnionTable(tableName);
-            }
-            List<CodeUnion> codeUnions = batchTaskService.getCodeUnionByItemCode(param);
-            if (null != codeUnions&&codeUnions.size()>0){
-                batchTaskService.BatchInsertCodeUnion(tableName,codeUnions);
-               /* */
-                try{
-                    batchTaskService.deleteCodeFromSystemCode(itemCode);
-                }catch (Exception e){
-                    log.info(LOG_ERROR_PREFIX+"件码****************************"+itemCode+"****************************删除异常!");
+        String lock = (String)redisTemplate.opsForValue().get(REDIS_UNION_CODE_LOCK+itemCode);
+        if(null == lock){
+            /**
+             * 放入redis锁
+             * 保证其他线程不能操作这条数据
+             * */
+            redisTemplate.opsForValue().set(REDIS_UNION_CODE_LOCK+itemCode,1);
+            try {
+                String tableName = UnionTableNamePrefix+tableScheduleTime(produceDate);
+                //log.info("*************关联详情表"+tableName+"**********************************");
+                int count = initService.checkTableExits(tableName);
+                if(!(count>0)){
+                    //log.info("*************表"+tableName+"不存在，手动创建！**********************************");
+                    initService.createNewUnionTable(tableName);
+                }
+                List<CodeUnion> codeUnions = batchTaskService.getCodeUnionByItemCode(param);
+                if (null != codeUnions&&codeUnions.size()>0){
+                    /**
+                     * 先删除，再执行插入
+                     * */
+                    batchTaskService.deleteItemBeforeInsert(tableName,itemCode);
+                    batchTaskService.BatchInsertCodeUnion(tableName,codeUnions);
+                    /* */
+                    try{
+                        batchTaskService.deleteCodeFromSystemCode(itemCode);
+                    }catch (Exception e){
+                        log.info(LOG_ERROR_PREFIX+"件码****************************"+itemCode+"****************************删除异常!");
+                        ScheduleErrorCode scheduleErrorCode = new ScheduleErrorCode();
+                        scheduleErrorCode.setMachineCode(machineCode);
+                        scheduleErrorCode.setQrCode(itemCode);
+                        scheduleErrorCode.setRelationDate(produceDate);
+                        scheduleErrorCode.setTableName(tableName);
+                        scheduleErrorCode.setExecuteState(1);
+                        batchTaskService.insertErrorCode(scheduleErrorCode);
+                    }
+
+                }else{
                     ScheduleErrorCode scheduleErrorCode = new ScheduleErrorCode();
                     scheduleErrorCode.setMachineCode(machineCode);
                     scheduleErrorCode.setQrCode(itemCode);
                     scheduleErrorCode.setRelationDate(produceDate);
                     scheduleErrorCode.setTableName(tableName);
-                    scheduleErrorCode.setExecuteState(1);
+                    scheduleErrorCode.setExecuteState(0);
                     batchTaskService.insertErrorCode(scheduleErrorCode);
+                    log.info(LOG_ERROR_PREFIX+"件码****************************"+itemCode+"****************************没有关联包条码!");
                 }
-
-            }else{
-                ScheduleErrorCode scheduleErrorCode = new ScheduleErrorCode();
-                scheduleErrorCode.setMachineCode(machineCode);
-                scheduleErrorCode.setQrCode(itemCode);
-                scheduleErrorCode.setRelationDate(produceDate);
-                scheduleErrorCode.setTableName(tableName);
-                scheduleErrorCode.setExecuteState(0);
-                batchTaskService.insertErrorCode(scheduleErrorCode);
-                log.info(LOG_ERROR_PREFIX+"件码****************************"+itemCode+"****************************没有关联包条码!");
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
-
     }
 
 

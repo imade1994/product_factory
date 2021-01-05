@@ -73,4 +73,9 @@ public class BatchTaskServiceImpl implements BatchTaskService {
         batchTaskMapper.updateSchedule(id,executeState);
     }
 
+    @Override
+    public void deleteItemBeforeInsert(String tableName,String itemCode) {
+        batchTaskMapper.deleteItemBeforeInsert(tableName,itemCode);
+    }
+
 }

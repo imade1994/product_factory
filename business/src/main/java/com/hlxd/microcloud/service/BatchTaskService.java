@@ -40,4 +40,6 @@ public interface BatchTaskService {
 
 
     void updateSchedule(int id,int executeState);
+
+    void deleteItemBeforeInsert(String tableName,String itemCode);
 }

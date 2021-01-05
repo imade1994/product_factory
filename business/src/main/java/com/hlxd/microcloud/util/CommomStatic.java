@@ -36,6 +36,9 @@ public final class CommomStatic {
 
     public static final String SUCCESS_MESSAGE="success";
 
+
+    public static final String REDIS_UNION_CODE_LOCK="T_HL_SYSTEM_CODE_LOCK";
+
     public static Map wrongTags = new HashMap();
 
 

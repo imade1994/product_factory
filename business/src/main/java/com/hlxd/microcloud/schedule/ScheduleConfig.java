@@ -86,9 +86,19 @@ public class ScheduleConfig {
         scheduleConfig.discardService      = this.discardService;
         scheduleConfig.uploadRecordService = this.uploadRecordService;
         //unionCode();
+        //delRedis();
+        //unionCode();
     }
 
-    @Scheduled(cron = "0 0/1 * * * ? ")
+    public void delRedis(){
+       Set<String> keys = redisTemplate.keys("T_HL_SYSTEM_CODE_LOCK*");
+       for(String s:keys){
+           log.info("************************删除keys"+s);
+           redisTemplate.delete(s);
+       }
+    }
+
+    @Scheduled(cron = "0 0/5 * * * ? ")
     public  void unionCode(){
         /**
          * 查询当前是否有线程在操作数据库
@@ -97,46 +107,51 @@ public class ScheduleConfig {
         //log.info(LOG_INFO_PREFIX+"******************************定时任务主动查询关联触发当前锁值为"+lock);
         List<FutureTask<String>> futureTasks = new ArrayList<>();
         List<ScheduleErrorCode> scheduleErrorCodes = batchTaskService.getErrorCode(0);
-        for(ScheduleErrorCode scheduleErrorCode:scheduleErrorCodes){
+        for(ScheduleErrorCode scheduleErrorCode:scheduleErrorCodes) {
             /**
              * 保证同时只有一个线程操作一条数据合并
              * */
+            /*redisTemplate.delete(REDIS_UNION_CODE_LOCK+scheduleErrorCode.getQrCode());
+            String lock = null;*/
             String lock = (String) redisTemplate.opsForValue().get(REDIS_UNION_CODE_LOCK+scheduleErrorCode.getQrCode());
             if(null == lock){
                 Callable<String> queryCall = new Callable<String>() {
                     @Override
                     public String call()  {
                         try{
-                            redisTemplate.opsForValue().set(REDIS_UNION_CODE_LOCK+scheduleErrorCode.getQrCode(),1);
+                            redisTemplate.opsForValue().set(REDIS_UNION_CODE_LOCK+scheduleErrorCode.getQrCode(),'1');
                             Map map = new HashMap();
                             map.put("itemCode",scheduleErrorCode.getQrCode());
-                            /**
-                             * 获取组装好的3码关联关系实体
-                             * */
+                            /*
+                 * 获取组装好的3码关联关系实体
+                 */
                             List<CodeUnion> codeUnions = batchTaskService.getCodeUnionByItemCode(map);
                             if(null != codeUnions&&codeUnions.size()>0){
-                                /**
-                                 * 先执行删除再同步插入
-                                 * */
+                                /*
+                 * 先执行删除再同步插入
+                 */
                                 batchTaskService.deleteItemBeforeInsert(scheduleErrorCode.getTableName(),scheduleErrorCode.getQrCode());
+
                                 batchTaskService.BatchInsertCodeUnion(scheduleErrorCode.getTableName(),codeUnions);
-                                /**
-                                 * 更新异常主库ID
-                                 * 状态码 1:为执行完成可以执行删除
-                                 * */
+                                /*
+                 * 更新异常主库ID
+                 * 状态码 1:为执行完成可以执行删除
+                 */
                                 batchTaskService.updateSchedule(scheduleErrorCode.getId(),1);
-                                /**
-                                 * 从主库移除数据
-                                 *
-                                 batchTaskService.deleteCodeFromSystemCode(scheduleErrorCode.getQrCode());
-                                 *//**
-                                 * 从执行异常库删除数据
-                                 * *//*
+                                /*
+                 * 从主库移除数据
+                 *//*
+                 batchTaskService.deleteCodeFromSystemCode(scheduleErrorCode.getQrCode());
+                 *//*
+                 * 从执行异常库删除数据
+                 *//*
                                 batchTaskService.deleteSchedule(scheduleErrorCode.getId());*/
                             }
                         }catch (Exception e){
                             log.error(LOG_ERROR_PREFIX+"****************定时任务出现异常二维码为"+scheduleErrorCode.getQrCode()+"***************异常信息为"+e.getMessage());
                             return "";
+                        }finally {
+                            redisTemplate.delete(REDIS_UNION_CODE_LOCK+scheduleErrorCode.getQrCode());
                         }
                         return scheduleErrorCode.getQrCode();
                     }
@@ -146,17 +161,17 @@ public class ScheduleConfig {
                 ThreadManager.getLongPool().execute(CodeUnion);
             }
         }
-        /**
-         * 轮询多线程任务结果
-         * 执行完成会返回 true;
-         * */
+        /*
+                 * 轮询多线程任务结果
+                 * 执行完成会返回 true;
+                 */
         for(FutureTask<String> futureTask:futureTasks){
             try {
                 String code = futureTask.get();
-                /**
+                /*
                  * 删除redis锁
                  * 释放资源
-                 * */
+                 */
                 redisTemplate.delete(REDIS_UNION_CODE_LOCK+code);
             } catch (InterruptedException e) {
                 log.error(LOG_ERROR_PREFIX+"****************获取多线程结果出现异常***************异常信息为"+e.getMessage());
@@ -164,6 +179,7 @@ public class ScheduleConfig {
                 log.error(LOG_ERROR_PREFIX+"****************获取多线程结果出现异常***************异常信息为"+e.getMessage());
                 e.printStackTrace();
             }
+
         }
     }
 
@@ -302,8 +318,8 @@ public class ScheduleConfig {
         log.info("***********************编码上传定时任务***************************");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat simpleDateFormat_1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        Long stamp     = new Date().getTime()-24*60*1000L;//减一天的时间
-        Long stamp     = new Date().getTime()-(2*24*60*60*1000);//减一天的时间
+        Long stamp     = new Date().getTime()-24*60*1000L;//减一天的时间
+       // Long stamp     = new Date().getTime()-(2*24*60*60*1000);//减一天的时间
         Date countDate =new Date(stamp);
         String currentDate =simpleDateFormat.format(countDate);
         Map paramMap = new HashMap();
@@ -423,6 +439,9 @@ public class ScheduleConfig {
     }
 
     public static boolean uploadStatistic(String date){
+
+
+
         return true;
     }
 

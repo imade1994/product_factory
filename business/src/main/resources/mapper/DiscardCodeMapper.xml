@@ -159,7 +159,7 @@ group by currentDate
         t_hl_discard_upload
         (countDate,packageCount,StripCount,uploadState,updateDate)
         values
-        (#{countDate},#{packageCount},#{StripCount},#{uploadState},now())
+        (#{countDate},#{packageCount},#{stripCount},#{uploadState},now())
     </insert>
 
 </mapper>

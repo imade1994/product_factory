@@ -58,7 +58,7 @@ public class AsyncService {
              * 放入redis锁
              * 保证其他线程不能操作这条数据
              * */
-            redisTemplate.opsForValue().set(REDIS_UNION_CODE_LOCK+itemCode,1);
+            redisTemplate.opsForValue().set(REDIS_UNION_CODE_LOCK+itemCode,'1');
             try {
                 String tableName = UnionTableNamePrefix+tableScheduleTime(produceDate);
                 //log.info("*************关联详情表"+tableName+"**********************************");
@@ -69,13 +69,13 @@ public class AsyncService {
                 }
                 List<CodeUnion> codeUnions = batchTaskService.getCodeUnionByItemCode(param);
                 if (null != codeUnions&&codeUnions.size()>0){
-                    /**
-                     * 先删除，再执行插入
-                     * */
-                    batchTaskService.deleteItemBeforeInsert(tableName,itemCode);
-                    batchTaskService.BatchInsertCodeUnion(tableName,codeUnions);
-                    /* */
                     try{
+                        /**
+                         * 先删除，再执行插入
+                         * */
+                        //batchTaskService.deleteItemBeforeInsert(tableName,itemCode);
+                        batchTaskService.BatchInsertCodeUnion(tableName,codeUnions);
+                        /* */
                         batchTaskService.deleteCodeFromSystemCode(itemCode);
                     }catch (Exception e){
                         log.info(LOG_ERROR_PREFIX+"件码****************************"+itemCode+"****************************删除异常!");
@@ -100,7 +100,10 @@ public class AsyncService {
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
+            }finally {
+                redisTemplate.delete(REDIS_UNION_CODE_LOCK+itemCode);
             }
+
         }
     }
 

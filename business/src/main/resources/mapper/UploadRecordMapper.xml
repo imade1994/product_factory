@@ -72,7 +72,7 @@
     <select id="insertUploadRecord" parameterType="com.hlxd.microcloud.vo.UploadRecord" >
         insert into
         t_hl_upload_record
-        (id,
+        (
        pack_twig,
        twig_item,
        statistic,
@@ -96,7 +96,7 @@
 				then realtime_relate
 				else null
 				end
-				),0)as currentProduce
+				),0)as current_produce
 				from
 				t_hl_realtime_work
 				where produce_date = #{currentDate}

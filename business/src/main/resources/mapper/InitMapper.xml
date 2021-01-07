@@ -204,7 +204,7 @@ FROM
   `brand_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '牌号',
   `shift_id` int(20) NULL DEFAULT NULL COMMENT '包装机班组ID',
   `package_shift_id` int(20) NULL DEFAULT NULL COMMENT '装封箱机班组ID',
-   PRIMARY KEY (`qr_code`, `package_code`, `item_code`, `relation_date`) USING BTREE,
+   PRIMARY KEY (`qr_code`, `package_code`, `item_code`, `relation_date`,`package_relation_date`) USING BTREE,
   INDEX `index_query`(`machine_code`, `relation_date`) USING BTREE COMMENT 'countQuery',
   INDEX `code_query`(`qr_code`, `package_code`, `item_code`) USING BTREE COMMENT 'codeQuery'
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;

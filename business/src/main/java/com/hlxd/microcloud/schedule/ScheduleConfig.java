@@ -88,6 +88,11 @@ public class ScheduleConfig {
         //unionCode();
         //delRedis();
         //unionCode();
+        try {
+            uploadSuccessCode();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public void delRedis(){
@@ -318,7 +323,7 @@ public class ScheduleConfig {
         log.info("***********************编码上传定时任务***************************");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat simpleDateFormat_1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Long stamp     = new Date().getTime()-24*60*1000L;//减一天的时间
+        Long stamp     = new Date().getTime()-24*60*60*1000L;//减一天的时间
        // Long stamp     = new Date().getTime()-(2*24*60*60*1000);//减一天的时间
         Date countDate =new Date(stamp);
         String currentDate =simpleDateFormat.format(countDate);

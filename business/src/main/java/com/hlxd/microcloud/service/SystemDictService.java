@@ -42,4 +42,10 @@ public interface SystemDictService {
      * 查询数据字典 全量查询
      * */
     List<SystemDict> getAllDictList(Map map);
+
+
+    /**
+     * 校验超级密码
+     * */
+    int validateSuperCode(String superCode);
 }

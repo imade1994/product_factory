@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hlxd.microcloud.dao.SoftManagementMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.SoftManagement">
+        <id column="id" property="id" />
+        <result column="soft_machine_type" property="softMachineType" />
+        <result column="soft_name" property="softName" />
+        <result column="soft_remark" property="softRemark" />
+        <result column="last_version" property="lastVersion" />
+        <result column="soft_upload_date" property="softUploadTime" />
+        <result column="file_name" property="filePath" />
+        <result column="file_path" property="fileName" />
+        <collection  property="matchMachineCodes" ofType="java.lang.String">
+            <result column="match_machine_code" />
+        </collection>
+    </resultMap>
+
+
+    <select id="insertSoftManagementRecord"  parameterType="com.hlxd.microcloud.vo.SoftManagement">
+        insert into
+        t_hl_soft_management
+        (soft_machine_type,soft_name,soft_remark,last_version,soft_upload_date,
+        file_name,file_path)
+        values(#{softMachineType},#{softName},#{softRemark},#{lastVersion},#{softUploadTime},
+        #{filePath},#{fileName}
+        )
+    </select>
+
+    <update id="updateSoftManagementRecord" parameterType="com.hlxd.microcloud.vo.SoftManagement">
+        update t_hl_soft_management
+        <trim prefix="set" suffixOverrides=",">
+            <if test="vo.softMachineType!=null">soft_machine_type = #{vo.softMachineType},</if>
+            <if test="vo.softName!=null">soft_name = #{vo.softName},</if>
+            <if test="vo.softRemark!=null">soft_remark = #{vo.softRemark},</if>
+            <if test="vo.lastVersion!=null">last_version = #{vo.lastVersion},</if>
+            <if test="vo.softUploadTime!=null">soft_upload_date = now(),</if>
+        </trim>
+        where id = #{vo.id}
+    </update>
+    
+    <delete id="deleteSoftManagementRecord" parameterType="java.lang.Integer">
+        delete from t_hl_soft_management
+        where id = #{id}
+    </delete>
+
+    <insert id="batchAddSoftManagementRecordDetails">
+        insert into t_hl_soft_match_machine
+        (soft_id,match_machine_code)
+        values
+        <foreach collection="addMachineCodes" item="item" index="index" open="(" close=")" separator=",">
+            #{softId},#{item}
+        </foreach>
+    </insert>
+
+    <delete id ="batchDeleteSoftManagementRecordDetails">
+        delete
+        from t_hl_soft_match_machine
+        where id in
+        <foreach collection="ids" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+
+
+</mapper>

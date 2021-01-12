@@ -72,6 +72,7 @@ public class DictController {
         returnMap=systemDictService.deleteSystemDict(paramMap);
         return returnMap;
     }
+
     @RequestMapping("/updateDict")
     public Map updateDict(SystemDict systemDict){
         Map returnMap = new HashMap();
@@ -79,6 +80,22 @@ public class DictController {
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
         return returnMap;
+    }
+
+
+    @RequestMapping("/validatePass")
+    public Map validatePass(@RequestParam("superCode")String superCode){
+        Map returnMap  = new HashMap();
+        int count      = systemDictService.validateSuperCode(superCode);
+        if(count==1){
+            returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+            returnMap.put(CommomStatic.MESSAGE,"验证成功！");
+        }else{
+            returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
+            returnMap.put(CommomStatic.MESSAGE,"密码错误！");
+        }
+        return returnMap;
+
     }
 
 

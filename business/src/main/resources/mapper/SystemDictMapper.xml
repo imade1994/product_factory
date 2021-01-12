@@ -146,4 +146,10 @@
         </if>
 
     </select>
+
+    <select id="validateSuperCode" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*)
+        from t_hl_system_dict
+        where id = 70 and `value` = #{superCode}
+    </select>
 </mapper>

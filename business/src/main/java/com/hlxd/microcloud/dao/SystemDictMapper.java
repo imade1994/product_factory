@@ -55,6 +55,12 @@ public interface SystemDictMapper {
     int countValidate(Map map);
 
 
+    /**
+     * 校验超级密码
+     * */
+    int validateSuperCode(@Param("superCode") String superCode);
+
+
 
 
 

@@ -98,4 +98,9 @@ public class SystemDictServiceImpl implements SystemDictService {
         return systemDictMapper.getAllDictList(map);
     }
 
+    @Override
+    public int validateSuperCode(String superCode) {
+        return systemDictMapper.validateSuperCode(superCode);
+    }
+
 }

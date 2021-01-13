@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * CREATED BY IDEA
@@ -20,17 +21,22 @@ public interface SoftManagementMapper {
 
 
 
-    void insertSoftManagementRecord(SoftManagement softManagement);
+    int insertSoftManagementRecord(SoftManagement softManagement);
 
     void deleteSoftManagementRecord(@Param("id")int id);
 
-    void updateSoftManagementRecord(SoftManagement softManagement);
+    void updateSoftManagementRecord(@Param("vo")SoftManagement softManagement);
 
 
     void batchAddSoftManagementRecordDetails(@Param("addMachineCodes") List<String> machineCodes,@Param("softId")int softId);
 
 
     void batchDeleteSoftManagementRecordDetails(@Param("ids")List<Integer> ids);
+
+
+    List<SoftManagement> getSoftManagement(Map map);
+
+
 
 
 

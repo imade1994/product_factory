@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * CREATED BY IDEA
@@ -25,8 +26,8 @@ public class SoftManagementServiceImpl implements SoftManagementService {
 
 
     @Override
-    public void insertSoftManagementRecord(SoftManagement softManagement) {
-        softManagementMapper.insertSoftManagementRecord(softManagement);
+    public int insertSoftManagementRecord(SoftManagement softManagement) {
+        return softManagementMapper.insertSoftManagementRecord(softManagement);
     }
 
     @Override
@@ -49,5 +50,10 @@ public class SoftManagementServiceImpl implements SoftManagementService {
     public void batchDeleteSoftManagementRecordDetails(List<Integer> ids) {
         softManagementMapper.batchDeleteSoftManagementRecordDetails(ids);
 
+    }
+
+    @Override
+    public List<SoftManagement> getSoftManagement(Map map) {
+        return softManagementMapper.getSoftManagement(map);
     }
 }

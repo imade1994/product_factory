@@ -127,10 +127,17 @@ public final class CommonUtil {
       return simpleDateFormat.format(new Date());
   }
 
-    public static String tableScheduleTime(String date) throws ParseException {
+    public static String tableScheduleTime(String date) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(TableTime);
         SimpleDateFormat simpleDateFormat_1 = new SimpleDateFormat(ScheduleDate);
-        return simpleDateFormat.format(simpleDateFormat_1.parse(date));
+        String returnString  = "";
+        try{
+            returnString = simpleDateFormat.format(simpleDateFormat_1.parse(date));
+        }catch (Exception e){
+            log.error("********************************时间转化异常"+date);
+            returnString = "********";
+        }
+        return returnString;
     }
     public static boolean compareBefore(Date date1,Date date2){
       return date1.getTime()<=date2.getTime();

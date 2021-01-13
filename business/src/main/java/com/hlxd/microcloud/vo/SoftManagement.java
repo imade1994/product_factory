@@ -34,7 +34,7 @@ public class SoftManagement implements Serializable {
 
     private String fileName;
 
-    private List<String> matchMachineCodes;
+    private List<SoftManagementRecordDetails> matchMachineCodes;
 
 
 }

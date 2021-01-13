@@ -200,7 +200,7 @@ FROM
   `package_machine_code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '装封箱机编码',
   `package_machine_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '装封箱机名称',
   `relation_date` timestamp(0) NOT NULL DEFAULT DEFAULT NULL COMMENT '包装机关联日期',
-  `package_relation_date` timestamp(0) NOT NULL DEFAULT NULL COMMENT '装封箱机关联日期',
+  `package_relation_date` timestamp(0) NOT NULL DEFAULT DEFAULT NULL COMMENT '装封箱机关联日期',
   `brand_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '牌号',
   `shift_id` int(20) NULL DEFAULT NULL COMMENT '包装机班组ID',
   `package_shift_id` int(20) NULL DEFAULT NULL COMMENT '装封箱机班组ID',

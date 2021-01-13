@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.text.ParseException;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class AsyncService {
 
 
     @Async("AsyncConfigure")
-    public void batchInsertByCanal(String itemCode,String produceDate,String machineCode){
+    public void batchInsertByCanal(String itemCode,String produceDate,String machineCode)  {
         log.info("**************************进入异步携带参数itemCode"+itemCode+"生产日期"+produceDate+"**********************************");
         Map param = new HashMap();
         param.put("itemCode",itemCode);
@@ -59,8 +60,8 @@ public class AsyncService {
              * 保证其他线程不能操作这条数据
              * */
             redisTemplate.opsForValue().set(REDIS_UNION_CODE_LOCK+itemCode,'1');
+            String tableName = UnionTableNamePrefix+tableScheduleTime(produceDate);
             try {
-                String tableName = UnionTableNamePrefix+tableScheduleTime(produceDate);
                 //log.info("*************关联详情表"+tableName+"**********************************");
                 int count = initService.checkTableExits(tableName);
                 if(!(count>0)){
@@ -98,8 +99,19 @@ public class AsyncService {
                     batchTaskService.insertErrorCode(scheduleErrorCode);
                     log.info(LOG_ERROR_PREFIX+"件码****************************"+itemCode+"****************************没有关联包条码!");
                 }
-            } catch (ParseException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                ScheduleErrorCode scheduleErrorCode = new ScheduleErrorCode();
+                scheduleErrorCode.setRelationDate(produceDate);
+                scheduleErrorCode.setTableName(tableName);
+                scheduleErrorCode.setMachineCode(machineCode);
+                scheduleErrorCode.setQrCode(itemCode);
+                scheduleErrorCode.setExecuteState(0);
+                batchTaskService.insertErrorCode(scheduleErrorCode);
+                log.info(LOG_ERROR_PREFIX+"件码****************************"+itemCode+"****************************执行是发生异常!");
+                /**
+                 * 回滚此次事务！
+                 * */
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             }finally {
                 redisTemplate.delete(REDIS_UNION_CODE_LOCK+itemCode);
             }

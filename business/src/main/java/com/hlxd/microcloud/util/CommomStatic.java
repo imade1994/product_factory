@@ -34,7 +34,7 @@ public final class CommomStatic {
     public static final String TIME="lastTime";
 
 
-    public static final String FILEPATH = "/static";
+    public static final String FILEPATH = "d:/static";
 
 
     public static final String FILENAME = "SOFT";

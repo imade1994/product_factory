@@ -12,13 +12,18 @@
         <result column="soft_upload_date" property="softUploadTime" />
         <result column="file_name" property="filePath" />
         <result column="file_path" property="fileName" />
-        <collection  property="matchMachineCodes" ofType="java.lang.String">
-            <result column="match_machine_code" />
+        <collection  property="matchMachineCodes" ofType="com.hlxd.microcloud.vo.SoftManagementRecordDetails">
+            <result column="match_machine_code" property="machineCode" />
+            <result column="d_id" property="id" />
+            <result column="soft_id" property="softId" />
         </collection>
     </resultMap>
 
 
-    <select id="insertSoftManagementRecord"  parameterType="com.hlxd.microcloud.vo.SoftManagement">
+    <insert id="insertSoftManagementRecord"  parameterType="com.hlxd.microcloud.vo.SoftManagement">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            select max(id)  from t_hl_soft_management
+        </selectKey>
         insert into
         t_hl_soft_management
         (soft_machine_type,soft_name,soft_remark,last_version,soft_upload_date,
@@ -26,7 +31,7 @@
         values(#{softMachineType},#{softName},#{softRemark},#{lastVersion},#{softUploadTime},
         #{filePath},#{fileName}
         )
-    </select>
+    </insert>
 
     <update id="updateSoftManagementRecord" parameterType="com.hlxd.microcloud.vo.SoftManagement">
         update t_hl_soft_management
@@ -35,7 +40,7 @@
             <if test="vo.softName!=null">soft_name = #{vo.softName},</if>
             <if test="vo.softRemark!=null">soft_remark = #{vo.softRemark},</if>
             <if test="vo.lastVersion!=null">last_version = #{vo.lastVersion},</if>
-            <if test="vo.softUploadTime!=null">soft_upload_date = now(),</if>
+            <if test="vo.softUploadTime!=null">soft_upload_date = #{vo.softUploadTime},</if>
         </trim>
         where id = #{vo.id}
     </update>
@@ -45,12 +50,12 @@
         where id = #{id}
     </delete>
 
-    <insert id="batchAddSoftManagementRecordDetails">
+    <insert id="batchAddSoftManagementRecordDetails" >
         insert into t_hl_soft_match_machine
         (soft_id,match_machine_code)
         values
-        <foreach collection="addMachineCodes" item="item" index="index" open="(" close=")" separator=",">
-            #{softId},#{item}
+        <foreach collection="addMachineCodes" item="item" index="index" separator=",">
+            (#{softId},#{item})
         </foreach>
     </insert>
 
@@ -62,6 +67,36 @@
             #{item}
         </foreach>
     </delete>
+
+    <select id="getSoftManagement" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+        select
+        thsm.*,
+        thsmm.id as d_id,
+        thsmm.soft_id,
+        thsmm.match_machine_code
+        from
+        t_hl_soft_management thsm
+        left join
+        t_hl_soft_match_machine thsmm
+        on thsmm.soft_id = thsm.id
+        <trim prefix="where" prefixOverrides="AND">
+            <if test="null != id">
+                AND thsm.id = #{id}
+            </if>
+            <if test="null != softMachineType">
+                AND thsm.soft_machine_type = #{softMachineType}
+            </if>
+            <if test="null != softName">
+                AND thsm.soft_name = #{softName}
+            </if>
+            <if test="null != machineCode">
+                AND thsmm.match_machine_code= #{machineCode}
+            </if>
+            <if test="null != validate">
+                ORDER BY thsm.soft_upload_date desc limit 1
+            </if>
+        </trim>
+    </select>
 
 
 

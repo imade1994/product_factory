@@ -1,6 +1,7 @@
 package com.hlxd.microcloud.service;
 
 import com.hlxd.microcloud.vo.Machine;
+import com.hlxd.microcloud.vo.SoftMachine;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
@@ -50,4 +51,11 @@ public interface MachineService {
     List<String> getRoom();
 
     Machine getMachine(String machineCode);
+
+
+
+    /**
+     * 适配机器
+     * */
+    List<SoftMachine> getAllSoftMachines();
 }

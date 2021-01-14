@@ -8,6 +8,7 @@ import com.hlxd.microcloud.util.FileUpload;
 import com.hlxd.microcloud.vo.Brand;
 import com.hlxd.microcloud.vo.SoftManagement;
 import com.hlxd.microcloud.vo.SoftManagementRecordDetails;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.internals.TransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +40,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class ApiOutController {
     @Autowired
     private BrandService brandService;
@@ -84,11 +91,17 @@ public class ApiOutController {
      * 只是更新记录，不涉及软件更新
      * */
     @RequestMapping("/soft/updateSoftManagementRecord")
-    public Map updateSoft(SoftManagement softManagement){
+    public Map updateSoft(SoftManagement softManagement,@RequestParam("addMachineCodes")List<String> addMachineCodes,@RequestParam("deleteMachineCodes")List<Integer> deleteMachineCodes){
         Map returnMap   =  new HashMap();
         if(null != softManagement){
             try{
                 softManagementService.updateSoftManagementRecord(softManagement);
+                if(addMachineCodes.size()>0){
+                    softManagementService.batchAddSoftManagementRecordDetails(addMachineCodes,softManagement.getId());
+                }
+                if(deleteMachineCodes.size()>0){
+                    softManagementService.batchDeleteSoftManagementRecordDetails(deleteMachineCodes);
+                }
                 returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
                 returnMap.put(CommomStatic.MESSAGE,"UPDATE SUCCESS!");
             }catch (Exception e){
@@ -115,7 +128,9 @@ public class ApiOutController {
         List<SoftManagement> softManagements = softManagementService.getSoftManagement(paramMap);
         try{
             softManagementService.deleteSoftManagementRecord(id);
+
             if(null != softManagements && softManagements.size()>0){
+                FileUpload.deleteFile(CommomStatic.FILEPATH+softManagements.get(0).getFileName());
                 List<SoftManagementRecordDetails> matchMachineCodes = softManagements.get(0).getMatchMachineCodes();
                 List<Integer> ids = new ArrayList<>();
                 matchMachineCodes.stream().forEach(matchMachineCode ->{
@@ -148,14 +163,61 @@ public class ApiOutController {
         paramMap.put("softName",softName);
         List<SoftManagement> softManagements = softManagementService.getSoftManagement(paramMap);
         if(softManagements.size()>0){
+            Map tem = new HashMap();
+            tem.put("softId",softManagements.get(0).getId());
+            tem.put("lastVersion",softManagements.get(0).getLastVersion());
             returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
-            returnMap.put(CommomStatic.MESSAGE,softManagements.get(0).getLastVersion());
+            returnMap.put(CommomStatic.MESSAGE,tem);
         }else{
             returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
             returnMap.put(CommomStatic.MESSAGE,"暂无版本信息！");
         }
         return returnMap;
     }
+
+    /**
+     * 获取软件信息
+     * */
+    @RequestMapping("/soft/getSoftManagementRecords")
+    public Map getSoftManagementRecords(HttpServletRequest request){
+        Map paramMap = CommonUtil.transformMap(request.getParameterMap());
+        Map returnMap = new HashMap();
+        List<SoftManagement> softManagements =
+                softManagementService.getSoftManagement(paramMap);
+        returnMap.put(CommomStatic.DATA,softManagements);
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        return returnMap;
+    }
+
+    /**
+     * 下载软件
+     * */
+    @RequestMapping("/soft/downLoadSoft")
+    public void downLoadSoft(@RequestParam("softManagementRecordId")int softManagementRecordId, HttpServletResponse response,HttpServletRequest request){
+        Map paramMap  = new HashMap();
+        paramMap.put("id",softManagementRecordId);
+        List<SoftManagement> softManagements = softManagementService.getSoftManagement(paramMap);
+        if(softManagements.size()>0){
+            try{
+                String fileName = softManagements.get(0).getFileName();
+                String filePath = CommomStatic.FILEPATH;
+                InputStream is  = new FileInputStream(filePath+fileName);
+                response.reset();
+                response.setContentType("bin");
+                response.addHeader("Content-Disposition", "attachment; filename=\"" + FileUpload.getFilename(request.getHeader("user-agent"),softManagements.get(0).getFileName()) + "\"");
+                byte[]b = new byte[1024];
+                int len;
+                while((len = is.read(b))>0 ){
+                    response.getOutputStream().write(b,0,len);
+                    is.close();
+                }
+            }catch (Exception e){
+                log.error("*********************系统下载功能异常"+e.getMessage());
+            }
+        }
+    }
+
+
 
 
 

@@ -22,6 +22,8 @@ public class SoftManagement implements Serializable {
 
     private String softMachineType;
 
+    private String softMachineName;
+
     private String softName;
 
     private String softRemark;
@@ -35,6 +37,8 @@ public class SoftManagement implements Serializable {
     private String fileName;
 
     private List<SoftManagementRecordDetails> matchMachineCodes;
+
+
 
 
 }

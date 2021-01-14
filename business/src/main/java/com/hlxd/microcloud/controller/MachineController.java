@@ -3,6 +3,7 @@ package com.hlxd.microcloud.controller;
 import com.hlxd.microcloud.service.MachineService;
 import com.hlxd.microcloud.util.CommomStatic;
 import com.hlxd.microcloud.vo.Machine;
+import com.hlxd.microcloud.vo.SoftMachine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +41,15 @@ public class MachineController {
         List<Machine> machines = machineService.getMachineList(paramMap);
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         returnMap.put(CommomStatic.DATA,machines);
+        return returnMap;
+    }
+
+    @RequestMapping("/getSoftMachine")
+    public Map getSoftMachine(){
+        Map returnMap = new HashMap();
+        List<SoftMachine> softMachines = machineService.getAllSoftMachines();
+        returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
+        returnMap.put(CommomStatic.DATA,softMachines);
         return returnMap;
     }
 

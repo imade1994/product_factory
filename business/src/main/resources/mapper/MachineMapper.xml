@@ -16,6 +16,13 @@
         <result column="group_name" property="groupName" />
     </resultMap>
 
+    <resultMap id="softMachine" type="com.hlxd.microcloud.vo.SoftMachine">
+        <result column="machine_model" property="machineModel" />
+        <collection property="machineCodes" ofType="java.lang.String" javaType="list">
+            <result column="machine_code"></result>
+        </collection>
+    </resultMap>
+
 
     <select id="getMachineList" resultMap="BaseResultMap" parameterType="java.util.HashMap">
         select thbm.*,
@@ -76,6 +83,13 @@
         from t_hl_base_machine
         where machine_code = #{machineCode}
 
+    </select>
+
+    <select id="getAllSoftMachines" resultMap="softMachine">
+        select
+        machine_model,
+        machine_code
+         from t_hl_base_machine
     </select>
 
 

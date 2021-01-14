@@ -3,6 +3,7 @@ package com.hlxd.microcloud.service.impl;
 import com.hlxd.microcloud.dao.MachineMapper;
 import com.hlxd.microcloud.service.MachineService;
 import com.hlxd.microcloud.vo.Machine;
+import com.hlxd.microcloud.vo.SoftMachine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +53,11 @@ public class MachineServiceImpl implements MachineService {
     @Override
     public Machine getMachine(String machineCode) {
         return machineMapper.getMachine(machineCode);
+    }
+
+    @Override
+    public List<SoftMachine> getAllSoftMachines() {
+        return machineMapper.getAllSoftMachines();
     }
 
 

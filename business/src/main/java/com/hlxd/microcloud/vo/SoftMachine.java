@@ -3,28 +3,24 @@ package com.hlxd.microcloud.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * CREATED BY IDEA
  *
  * @Author taojun
- * @Date 2021/1/1316:46
+ * @Date 2021/1/1416:03
  * @VERSION 4.0
  * @COMPANY HLXD
  * @PROJECT product_factory_master
  */
 @Data
-public class SoftManagementRecordDetails implements Serializable {
+public class SoftMachine implements Serializable {
+
+    private String machineModel;
 
 
-    private int id;
+    private List<String> machineCodes;
 
-
-    private int softId;
-
-    private String machineCode;
-
-
-    private String machineName;
 
 }

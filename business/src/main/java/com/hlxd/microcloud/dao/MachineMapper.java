@@ -1,6 +1,7 @@
 package com.hlxd.microcloud.dao;
 
 import com.hlxd.microcloud.vo.Machine;
+import com.hlxd.microcloud.vo.SoftMachine;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -48,4 +49,10 @@ public interface MachineMapper {
     List<String> getRoom();
 
     Machine getMachine(@Param("machineCode")String machineCode);
+
+
+    /**
+     * 适配机器
+     * */
+    List<SoftMachine> getAllSoftMachines();
 }

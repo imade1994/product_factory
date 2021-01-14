@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.hlxd.microcloud.vo.SoftManagement">
         <id column="id" property="id" />
         <result column="soft_machine_type" property="softMachineType" />
+        <result column="soft_machine_name" property="softMachineName" />
         <result column="soft_name" property="softName" />
         <result column="soft_remark" property="softRemark" />
         <result column="last_version" property="lastVersion" />
@@ -14,6 +15,7 @@
         <result column="file_path" property="fileName" />
         <collection  property="matchMachineCodes" ofType="com.hlxd.microcloud.vo.SoftManagementRecordDetails">
             <result column="match_machine_code" property="machineCode" />
+            <result column="match_machine_name" property="machineName" />
             <result column="d_id" property="id" />
             <result column="soft_id" property="softId" />
         </collection>
@@ -28,7 +30,7 @@
         t_hl_soft_management
         (soft_machine_type,soft_name,soft_remark,last_version,soft_upload_date,
         file_name,file_path)
-        values(#{softMachineType},#{softName},#{softRemark},#{lastVersion},#{softUploadTime},
+        values(#{softMachineType},#{softName},#{softRemark},#{lastVersion},now(),
         #{filePath},#{fileName}
         )
     </insert>
@@ -40,7 +42,6 @@
             <if test="vo.softName!=null">soft_name = #{vo.softName},</if>
             <if test="vo.softRemark!=null">soft_remark = #{vo.softRemark},</if>
             <if test="vo.lastVersion!=null">last_version = #{vo.lastVersion},</if>
-            <if test="vo.softUploadTime!=null">soft_upload_date = #{vo.softUploadTime},</if>
         </trim>
         where id = #{vo.id}
     </update>
@@ -73,13 +74,19 @@
         thsm.*,
         thsmm.id as d_id,
         thsmm.soft_id,
-        thsmm.match_machine_code
+        thsmm.match_machine_code,
+        thbm.machine_model as match_machine_name,
+        thsd.key as soft_machine_name
         from
         t_hl_soft_management thsm
         left join
         t_hl_soft_match_machine thsmm
         on thsmm.soft_id = thsm.id
-        <trim prefix="where" prefixOverrides="AND">
+        left join t_hl_system_dict thsd
+        on thsm.soft_machine_type = thsd.value
+        left join t_hl_base_machine thbm
+        on thsmm.match_machine_code = thbm.machine_code
+        <trim prefix="where" prefixOverrides="AND" >
             <if test="null != id">
                 AND thsm.id = #{id}
             </if>
@@ -87,7 +94,10 @@
                 AND thsm.soft_machine_type = #{softMachineType}
             </if>
             <if test="null != softName">
-                AND thsm.soft_name = #{softName}
+                AND thsm.soft_name like CONCAT(CONCAT('%',#{softName}),'%')
+            </if>
+            <if test="null != lastVersion">
+                AND thsm.last_version = #{lastVersion}
             </if>
             <if test="null != machineCode">
                 AND thsmm.match_machine_code= #{machineCode}

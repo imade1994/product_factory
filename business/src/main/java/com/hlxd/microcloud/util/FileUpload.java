@@ -3,9 +3,11 @@ package com.hlxd.microcloud.util;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
+import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -128,5 +130,22 @@ public class FileUpload {
             System.out.println("删除文件失败：" + fileName + "不存在！");
             return false;
         }
+    }
+
+    public static String   getFilename(String agent ,String filename) throws UnsupportedEncodingException {
+        if (agent.contains("MSIE")) {
+            // IE浏览器
+            filename = URLEncoder.encode(filename, "utf-8");
+            filename = filename.replace("+", " ");
+        } else if (agent.contains("Firefox")) {
+            // 火狐浏览器
+            BASE64Encoder base64Encoder = new BASE64Encoder();
+            filename = "=?utf-8?B?"
+                    + base64Encoder.encode(filename.getBytes("utf-8")) + "?=";
+        } else {
+            // 其它浏览器
+            filename = URLEncoder.encode(filename, "utf-8");
+        }
+        return filename;
     }
 }

@@ -132,6 +132,11 @@ public class ScheduleConfig {
                  */
                             List<CodeUnion> codeUnions = batchTaskService.getCodeUnionByItemCode(map);
                             if(null != codeUnions&&codeUnions.size()>0){
+                                int count = initService.checkTableExits(scheduleErrorCode.getTableName());
+                                if(!(count>0)){
+                                    //log.info("*************表"+tableName+"不存在，手动创建！**********************************");
+                                    initService.createNewUnionTable(scheduleErrorCode.getTableName());
+                                }
                                 /*
                  * 先执行删除再同步插入
                  */
@@ -142,15 +147,15 @@ public class ScheduleConfig {
                  * 更新异常主库ID
                  * 状态码 1:为执行完成可以执行删除
                  */
-                                batchTaskService.updateSchedule(scheduleErrorCode.getId(),1);
+                                //batchTaskService.updateSchedule(scheduleErrorCode.getId(),1);
                                 /*
                  * 从主库移除数据
-                 *//*
+                 */
                  batchTaskService.deleteCodeFromSystemCode(scheduleErrorCode.getQrCode());
-                 *//*
+                /*
                  * 从执行异常库删除数据
-                 *//*
-                                batchTaskService.deleteSchedule(scheduleErrorCode.getId());*/
+                 */
+                                batchTaskService.deleteSchedule(scheduleErrorCode.getId());
                             }
                         }catch (Exception e){
                             log.error(LOG_ERROR_PREFIX+"****************定时任务出现异常二维码为"+scheduleErrorCode.getQrCode()+"***************异常信息为"+e.getMessage());
@@ -251,7 +256,7 @@ public class ScheduleConfig {
         }
     }
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 30 1 * * ?")
     //@Scheduled(cron = "0 0/1 * * * ? ")
     public void deleteCodeFromBase(){
         log.info(LOG_INFO_PREFIX+"******************************删除任务触发");

@@ -45,7 +45,7 @@ public class ThreadManager {
     public static ThreadPoolProxy getLongPool() {
         synchronized (mLongLock) {
             if (mLongPool == null) {
-                mLongPool = new ThreadPoolProxy(50, 50, 5L);
+                mLongPool = new ThreadPoolProxy(100, 100, 5L);
             }
             return mLongPool;
         }
@@ -55,7 +55,7 @@ public class ThreadManager {
     public static ThreadPoolProxy getShortPool() {
         synchronized (mShortLock) {
             if (mShortPool == null) {
-                mShortPool = new ThreadPoolProxy(50, 50, 5L);
+                mShortPool = new ThreadPoolProxy(100, 100, 5L);
             }
             return mShortPool;
         }

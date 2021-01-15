@@ -113,16 +113,17 @@ values
 A
 from
 t_hl_system_code  A
-where  EXISTS
+where  A.parent_code in
 (
-select * from
+select qrcode from
 (select
    DISTINCT(qrcode) as qrcode
         from t_hl_system_code thsc
         where thsc.package_type = 2
         and thsc.parent_code = #{itemCode} )c
-where A.parent_code = c.qrcode
-) or parent_code = #{itemCode} or qrCode = #{itemCode}
+);
+ delete from t_hl_system_code where parent_code = #{itemCode} and package_type = 2;
+ delete from t_hl_system_code where qrCode = #{itemCode} and package_type=3;
     </delete>
 
     <insert id="insertErrorCode" parameterType="com.hlxd.microcloud.vo.ScheduleErrorCode">
@@ -158,10 +159,6 @@ where A.parent_code = c.qrcode
         delete
         from  ${tableName}
         where item_code = '${itemCode}'
-
-
-
-
     </delete>
 
 

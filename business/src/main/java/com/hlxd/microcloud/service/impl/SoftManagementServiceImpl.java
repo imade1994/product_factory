@@ -2,6 +2,7 @@ package com.hlxd.microcloud.service.impl;
 
 import com.hlxd.microcloud.dao.SoftManagementMapper;
 import com.hlxd.microcloud.service.SoftManagementService;
+import com.hlxd.microcloud.vo.SoftVo;
 import com.hlxd.microcloud.vo.SoftManagement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,26 @@ public class SoftManagementServiceImpl implements SoftManagementService {
     @Autowired
     private SoftManagementMapper softManagementMapper;
 
+
+    @Override
+    public void insertSoft(SoftVo soft) {
+         softManagementMapper.insertSoft(soft);
+    }
+
+    @Override
+    public void updateSoft(Map map) {
+        softManagementMapper.updateSoft(map);
+    }
+
+    @Override
+    public void deleteSoft(int id) {
+        softManagementMapper.deleteSoft(id);
+    }
+
+    @Override
+    public SoftManagement getSoftVersion(int id) {
+        return softManagementMapper.getSoftVersion(id);
+    }
 
     @Override
     public int insertSoftManagementRecord(SoftManagement softManagement) {
@@ -53,7 +74,7 @@ public class SoftManagementServiceImpl implements SoftManagementService {
     }
 
     @Override
-    public List<SoftManagement> getSoftManagement(Map map) {
+    public List<SoftVo> getSoftManagement(Map map) {
         return softManagementMapper.getSoftManagement(map);
     }
 }

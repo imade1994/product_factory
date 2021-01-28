@@ -1,5 +1,6 @@
 package com.hlxd.microcloud.service;
 
+import com.hlxd.microcloud.vo.SoftVo;
 import com.hlxd.microcloud.vo.SoftManagement;
 
 import java.util.List;
@@ -16,6 +17,26 @@ import java.util.Map;
  */
 public interface SoftManagementService {
 
+    /**
+     * 新增软件信息
+     * */
+    void insertSoft(SoftVo soft);
+
+    /**
+     * 更新软件信息
+     * */
+    void updateSoft(Map map);
+
+    /**
+     * 删除软件
+     * */
+    void deleteSoft(int id);
+
+    /**
+     * 获取版本信息
+     * */
+    SoftManagement getSoftVersion(int id);
+
     int insertSoftManagementRecord(SoftManagement softManagement);
 
     void deleteSoftManagementRecord(int id);
@@ -28,7 +49,7 @@ public interface SoftManagementService {
     void batchDeleteSoftManagementRecordDetails(List<Integer> ids);
 
 
-    List<SoftManagement> getSoftManagement(Map map);
+    List<SoftVo> getSoftManagement(Map map);
 
 
 

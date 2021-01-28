@@ -19,10 +19,7 @@ public class SoftManagement implements Serializable {
 
     private int id;
 
-
-    private String softMachineType;
-
-    private String softMachineName;
+    private int softId;
 
     private String softName;
 

@@ -57,5 +57,5 @@ public interface MachineService {
     /**
      * 适配机器
      * */
-    List<SoftMachine> getAllSoftMachines();
+    List<SoftMachine> getAllSoftMachines(Map map);
 }

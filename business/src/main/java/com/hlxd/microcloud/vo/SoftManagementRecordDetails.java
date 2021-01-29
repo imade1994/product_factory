@@ -22,6 +22,8 @@ public class SoftManagementRecordDetails implements Serializable {
 
     private int versionId;
 
+    private String machineModel;
+
     private String machineCode;
 
 

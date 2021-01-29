@@ -85,11 +85,16 @@
 
     </select>
 
-    <select id="getAllSoftMachines" resultMap="softMachine">
+    <select id="getAllSoftMachines" resultMap="softMachine" parameterType="java.util.HashMap">
         select
         machine_model,
         machine_code
-         from t_hl_base_machine
+        from t_hl_base_machine
+        <trim prefix="where" prefixOverrides="AND">
+            <if test="null != groupCode">
+            AND group_code = #{groupCode}
+            </if>
+        </trim>
     </select>
 
 

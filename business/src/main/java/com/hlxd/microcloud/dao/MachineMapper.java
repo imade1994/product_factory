@@ -54,5 +54,5 @@ public interface MachineMapper {
     /**
      * 适配机器
      * */
-    List<SoftMachine> getAllSoftMachines();
+    List<SoftMachine> getAllSoftMachines(Map map);
 }

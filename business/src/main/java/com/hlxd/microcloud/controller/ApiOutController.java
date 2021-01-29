@@ -129,8 +129,8 @@ public class ApiOutController {
         softManagement.setFilePath(CommomStatic.FILEPATH);
         softManagement.setFileName(fileName);
         try{
-            softManagementService.insertSoftManagementRecord(softManagement);
-            int versionId  = softManagement.getId();
+            int versionId =softManagementService.insertSoftManagementRecord(softManagement);
+
             if(machineCodes.size()>0){
                 softManagementService.batchAddSoftManagementRecordDetails(machineCodes,versionId);
             }
@@ -156,11 +156,24 @@ public class ApiOutController {
             try{
                 //获取之前的记录
                 SoftManagement oldSoft = softManagementService.getSoftVersion(softManagement.getId());
-                //删除旧文件
-                FileUpload.deleteFile(CommomStatic.FILEPATH+oldSoft.getFileName());
-                //上传新文件
-                String fileName = FileUpload.Upload(file,CommomStatic.FILEPATH,softManagement.getSoftName()+"-"+softManagement.getLastVersion());
-                softManagement.setFileName(fileName);
+                List<SoftManagementRecordDetails> softManagementRecordDetails = oldSoft.getMatchMachineCodes();
+                if(addMachineCodes.size()>0){
+                    for(String s:addMachineCodes){
+                        for(SoftManagementRecordDetails softManagementRecordDetails1:softManagementRecordDetails){
+                            if(s.equals(softManagementRecordDetails1.getMachineCode())){
+                                //移除，重复添加编码
+                                addMachineCodes.remove(s);
+                            }
+                        }
+                    }
+                }
+                if(null != file){
+                    //删除旧文件
+                    FileUpload.deleteFile(CommomStatic.FILEPATH+oldSoft.getFileName());
+                    //上传新文件
+                    String fileName = FileUpload.Upload(file,CommomStatic.FILEPATH,softManagement.getSoftName()+"-"+softManagement.getLastVersion());
+                    softManagement.setFileName(fileName);
+                }
                 //更新版本记录
                 softManagementService.updateSoftManagementRecord(softManagement);
                 if(addMachineCodes.size()>0){

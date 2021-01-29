@@ -56,8 +56,8 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
-    public List<SoftMachine> getAllSoftMachines() {
-        return machineMapper.getAllSoftMachines();
+    public List<SoftMachine> getAllSoftMachines(Map map) {
+        return machineMapper.getAllSoftMachines(map);
     }
 
 

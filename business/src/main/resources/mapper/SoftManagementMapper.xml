@@ -21,6 +21,7 @@
             <collection  property="matchMachineCodes" ofType="com.hlxd.microcloud.vo.SoftManagementRecordDetails">
                 <result column="m_match_machine_code" property="machineCode" />
                 <result column="m_match_machine_name" property="machineName" />
+                <result column="m_machine_model" property="machineModel" />
                 <result column="m_id" property="id" />
                 <result column="m_version_id" property="versionId" />
             </collection>
@@ -39,6 +40,7 @@
         <collection  property="matchMachineCodes" ofType="com.hlxd.microcloud.vo.SoftManagementRecordDetails">
             <result column="m_match_machine_code" property="machineCode" />
             <result column="m_match_machine_name" property="machineName" />
+            <result column="m_machine_model" property="machineModel" />
             <result column="m_id" property="id" />
             <result column="m_version_id" property="versionId" />
         </collection>
@@ -135,7 +137,8 @@
         thsmm.id as m_id,
         thsmm.version_id as m_version_id,
         thsmm.match_machine_code as m_match_machine_code,
-        thbm.machine_name as m_match_machine_name
+        thbm.machine_name as m_match_machine_name,
+        thbm.machine_model as m_machine_model
         from t_hl_soft ths
         left join t_hl_soft_management thsm
         on ths.id = thsm.soft_id
@@ -150,7 +153,7 @@
                 AND ths.id = #{id}
             </if>
             <if test="null != softMachineType">
-                AND ths.soft_machine_type = #{softMachineType}
+                AND ths.match_machine_type = #{softMachineType}
             </if>
             <if test="null != softName">
                 AND ths.soft_name like CONCAT(CONCAT('%',#{softName}),'%')
@@ -185,10 +188,14 @@
         thsm.file_path as filePath,
         thsmm.id as m_id,
         thsmm.version_id as m_version_id,
-        thsmm.match_machine_code as m_match_machine_code
+        thsmm.match_machine_code as m_match_machine_code,
+        thbm.machine_model as m_machine_model,
+        thbm.machine_name  as m_match_machine_name
         from t_hl_soft_management thsm
         left join t_hl_soft_match_machine thsmm
         on thsm.id = thsmm.version_id
+        left join t_hl_base_machine thbm
+        on thsmm.match_machine_code = thbm.machine_code
         where thsm.id = #{id}
     </select>
 

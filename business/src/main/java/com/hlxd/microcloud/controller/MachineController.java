@@ -45,9 +45,10 @@ public class MachineController {
     }
 
     @RequestMapping("/getSoftMachine")
-    public Map getSoftMachine(){
+    public Map getSoftMachine(HttpServletRequest request){
+        Map paramMap = transformMap(request.getParameterMap());
+        List<SoftMachine> softMachines = machineService.getAllSoftMachines(paramMap);
         Map returnMap = new HashMap();
-        List<SoftMachine> softMachines = machineService.getAllSoftMachines();
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         returnMap.put(CommomStatic.DATA,softMachines);
         return returnMap;

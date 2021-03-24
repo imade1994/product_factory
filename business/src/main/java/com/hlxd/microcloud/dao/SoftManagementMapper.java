@@ -24,7 +24,7 @@ public interface SoftManagementMapper {
     /**
      * 新增软件信息
      * */
-    void insertSoft(SoftVo soft);
+    int insertSoft(SoftVo soft);
 
     /**
      * 更新软件信息
@@ -48,7 +48,7 @@ public interface SoftManagementMapper {
     /**
      * 获取版本信息
      * */
-    SoftManagement getSoftVersion(@Param("id")int id);
+    SoftManagement getSoftVersion(Map map);
 
 
     /**
@@ -59,7 +59,7 @@ public interface SoftManagementMapper {
     /**
      * 批量更新适应版本信息
      * */
-    void batchAddSoftManagementRecordDetails(@Param("addMachineCodes") List<String> machineCodes,@Param("softId")int softId);
+    void batchAddSoftManagementRecordDetails(@Param("addMachineModels") List<String> machineModels,@Param("softId")int softId);
 
     /**
      * 批量删除适应版本信息

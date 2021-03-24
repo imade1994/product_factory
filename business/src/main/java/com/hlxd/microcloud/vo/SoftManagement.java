@@ -33,7 +33,7 @@ public class SoftManagement implements Serializable {
 
     private String fileName;
 
-    private List<SoftManagementRecordDetails> matchMachineCodes;
+
 
 
 

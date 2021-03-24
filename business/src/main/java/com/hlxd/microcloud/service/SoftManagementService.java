@@ -20,7 +20,7 @@ public interface SoftManagementService {
     /**
      * 新增软件信息
      * */
-    void insertSoft(SoftVo soft);
+    int insertSoft(SoftVo soft);
 
     /**
      * 更新软件信息
@@ -35,7 +35,7 @@ public interface SoftManagementService {
     /**
      * 获取版本信息
      * */
-    SoftManagement getSoftVersion(int id);
+    SoftManagement getSoftVersion(Map map);
 
     int insertSoftManagementRecord(SoftManagement softManagement);
 

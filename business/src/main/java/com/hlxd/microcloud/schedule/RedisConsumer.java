@@ -9,6 +9,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * CREATED BY IDEA
@@ -19,12 +22,14 @@ import javax.annotation.PostConstruct;
  * @COMPANY HLXD
  * @PROJECT product_factory_master
  */
-@Component
+//@Component
 @Slf4j
 public class RedisConsumer {
 
     @Autowired
-    public  RedisTemplate<String, Object> redisTemplate;
+    public  RedisTemplate<String, Object> redisTemplate
+
+            ;
 
     public  RedisConsumer redisConsumer;
 
@@ -52,6 +57,7 @@ public class RedisConsumer {
     public void initDataToRedis(){
         KafkaConsumerUtil consumer = new KafkaConsumerUtil(redisConsumer);
         Thread thread = new Thread(consumer);
+
         thread.start();
     }
 

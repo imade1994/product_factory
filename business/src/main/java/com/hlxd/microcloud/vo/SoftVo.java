@@ -33,4 +33,6 @@ public class SoftVo implements Serializable {
 
     private List<SoftManagement> softVersions;
 
+    private List<SoftManagementRecordDetails> matchMachineModel;
+
 }

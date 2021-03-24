@@ -58,23 +58,54 @@ public class ApiOutController {
     }
 
     @RequestMapping("/soft/addSoft")
-    public Map addSoft(SoftVo soft){
+    @Transactional(rollbackFor = Exception.class)
+    public Map addSoft(SoftVo soft,@RequestParam("machineModel") List<String> machineModel){
         Map returnMap = new HashMap();
-        softManagementService.insertSoft(soft);
+        int softId = softManagementService.insertSoft(soft);
+        if(machineModel.size()>0){
+            softManagementService.batchAddSoftManagementRecordDetails(machineModel,softId);
+        }
         returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
         returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
         return  returnMap;
     }
 
     @RequestMapping("/soft/updateSoft")
-    public Map updateSoft(HttpServletRequest request){
+    @Transactional(rollbackFor = Exception.class)
+    public Map updateSoft(HttpServletRequest request,@RequestParam("addMachineModels")List<String> addMachineModel,@RequestParam("deleteMachineModels")List<Integer> deleteMachineModel){
         Map returnMap = new HashMap();
         Map<String,String> paramMap  = CommonUtil.transformMap(request.getParameterMap());
         try {
             softManagementService.updateSoft(paramMap);
+            List<SoftVo> softs = softManagementService.getSoftManagement(paramMap);
+            if(null !=softs && softs.size()>0){
+                SoftVo softVo = softs.get(0);
+                List<SoftManagementRecordDetails> softManagementRecordDetails = softVo.getMatchMachineModel();
+                if(addMachineModel.size()>0){
+                    for(String s:addMachineModel){
+                        for(SoftManagementRecordDetails softManagementRecordDetails1:softManagementRecordDetails){
+                            if(s.equals(softManagementRecordDetails1.getMachineModel())){
+                                //移除，重复添加编码
+                                addMachineModel.remove(s);
+                            }
+                        }
+                    }
+                }
+                if(addMachineModel.size()>0){
+                    softManagementService.batchAddSoftManagementRecordDetails(addMachineModel,softVo.getId());
+                }
+                if(deleteMachineModel.size()>0){
+                    softManagementService.batchDeleteSoftManagementRecordDetails(deleteMachineModel);
+                }
+            }
+
             returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
             returnMap.put(CommomStatic.MESSAGE,CommomStatic.SUCCESS_MESSAGE);
         }catch (Exception e){
+            /**
+             * 上述过程发生异常，手动回滚事务
+             * */
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
             returnMap.put(CommomStatic.MESSAGE,"更新失败！"+e.getMessage());
         }
@@ -98,7 +129,7 @@ public class ApiOutController {
                 //删除软件关联设备信息
                 if(null != softManagements && softManagements.size()>0){
                     FileUpload.deleteFile(CommomStatic.FILEPATH+softManagement.getFileName());
-                    List<SoftManagementRecordDetails> matchMachineCodes = softManagement.getMatchMachineCodes();
+                    List<SoftManagementRecordDetails> matchMachineCodes = softList.get(0).getMatchMachineModel();
                     List<Integer> ids = new ArrayList<>();
                     matchMachineCodes.stream().forEach(matchMachineCode ->{
                         ids.add(matchMachineCode.getId());
@@ -122,18 +153,14 @@ public class ApiOutController {
 
     @RequestMapping("/soft/upload")
     @Transactional(rollbackFor = Exception.class)
-    public Map uploadMachineSoft(MultipartFile file, SoftManagement softManagement,@RequestParam("machineCodes") List<String> machineCodes){
+    public Map uploadMachineSoft(MultipartFile file, SoftManagement softManagement){
         Map returnMap   =  new HashMap();
         String fileName = FileUpload.Upload(file,CommomStatic.FILEPATH,softManagement.getSoftName()+"-"+softManagement.getLastVersion());
         //SoftManagement softManagement = new SoftManagement();
         softManagement.setFilePath(CommomStatic.FILEPATH);
         softManagement.setFileName(fileName);
         try{
-            int versionId =softManagementService.insertSoftManagementRecord(softManagement);
-
-            if(machineCodes.size()>0){
-                softManagementService.batchAddSoftManagementRecordDetails(machineCodes,versionId);
-            }
+            softManagementService.insertSoftManagementRecord(softManagement);
             returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
             returnMap.put(CommomStatic.MESSAGE,"上传成功！");
         }catch (Exception e){
@@ -150,23 +177,14 @@ public class ApiOutController {
      * 只是更新记录，不涉及软件更新
      * */
     @RequestMapping("/soft/updateSoftManagementRecord")
-    public Map updateSoft(SoftManagement softManagement,@RequestParam("addMachineCodes")List<String> addMachineCodes,@RequestParam("deleteMachineCodes")List<Integer> deleteMachineCodes,MultipartFile file){
+    public Map updateSoft(SoftManagement softManagement,MultipartFile file){
         Map returnMap   =  new HashMap();
         if(null != softManagement){
             try{
                 //获取之前的记录
-                SoftManagement oldSoft = softManagementService.getSoftVersion(softManagement.getId());
-                List<SoftManagementRecordDetails> softManagementRecordDetails = oldSoft.getMatchMachineCodes();
-                if(addMachineCodes.size()>0){
-                    for(String s:addMachineCodes){
-                        for(SoftManagementRecordDetails softManagementRecordDetails1:softManagementRecordDetails){
-                            if(s.equals(softManagementRecordDetails1.getMachineCode())){
-                                //移除，重复添加编码
-                                addMachineCodes.remove(s);
-                            }
-                        }
-                    }
-                }
+                Map paramMap = new HashMap();
+                paramMap.put("id",softManagement.getId());
+                SoftManagement oldSoft = softManagementService.getSoftVersion(paramMap);
                 if(null != file){
                     //删除旧文件
                     FileUpload.deleteFile(CommomStatic.FILEPATH+oldSoft.getFileName());
@@ -176,12 +194,6 @@ public class ApiOutController {
                 }
                 //更新版本记录
                 softManagementService.updateSoftManagementRecord(softManagement);
-                if(addMachineCodes.size()>0){
-                    softManagementService.batchAddSoftManagementRecordDetails(addMachineCodes,softManagement.getId());
-                }
-                if(deleteMachineCodes.size()>0){
-                    softManagementService.batchDeleteSoftManagementRecordDetails(deleteMachineCodes);
-                }
                 returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
                 returnMap.put(CommomStatic.MESSAGE,"更新成功!");
             }catch (Exception e){
@@ -201,11 +213,12 @@ public class ApiOutController {
      * */
     @RequestMapping("/soft/deleteSoftManagementRecord")
     @Transactional(rollbackFor = Exception.class)
-    public Map deleteSoftManagementRecord(@RequestParam("id")int id){
+    public Map deleteSoftManagementRecord(@RequestParam("id")int id,@RequestParam("softId")int softId){
         Map paramMap  = new HashMap();
         Map returnMap = new HashMap();
         paramMap.put("id",String.valueOf(id));
-        SoftManagement softManagement = softManagementService.getSoftVersion(id);
+        paramMap.put("softId",String.valueOf(softId));
+        SoftManagement softManagement = softManagementService.getSoftVersion(paramMap);
         if(null == softManagement){
             returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
             returnMap.put(CommomStatic.MESSAGE,"删除失败！版本不存在！");
@@ -213,14 +226,14 @@ public class ApiOutController {
             try{
                 softManagementService.deleteSoftManagementRecord(id);
                 FileUpload.deleteFile(CommomStatic.FILEPATH+softManagement.getFileName());
-                List<Integer> ids = new ArrayList<>();
+                /*List<Integer> ids = new ArrayList<>();
                 List<SoftManagementRecordDetails> matchMachineCodes = softManagement.getMatchMachineCodes();
                 matchMachineCodes.stream().forEach(matchMachineCode ->{
                     ids.add(matchMachineCode.getId());
                 });
                 if(ids.size()>0){
                     softManagementService.batchDeleteSoftManagementRecordDetails(ids);
-                }
+                }*/
                 returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
                 returnMap.put(CommomStatic.MESSAGE,"删除成功！");
             }catch (Exception e){
@@ -239,20 +252,25 @@ public class ApiOutController {
      * 校验最新版本
      * */
     @RequestMapping("/soft/validateLastVersion")
-    public Map validateLastVersion(@RequestParam("machineCode")String machineCode,@RequestParam("softName")String softName){
+    public Map validateLastVersion(@RequestParam("softId")String softId,@RequestParam("version")String version){
         Map paramMap  = new HashMap();
         Map returnMap = new HashMap();
         paramMap.put("validate","1");
-        paramMap.put("machineCode",machineCode);
-        paramMap.put("validateSoftName",softName);
+        paramMap.put("softId",softId);
+        paramMap.put("version",version);
         List<SoftVo> softs = softManagementService.getSoftManagement(paramMap);
         if(softs.size()>0){
-            SoftVo soft = softs.get(0);
-            Map tem = new HashMap();
-            tem.put("versionId",soft.getSoftVersions().get(0).getId());
-            tem.put("lastVersion",soft.getSoftVersions().get(0).getLastVersion());
+            List<Map> mapList = new ArrayList<>();
+            for(SoftVo soft:softs){
+                Map tem = new HashMap();
+                tem.put("versionId",soft.getSoftVersions().get(0).getId());
+                tem.put("version",soft.getSoftVersions().get(0).getLastVersion());
+                tem.put("remark",soft.getSoftVersions().get(0).getSoftRemark());
+                mapList.add(tem);
+            }
+
             returnMap.put(CommomStatic.STATUS,CommomStatic.SUCCESS);
-            returnMap.put(CommomStatic.MESSAGE,tem);
+            returnMap.put(CommomStatic.MESSAGE,mapList);
         }else{
             returnMap.put(CommomStatic.STATUS,CommomStatic.FAIL);
             returnMap.put(CommomStatic.MESSAGE,"暂无版本信息！");
@@ -277,8 +295,11 @@ public class ApiOutController {
      * 下载软件
      * */
     @RequestMapping("/soft/downLoadSoft")
-    public void downLoadSoft(@RequestParam("versionId")int versionId, HttpServletResponse response,HttpServletRequest request){
-        SoftManagement softManagement = softManagementService.getSoftVersion(versionId);
+    public void downLoadSoft(@RequestParam("softId")int softId,@RequestParam("versionId")int versionId, HttpServletResponse response,HttpServletRequest request){
+        Map paramMap = new HashMap();
+        paramMap.put("softId",softId);
+        paramMap.put("id",versionId);
+        SoftManagement softManagement = softManagementService.getSoftVersion(paramMap);
         if(null != softManagement){
             try{
                 String fileName = softManagement.getFileName();

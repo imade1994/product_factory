@@ -35,7 +35,7 @@ import static com.hlxd.microcloud.util.CommonUtil.*;
  * @COMPANY HLXD
  * @PROJECT product_factory
  */
-@Component
+//@Component
 //@RestController("/api/manual")
 @Slf4j
 public class ScheduleConfig {

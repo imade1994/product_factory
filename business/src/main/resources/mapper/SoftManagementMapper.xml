@@ -18,13 +18,11 @@
             <result column="v_soft_upload_date" property="softUploadTime" />
             <result column="v_file_name" property="filePath" />
             <result column="v_file_path" property="fileName" />
-            <collection  property="matchMachineCodes" ofType="com.hlxd.microcloud.vo.SoftManagementRecordDetails">
-                <result column="m_match_machine_code" property="machineCode" />
-                <result column="m_match_machine_name" property="machineName" />
-                <result column="m_machine_model" property="machineModel" />
-                <result column="m_id" property="id" />
-                <result column="m_version_id" property="versionId" />
-            </collection>
+        </collection>
+        <collection  property="matchMachineModel" ofType="com.hlxd.microcloud.vo.SoftManagementRecordDetails">
+            <result column="m_match_machine_model" property="machineModel" />
+            <result column="m_id" property="id" />
+            <result column="m_soft_id" property="softId" />
         </collection>
     </resultMap>
 
@@ -37,16 +35,12 @@
         <result column="soft_upload_date" property="softUploadTime" />
         <result column="file_name" property="filePath" />
         <result column="file_path" property="fileName" />
-        <collection  property="matchMachineCodes" ofType="com.hlxd.microcloud.vo.SoftManagementRecordDetails">
-            <result column="m_match_machine_code" property="machineCode" />
-            <result column="m_match_machine_name" property="machineName" />
-            <result column="m_machine_model" property="machineModel" />
-            <result column="m_id" property="id" />
-            <result column="m_version_id" property="versionId" />
-        </collection>
     </resultMap>
 
     <insert id="insertSoft" parameterType="com.hlxd.microcloud.vo.SoftVo">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            select max(id)  from t_hl_soft
+        </selectKey>
         insert into t_hl_soft
         (soft_name,match_machine_type,soft_remark)
         values(#{softName},#{matchMachineType},#{softRemark})
@@ -103,9 +97,9 @@
 
     <insert id="batchAddSoftManagementRecordDetails" >
         insert into t_hl_soft_match_machine
-        (version_id,match_machine_code)
+        (soft_Id,match_model)
         values
-        <foreach collection="addMachineCodes" item="item" index="index" separator=",">
+        <foreach collection="addMachineModels" item="item" index="index" separator=",">
             (#{softId},#{item})
         </foreach>
     </insert>
@@ -135,19 +129,15 @@
         thsm.soft_id as v_soft_id,
         thsm.file_path as v_file_path,
         thsmm.id as m_id,
-        thsmm.version_id as m_version_id,
-        thsmm.match_machine_code as m_match_machine_code,
-        thbm.machine_name as m_match_machine_name,
-        thbm.machine_model as m_machine_model
+        thsmm.soft_id as m_soft_id,
+        thsmm.match_model as m_match_machine_model
         from t_hl_soft ths
         left join t_hl_soft_management thsm
         on ths.id = thsm.soft_id
         left join t_hl_soft_match_machine thsmm
-        on thsm.id = thsmm.version_id
+        on ths.id = thsmm.soft_id
         left join t_hl_system_dict thsd
         on ths.match_machine_type = thsd.value and thsd.parent_id = 1
-        left join t_hl_base_machine thbm
-        on thsmm.match_machine_code = thbm.machine_code
         <trim prefix="where" prefixOverrides="AND" >
             <if test="null != id">
                 AND ths.id = #{id}
@@ -167,16 +157,16 @@
             <if test="null != lastVersion">
                 AND thsm.last_version = #{lastVersion}
             </if>
-            <if test="null != machineCode">
-                AND thsmm.match_machine_code= #{machineCode}
+            <if test="null != machineModel">
+                AND thsmm.match_model= #{machineModel}
             </if>
             <if test="null != validate">
-                AND ORDER BY thsm.soft_upload_date desc limit 1
+                AND ORDER BY thsm.soft_upload_date
             </if>
         </trim>
     </select>
 
-    <select id="getSoftVersion" parameterType="java.lang.Integer" resultMap="versionMap">
+    <select id="getSoftVersion" parameterType="java.util.HashMap" resultMap="versionMap">
         select
         thsm.id as id,
         thsm.soft_name as softName,
@@ -185,18 +175,16 @@
         thsm.soft_upload_date as softUploadDate,
         thsm.file_name as fileName,
         thsm.soft_id as softId,
-        thsm.file_path as filePath,
-        thsmm.id as m_id,
-        thsmm.version_id as m_version_id,
-        thsmm.match_machine_code as m_match_machine_code,
-        thbm.machine_model as m_machine_model,
-        thbm.machine_name  as m_match_machine_name
+        thsm.file_path as filePath
         from t_hl_soft_management thsm
-        left join t_hl_soft_match_machine thsmm
-        on thsm.id = thsmm.version_id
-        left join t_hl_base_machine thbm
-        on thsmm.match_machine_code = thbm.machine_code
-        where thsm.id = #{id}
+        <trim prefix="where" prefixOverrides="AND">
+            <if test="null != softId">
+                AND thsm.soft_id = #{softId}
+            </if>
+            <if test="null != id">
+                AND thsm.id = #{id}
+            </if>
+        </trim>
     </select>
 
 

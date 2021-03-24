@@ -27,8 +27,8 @@ public class SoftManagementServiceImpl implements SoftManagementService {
 
 
     @Override
-    public void insertSoft(SoftVo soft) {
-         softManagementMapper.insertSoft(soft);
+    public int insertSoft(SoftVo soft) {
+         return softManagementMapper.insertSoft(soft);
     }
 
     @Override
@@ -42,8 +42,8 @@ public class SoftManagementServiceImpl implements SoftManagementService {
     }
 
     @Override
-    public SoftManagement getSoftVersion(int id) {
-        return softManagementMapper.getSoftVersion(id);
+    public SoftManagement getSoftVersion(Map map) {
+        return softManagementMapper.getSoftVersion(map);
     }
 
     @Override
